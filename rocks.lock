@@ -1,0 +1,14 @@
+# rocks.lock — the exact rocks this project runs, including transitive
+# dependencies. To regenerate: delete this file, run tools/setup.sh
+# (fresh resolve from the rockspec), review the diff, commit.
+busted 2.3.0-1
+dkjson 2.10-1
+lsqlite3 0.9.5-1
+lua_cliargs 3.0.2-1
+lua-term 0.8-1
+luafilesystem 1.9.0-1
+luassert 1.9.0-1
+luasystem 0.7.1-1
+mediator_lua 1.1.2-0
+penlight 1.15.0-1
+say 1.4.1-3

@@ -37,6 +37,23 @@ of post 0000. The walking skeleton — tick loop, event log, two toy
 civilizations, one market — is the next series of commits. Watching now
 means watching from the actual beginning, which is rather the point.
 
+## Building
+
+Nothing simulates yet, but the toolchain is real and pinned. On macOS:
+
+```sh
+brew install lua@5.4 sqlite   # Lua 5.4 exactly — see docs/adr/0001
+./tools/setup.sh
+```
+
+Everything lands inside the repo — a pinned LuaRocks in `.toolchain/`,
+dependencies at the exact versions in `rocks.lock` in `lua_modules/`, and
+`./lua` / `./luarocks` wrappers in the root — nothing global is touched.
+The script ends by running `tools/doctor.lua`, which checks the
+properties determinism leans on (the Lua 5.4 integer subtype, 64-bit
+width, wrapping overflow, lsqlite3, busted) and fails loudly otherwise.
+How and why the pin is enforced this way is `docs/adr/0002`.
+
 ## The bets
 
 Lua 5.4, because an economy simulation is mostly bookkeeping and Lua
