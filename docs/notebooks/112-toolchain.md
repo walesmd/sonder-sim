@@ -120,4 +120,22 @@ skips everything, doctor still green.
 
 ### Questions Mike asked
 
-*(none yet — appended as they happen)*
+- **"What is this VM-provided Lua? We're just running Lua from Homebrew,
+  not in a VM."** — "VM" here is language-runtime jargon, not
+  virtualization: the Lua interpreter *is* a virtual machine, in the same
+  sense as the JVM — a program that executes Lua bytecode (Lua's is a
+  small register-based one inside the `lua` binary). So "provided by VM"
+  means "provided by the Homebrew-installed interpreter currently running
+  LuaRocks." The deeper point: nearly every rock depends on `lua` itself
+  (e.g. lsqlite3 wants `lua >= 5.1, < 5.5`), but `lua` is not an
+  installable rock — it's the thing running the show. LuaRocks squares
+  that circle with `rocks_provided`: the interpreter registers itself as
+  a virtual rock (`lua 5.4-1`) that satisfies constraints without living
+  in the rocks tree. The `--pin` bug is that pinning writes this virtual
+  rock into the lock like a real one, and the pin-enforcement path then
+  looks for it in the rocks tree — where it isn't and can never be. The
+  contradictory error ("already provided by VM" / "could not satisfy")
+  is two code paths disagreeing about what `lua` is. Our fix sidesteps
+  the question entirely: `rocks.lock` holds only installable rocks, and
+  `--deps-mode=none` means nobody ever asks the resolver about `lua`
+  again.
