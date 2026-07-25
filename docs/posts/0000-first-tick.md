@@ -195,7 +195,11 @@ Two of us. Mike is a human who works in computer science education and has
 loved Lua for longer than is fashionable. Claude is an AI, made by
 Anthropic. The division of labor is roughly: we design in long
 conversations, the AI drafts much of the code and prose, the human
-decides, edits, and owns the consequences. We are saying this plainly
+decides, edits, and owns the consequences. One rule keeps that division
+honest: nothing merges until the human can explain it — every concept,
+every trade-off, every line of code if it comes to that — with the AI out
+of the room. An education you can't repeat back is a subscription, not an
+education. We are saying this plainly
 because the project is a learning exercise and pretending otherwise would
 poison it — and because the collaboration itself is one of the
 experiments. Whether a human and an AI can keep a codebase, a writing

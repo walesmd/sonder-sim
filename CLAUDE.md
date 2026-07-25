@@ -5,8 +5,10 @@ distinct proclivities trading, scheming, allying, and warring across a
 procedurally grown galaxy, observed by a player who is something between a
 god and a subscriber. It is an educational project first — every mechanic
 ships with a written lesson — and a decades-horizon labor of love with no
-1.0, no roadmap, and no destination. We are doing this for the sake of
-learning and sharing. We are never in a rush.
+1.0, no roadmap, and no destination. A CS concept is introduced only when
+the work in front of us requires it; nothing gets taught in the abstract.
+We are doing this for the sake of learning and sharing. We are never in a
+rush.
 
 The name is John Koenig's coined word (*The Dictionary of Obscure
 Sorrows*): the realization that each random passerby is living a life as
@@ -64,6 +66,23 @@ are jointly owned and published.
   wild → the design → the CS underneath → what we got wrong.
 - Each published post pins a git tag `post/NNNN` at the exact code it
   describes. Posts live in the repo, next to the code they explain.
+- A post is not done until Mike can explain, unaided: every concept in it,
+  the decision-making that led to it, the pros and cons of what we chose,
+  and what the code does — line by line if need be. Mike does not go along
+  with what Claude provides; nothing merges that Mike can't defend without
+  Claude in the room.
+- Feature work follows a fixed rhythm, one branch per card: branch → build
+  shared understanding of the card → implement → Mike interrogates the
+  code until he owns it → write the post together → pull request.
+- Branch names always start with the Fizzy card number, then a short
+  summary of the card: card 112 → `112-toolchain`. The branch's notebook
+  uses the same name: `docs/notebooks/112-toolchain.md`.
+- Every feature branch keeps a notebook in `docs/notebooks/` (one file per
+  branch, named after it): decisions made, alternatives rejected, questions
+  Mike asked and the answers that stuck. Claude reads it at the start of
+  every session on that branch and appends as the work happens; the post is
+  distilled from it, and it merges with the PR so the raw back-and-forth
+  stays part of the record.
 - Architecture decisions get a short record in `docs/adr/`.
 - Schemas harden from the edges inward: events and persistence are strict
   from day one; interior entity tables start loose and tighten when the
@@ -90,13 +109,15 @@ are jointly owned and published.
 | apocrypha | intervention branches forked from canon |
 | synopsis | cross-version divergence report: forensic mode finds the first fork (binary search over checkpoint hashes); climate mode compares distributions across many seeds |
 | seed report | a community field report: "go look at seed N" plus what you saw |
+| notebook | per-branch working log of what we learned building a feature; the post's raw material |
 
 Perspective hierarchy (zoom levels): universe → civilization → (later)
 notable figures, crystallized from aggregates on demand.
 
 ## Tech
 
-- Lua 5.4 (the integer subtype is load-bearing for determinism).
+- Lua 5.4, deliberately not 5.5 (the integer subtype is load-bearing for
+  determinism; the staying-put decision is `docs/adr/0001`).
 - lsqlite3 for the annals; busted for tests when tests arrive; LuaRocks
   for dependencies.
 - License: MIT (code), CC BY 4.0 (posts and docs).
