@@ -1,0 +1,75 @@
+# Sonder
+
+> **sonder** *(n.)* — the realization that each random passerby is living a
+> life as vivid and complex as your own.
+> — John Koenig, *The Dictionary of Obscure Sorrows*
+
+Sonder is a universe simulator you read. Many simulated civilizations —
+each with its own temperament, grudges, and economic instincts — trade,
+scheme, ally, and go to war across a procedurally grown galaxy. Nobody
+plays it in the usual sense. The simulation runs whether or not you watch,
+history accumulates whether or not you read it, and the role on offer is
+something between a god and a subscriber.
+
+Two ideas make it worth building. First, no civilization in Sonder acts on
+the truth: each acts on what it *knows*, which is partial, late, and bent
+by culture — so the same war exists as two contradictory stories in two
+sets of records, and somewhere on the rim a small civilization that has
+never heard of either empire records a good harvest and some troubling
+lights in the sky. Second, everything is deterministic: a seed is a
+universe, the same seed is the same universe forever, and divine
+interventions are just recorded inputs. Histories here are shareable,
+checkable, and forkable.
+
+It is also, deliberately, a learning project. Every mechanic ships with an
+essay on the design and the computer science underneath it — priority
+queues arrive because fleets need arrival times, distributed-systems
+theory arrives because light is slow and news travels on merchant ships.
+Posts live in [`docs/posts/`](docs/posts/), each one pinned to a git tag
+pointing at the exact code it describes, so you can stand at any moment of
+this project's history and look around.
+
+## Status
+
+**Pre-0.1 — nothing runs yet.** The repository currently holds the
+project's constitution ([`CLAUDE.md`](CLAUDE.md)), this file, and a draft
+of post 0000. The walking skeleton — tick loop, event log, two toy
+civilizations, one market — is the next series of commits. Watching now
+means watching from the actual beginning, which is rather the point.
+
+## The bets
+
+Lua 5.4, because an economy simulation is mostly bookkeeping and Lua
+tables are unreasonably good at bookkeeping (also: joy, which on a
+decades-long project is a load-bearing engineering criterion).
+Determinism as the one non-negotiable law. Event sourcing, because in a
+game you mostly read, the record *is* the product — the log lives in
+SQLite, where SQL becomes a telescope. Beliefs over truth in every agent
+decision. A headless core that never knows whether anyone is watching.
+
+The arguments for each live in [`CLAUDE.md`](CLAUDE.md) and get unpacked
+post by post.
+
+## Following along
+
+There is no release cadence and no roadmap to 1.0. This is a labor of
+love with no end in sight, built slowly in public for the sake of
+learning and sharing. Read the posts if you want the lessons, star the
+repo if you want the universe, or neither — it runs regardless.
+
+Once v0.1 exists, seeds become the local currency: same seed, same
+universe, so "go look at seed 40412" is a complete story recommendation.
+Field reports from universes behaving badly will be the most welcome kind
+of issue.
+
+## Who
+
+Mike Wales (human — decides, edits, owns the consequences) and Claude
+(Anthropic's AI — drafts much of the code and prose), collaborating in
+long conversations. Whether a human and an AI can keep a codebase, a
+writing voice, and a shared universe coherent over decades is one of the
+experiments.
+
+## License
+
+Code: [MIT](LICENSE). Posts and documentation: CC BY 4.0.

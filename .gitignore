@@ -1,0 +1,20 @@
+# Simulation output — universes are reproducible from (version, seed,
+# intervention log), so they are never committed. Share coordinates, not worlds.
+out/
+*.db
+*.sqlite
+*.sqlite3
+
+# Lua / LuaRocks local trees
+lua_modules/
+.luarocks/
+
+# Editor and OS noise
+.DS_Store
+*.swp
+.idea/
+.vscode/
+
+# Local secrets
+.fizzy.yaml
+.env
