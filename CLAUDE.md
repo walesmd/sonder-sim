@@ -127,16 +127,19 @@ notable figures, crystallized from aggregates on demand.
 
 ## Status
 
-**Pre-0.1. Nothing runs yet.** Next up — Session 1, the walking skeleton:
+**Pre-0.1. Session 1 — the walking skeleton — is underway.** Done:
+deterministic tick loop + named RNG streams (card 113, post 0001
+*Ticks & Determinism*); event bus + event vocabulary v1 + terminal
+chronicle, visibility stamped on every event (card 114, post 0002
+*The Event Log*). Next up:
 
-- deterministic tick loop + named RNG streams
-- event bus with a terminal chronicle
-- SQLite annals + provenance table
+- SQLite annals + provenance table (card 115)
+- rolling state hash + golden-master replay test (card 116)
+- pass-through belief store — the seam (card 117)
 - toy world: two civilizations with opposed proclivities (mercantile vs
   martial), one commodity, one market with naive price adjustment
-- visibility fields on events; pass-through belief store
-- first posts: 0001 *Ticks & Determinism*, 0002 *The Event Log*,
-  0003 *Truth & Belief (the seam)*
+  (card 118)
+- cut v0.1 and re-cut post 0000 (card 119)
 
 A draft of post 0000 (*First Tick*) is in `docs/posts/` — written before
 any code existed; its chronicle excerpt and install steps are aspirational

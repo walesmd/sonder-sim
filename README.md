@@ -31,15 +31,18 @@ this project's history and look around.
 
 ## Status
 
-**Pre-0.1 — nothing runs yet.** The repository currently holds the
-project's constitution ([`CLAUDE.md`](CLAUDE.md)), this file, and a draft
-of post 0000. The walking skeleton — tick loop, event log, two toy
-civilizations, one market — is the next series of commits. Watching now
-means watching from the actual beginning, which is rather the point.
+**Pre-0.1 — the walking skeleton is growing.** The heartbeat ticks
+(post 0001: a deterministic tick loop and named RNG streams) and
+history is written down (post 0002: the append-only event log, a
+strict event vocabulary, and a terminal chronicle that renders the
+feed and can answer *why* something happened). Still to come for v0.1:
+the SQLite annals with provenance, the belief-store seam, and two toy
+civilizations trading one commodity. Watching now means watching from
+the actual beginning, which is rather the point.
 
 ## Building
 
-Nothing simulates yet, but the toolchain is real and pinned. On macOS:
+The toolchain is real and pinned. On macOS:
 
 ```sh
 brew install lua@5.4 sqlite   # Lua 5.4 exactly — see docs/adr/0001
@@ -53,6 +56,18 @@ The script ends by running `tools/doctor.lua`, which checks the
 properties determinism leans on (the Lua 5.4 integer subtype, 64-bit
 width, wrapping overflow, lsqlite3, busted) and fails loudly otherwise.
 How and why the pin is enforced this way is `docs/adr/0002`.
+
+## Running
+
+```sh
+./lua src/main.lua --seed 1893 --ticks 10           # a universe, narrated
+./lua src/main.lua --seed 1893 --ticks 10 --why 21  # why did event 21 happen?
+./lua_modules/bin/busted                            # the spec suite
+```
+
+Same seed, same feed, on every machine — that is the whole promise so
+far. `--why` walks an event's cause links back to genesis, because
+every event in a Sonder universe cites what caused it.
 
 ## The bets
 
