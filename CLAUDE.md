@@ -61,9 +61,14 @@ are jointly owned and published.
 
 ## Working agreement
 
-- Every increment ships twice: working code AND a post in `docs/posts/`.
-  Post shape, in order: chronicle excerpt showing the new behavior in the
-  wild → the design → the CS underneath → what we got wrong.
+- Every increment ships twice: the work AND a post in `docs/posts/`.
+  The work is usually code, but not always — architecture, system
+  rules, and lore are engineering too (post 0003 shipped zero lines of
+  code and some of the project's most consequential decisions); the
+  post obligation stands either way. Post shape, in order: excerpt
+  showing the new thing in the wild (a chronicle excerpt when there's
+  code; the artifact itself when there isn't) → the design → the CS
+  underneath → what we got wrong.
 - Each published post pins a git tag `post/NNNN` at the exact code it
   describes. Posts live in the repo, next to the code they explain.
 - A post is not done until Mike can explain, unaided: every concept in it,
@@ -116,6 +121,7 @@ are jointly owned and published.
 | synopsis | cross-version divergence report: forensic mode finds the first fork (binary search over checkpoint hashes); climate mode compares distributions across many seeds |
 | seed report | a community field report: "go look at seed N" plus what you saw |
 | notebook | per-branch working log of what we learned building a feature; the post's raw material |
+| lore | authored stories and priors (`docs/lore/`); an eval suite, not a PRD — every system must be able to host these stories, and a mechanic that blocks one has failed a test (exceptions: bad test, or consciously retired — Mike's call, on the record) |
 
 Perspective hierarchy (zoom levels): universe → civilization → (later)
 notable figures, crystallized from aggregates on demand.
@@ -137,7 +143,9 @@ notable figures, crystallized from aggregates on demand.
 deterministic tick loop + named RNG streams (card 113, post 0001
 *Ticks & Determinism*); event bus + event vocabulary v1 + terminal
 chronicle, visibility stamped on every event (card 114, post 0002
-*The Event Log*). Next up:
+*The Event Log*); the lore shelf — world-building chartered as an
+eval suite, a floor not a ceiling (card 129, post 0003 *The Lore
+Shelf*). Next up:
 
 - SQLite annals + provenance table (card 115)
 - rolling state hash + golden-master replay test (card 116)
@@ -146,6 +154,7 @@ chronicle, visibility stamped on every event (card 114, post 0002
   martial), one commodity, one market with naive price adjustment
   (card 118)
 - cut v0.1 and re-cut post 0000 (card 119)
+- standing lore sessions — the road to thirty species (card 130)
 
 A draft of post 0000 (*First Tick*) is in `docs/posts/` — written before
 any code existed; its chronicle excerpt and install steps are aspirational
