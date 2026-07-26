@@ -11,8 +11,8 @@
 
 return {
    -- Bumped when the envelope or an existing kind's payload changes
-   -- shape; merely adding a kind doesn't bump it. Card 115 writes
-   -- this into every universe's provenance table.
+   -- shape; merely adding a kind doesn't bump it. The archive writes
+   -- this into every universe's provenance table (card 115).
    schema_version = 1,
 
    -- Who could, in principle, come to know of an event. Nothing
@@ -23,7 +23,8 @@ return {
    -- Payload fields are declared as an ordered array of {name, type}
    -- pairs — an array, so nothing that walks a payload ever needs
    -- pairs(). Types are "integer" or "string" only: flat, float-free,
-   -- and one bind away from a SQLite column when card 115 arrives.
+   -- and one bind away from a SQLite column (the archive holds them
+   -- to it, card 115).
    kinds = {
       ["universe.genesis"] = {
          doc = "a universe begins; the first row of every annals and "

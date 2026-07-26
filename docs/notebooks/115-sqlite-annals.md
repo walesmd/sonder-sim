@@ -207,3 +207,42 @@ the default and make the second run's error a feature.
   average drift across all of history, biggest muster, event counts
   by kind, and a recursive CTE that walks an event's cause chain back
   to genesis (SQL `--why`).
+
+## Session 2 (2026-07-26, same day) — review, the default flip, and
+## the post
+
+Mike reviewed and signed off; two things came out of review, one
+technical, one process.
+
+- **Decision (Mike): archive by default** — recorded up at Q10. The
+  done-when said "a run writes universe.db" and meant the bare run;
+  the opt-in flag was answering a question the card hadn't asked.
+  Goes in the post's wrong-ledger.
+- **Process bug (jointly owned): Claude committed before Mike
+  reviewed.** Editor new/modified highlights diff against HEAD, so
+  the commits erased exactly the markers Mike reads diffs with.
+  Standing rule from here on: **nothing is committed until Mike says
+  so** — build, test, report, stop. (Also in the post; also in
+  Claude's persistent memory so it survives sessions.)
+
+Drafted `docs/posts/0004-the-history-book.md`. Shape: 200-tick run
+excerpt (fingerprint `df4d5b9f9f01cc4f`, 401 events, provenance dump
+with `git_commit = 435c8d0` from a clean tree, and the recursive-CTE
+`why 9` reproducing post 0002's ladder from the file alone) → design
+(the archive as follower, law 4 doubling as the persistence seam;
+tick-boundary transactions; causes as rows; canonical JSON over
+dkjson because bytes are promises; RAISE(ABORT) triggers traveling
+inside the file; provenance at birth, the deliberate absences —
+config `{}`, no wall-clock byte, timestamp in the name only) → CS
+(ACID and what COMMIT actually buys, fsync and group commit, SQLite's
+WAL — logs all the way down, ours is just the one that's the product;
+recursive CTEs as fixpoint iteration, UNION as the visited set) →
+wrong-ledger (the flag designed backwards, `os.tmpname` pre-creating,
+byte-identical files we deliberately won't promise, the
+commit-before-review process bug).
+
+Docs sweep: README Running (default archive + browsing queries,
+done in session 1's follow-up) and Status (post 0004 added, SQLite
+annals moved out of "still ahead"); CLAUDE.md status (115 done, next
+up starts at 116); vocabulary.lua's two future-tense card-115
+comments retensed. Suite green after all of it (67 specs).
