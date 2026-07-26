@@ -31,14 +31,20 @@ this project's history and look around.
 
 ## Status
 
-**Pre-0.1 — the walking skeleton is growing.** The heartbeat ticks
-(post 0001: a deterministic tick loop and named RNG streams) and
-history is written down (post 0002: the append-only event log, a
-strict event vocabulary, and a terminal chronicle that renders the
-feed and can answer *why* something happened). Still to come for v0.1:
-the SQLite annals with provenance, the belief-store seam, and two toy
-civilizations trading one commodity. Watching now means watching from
-the actual beginning, which is rather the point.
+**Pre-0.1 — the heartbeat runs, and history is written down.** The
+walking skeleton has its first two pieces. A deterministic tick loop
+with a named RNG stream per subsystem, so adding a feature to the
+market never shifts a single draw in the war machine — post 0001,
+[*Ticks & Determinism*](docs/posts/0001-ticks-and-determinism.md)
+(tag `post/0001`). And the annals: an append-only event log with a
+strict vocabulary, where every event cites the events that caused it
+and a terminal chronicle renders the feed — and answers *why* — from
+the log alone — post 0002,
+[*The Event Log*](docs/posts/0002-the-event-log.md) (tag `post/0002`).
+Still ahead for the skeleton: the SQLite annals with provenance, the
+belief-store seam, and two toy civilizations trading one commodity.
+Watching now means watching from very nearly the beginning, which is
+rather the point.
 
 ## Building
 
