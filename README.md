@@ -43,10 +43,15 @@ strict vocabulary, where every event cites the events that caused it
 and a terminal chronicle renders the feed — and answers *why* — from
 the log alone — post 0002,
 [*The Event Log*](docs/posts/0002-the-event-log.md) (tag `post/0002`).
-Still ahead for the skeleton: the SQLite annals with provenance, the
-belief-store seam, and two toy civilizations trading one commodity.
-Watching now means watching from very nearly the beginning, which is
-rather the point.
+The universe also has its first authored inhabitants: three
+civilizations and a fifteen-type world library on the lore shelf,
+chartered as an eval suite — stories the engine must be able to host,
+never a spec of what it builds — post 0003,
+[*The Lore Shelf*](docs/posts/0003-the-lore-shelf.md) (tag
+`post/0003`). Still ahead for the skeleton: the SQLite annals with
+provenance, the belief-store seam, and two toy civilizations trading
+one commodity. Watching now means watching from very nearly the
+beginning, which is rather the point.
 
 ## Building
 
@@ -86,6 +91,8 @@ Determinism as the one non-negotiable law. Event sourcing, because in a
 game you mostly read, the record *is* the product — the log lives in
 SQLite, where SQL becomes a telescope. Beliefs over truth in every agent
 decision. A headless core that never knows whether anyone is watching.
+And authored lore as an eval suite: stories the systems must at least
+be able to host — a floor, never a ceiling.
 
 The arguments for each live in [`CLAUDE.md`](CLAUDE.md) and get unpacked
 post by post.

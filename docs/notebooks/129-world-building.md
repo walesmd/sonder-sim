@@ -212,6 +212,41 @@ collect conflicts, and evals sharpen fastest against real systems.
 Ongoing lore work (the road to thirty, commodities, naming) moves to
 a new standing card. Next up: back to technical cards (115).
 
+## Session 6 (2026-07-26) — the post, and the principle behind it
+
+Mike reversed the session-5 no-post proposal and asked for a draft:
+this card *does* ship a post. His reasoning, now written into the
+working agreement itself: we may have "technically" written no code,
+but we touched a lot of code-adjacent things — architectural
+decisions and work-process decisions that weren't easy and needed
+documenting. "Not all engineering work is writing code. Sometimes
+it's thinking about how you're going to write the code or how you're
+going to build the systems. What are the rules around the systems
+that you want to build?"
+
+Drafted `docs/posts/0003-the-lore-shelf.md`: the Kept as the excerpt
+(the artifact itself, since there's no chronicle to excerpt) → the
+bedtime conversation, the seven questions, the cast, the eval-not-
+PRD / floor-not-ceiling charter, the four schema commitments → CS
+(acceptance tests before the system exists; properties vs examples;
+Goodhart and benchmark overfitting; booleans/enums/constants as
+one-way doors) → what we got wrong (the accidental law of physics;
+the charter's framing sentences all being second drafts; the
+gap-list catching our bias toward wise gentle elders).
+
+Expanded at Mike's direction: the post now names the methodology
+head-on — **eval-based development, not PRD-based development**. A
+PRD defines what to include (the most a product needs to be; build
+the list, then stop); an eval is an example tested against the
+product (the least the engine is allowed to be, silent about where
+it stops). They fail in opposite directions: a missed PRD item cuts
+scope and ships; a missed eval means there is nothing to ship.
+
+Docs sweep for the amended scope: CLAUDE.md working-agreement bullet
+now says increments ship "the work AND a post" with the
+prose-is-engineering-too clause; CLAUDE.md status and README status
+gained card 129 / post 0003; README's bets gained lore-as-evals.
+
 ### Open threads for future lore sessions
 
 - 27 more species, gap-list first.
