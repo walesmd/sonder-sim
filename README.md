@@ -31,22 +31,20 @@ this project's history and look around.
 
 ## Status
 
-**Pre-0.1 — the heartbeat runs.** The walking skeleton has its first
-piece: a deterministic tick loop with a named RNG stream per subsystem,
-so adding a feature to the market never shifts a single draw in the war
-machine. Two placeholder subsystems tick along and the run ends in a
-fingerprint — same seed, same fingerprint, on every machine:
-
-```sh
-./lua src/main.lua --seed 1893 --ticks 10
-```
-
-The design, the CS underneath, and the seed-space arithmetic are in post
-0001, [*Ticks & Determinism*](docs/posts/0001-ticks-and-determinism.md)
-(tag `post/0001`). Still ahead for the skeleton: the event log, two toy
-civilizations with opposed proclivities, and one market. Watching now
-means watching from very nearly the beginning, which is rather the
-point.
+**Pre-0.1 — the heartbeat runs, and history is written down.** The
+walking skeleton has its first two pieces. A deterministic tick loop
+with a named RNG stream per subsystem, so adding a feature to the
+market never shifts a single draw in the war machine — post 0001,
+[*Ticks & Determinism*](docs/posts/0001-ticks-and-determinism.md)
+(tag `post/0001`). And the annals: an append-only event log with a
+strict vocabulary, where every event cites the events that caused it
+and a terminal chronicle renders the feed — and answers *why* — from
+the log alone — post 0002,
+[*The Event Log*](docs/posts/0002-the-event-log.md) (tag `post/0002`).
+Still ahead for the skeleton: the SQLite annals with provenance, the
+belief-store seam, and two toy civilizations trading one commodity.
+Watching now means watching from very nearly the beginning, which is
+rather the point.
 
 ## Building
 
@@ -64,6 +62,18 @@ The script ends by running `tools/doctor.lua`, which checks the
 properties determinism leans on (the Lua 5.4 integer subtype, 64-bit
 width, wrapping overflow, lsqlite3, busted) and fails loudly otherwise.
 How and why the pin is enforced this way is `docs/adr/0002`.
+
+## Running
+
+```sh
+./lua src/main.lua --seed 1893 --ticks 10           # a universe, narrated
+./lua src/main.lua --seed 1893 --ticks 10 --why 21  # why did event 21 happen?
+./lua_modules/bin/busted                            # the spec suite
+```
+
+Same seed, same feed, on every machine — that is the whole promise so
+far. `--why` walks an event's cause links back to genesis, because
+every event in a Sonder universe cites what caused it.
 
 ## The bets
 
