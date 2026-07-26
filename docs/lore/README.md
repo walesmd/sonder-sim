@@ -54,6 +54,10 @@ rules exist so no lore decision ever paints the code into a corner:
 - [`axes.md`](axes.md) — the seven questions every civilization must
   be able to answer, and how each would eventually be accounted for
   in infrastructure. Start here.
+- [`worlds.md`](worlds.md) — the world library: seven axes a world is
+  made of, and a fifteen-type field guide from Gardens to Graves.
+  Types are presets, not enums; habitability is a relation, not a
+  column.
 - [`civilizations/`](civilizations/) — deep profiles, one file per
   species. Current cast: [the Vess](civilizations/the-vess.md),
   [the Continuance](civilizations/the-continuance.md), and

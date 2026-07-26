@@ -85,6 +85,46 @@ cornering your simulator"), it can be written when the 30-species
 push happens and there's a fuller story to tell. Mike ratifies or
 overrules at review.
 
+## Session 3 (2026-07-26) — the world library
+
+Mike: "I imagine we'll need a library of types of planets that could
+either sustain or be utilized by civilizations?" — note the two roles
+in the question itself: *sustain* and *be utilized*. That split
+became the catalog's structure (cradles / footholds / quarries and
+graves) and one of its infrastructure findings ("originate" and
+"sustain" are different columns; Holdfasts prove it).
+
+`docs/lore/worlds.md`: seven world axes (energy budget, habitability
+envelope, signal medium, gravity/escape cost, endowment, hazard
+profile, stability horizon), each with an infrastructure account,
+then fifteen types. Decisions worth remembering:
+
+- **Types are presets, not enums.** The generator (125) composes
+  attributes; named types are recognizable clusters for lore and
+  chronicle prose. Hybrids legal by construction (canonical example:
+  a rogue with a live core is a reefworld with the lights off).
+- **Habitability is a relation, not a column.** No `habitable`
+  boolean, ever — it's a join between species needs and world
+  attributes. A Garden is paradise to a surface-dweller and noisy
+  dead rock with weather to the Vess.
+- **Endowments are finite integer ledgers.** Mining moves matter
+  from the world's account to somebody's hold — card 120's audit
+  extended into geology for free. Depletion is a balance hitting
+  zero, and it is history.
+- **Hazard profile = distribution over future event kinds** — the
+  world-side half of civilization question 7. Real hazards live on
+  the world; awareness lives in belief stores; tragedy is the gap.
+- **Artificial habitats deliberately excluded** — they're outputs of
+  civilizations (built entities), not world types the galaxy deals
+  out. The Fleet lives entirely in the excluded category, which is
+  why the boundary matters.
+- Cast homeworlds land in the catalog: the Instrument is a
+  reefworld, Marrow a sleetworld, the Elyr homeworld a curated
+  grave.
+- Gaps recorded: shared biospheres, living worlds (world-as-
+  civilization boundary case), and a wet-and-warm cradle skew to
+  either ratify as cosmology or fix on the road to thirty.
+
 ### Open threads for future lore sessions
 
 - 27 more species, gap-list first.
