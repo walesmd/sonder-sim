@@ -145,9 +145,10 @@ deterministic tick loop + named RNG streams (card 113, post 0001
 chronicle, visibility stamped on every event (card 114, post 0002
 *The Event Log*); the lore shelf — world-building chartered as an
 eval suite, a floor not a ceiling (card 129, post 0003 *The Lore
-Shelf*). Next up:
+Shelf*); SQLite annals + provenance table — every run archives to a
+universe file that is append-only by trigger and self-describing
+(card 115, post 0004 *The History Book*). Next up:
 
-- SQLite annals + provenance table (card 115)
 - rolling state hash + golden-master replay test (card 116)
 - pass-through belief store — the seam (card 117)
 - toy world: two civilizations with opposed proclivities (mercantile vs

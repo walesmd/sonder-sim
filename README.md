@@ -48,9 +48,14 @@ civilizations and a fifteen-type world library on the lore shelf,
 chartered as an eval suite — stories the engine must be able to host,
 never a spec of what it builds — post 0003,
 [*The Lore Shelf*](docs/posts/0003-the-lore-shelf.md) (tag
-`post/0003`). Still ahead for the skeleton: the SQLite annals with
-provenance, the belief-store seam, and two toy civilizations trading
-one commodity. Watching now means watching from very nearly the
+`post/0003`). And history now survives the terminal: every run writes
+a SQLite universe file — the annals as rows, causes as a walkable
+graph, and a provenance table so the file can testify about its own
+origins — post 0004,
+[*The History Book*](docs/posts/0004-the-history-book.md) (tag
+`post/0004`). Still ahead for the skeleton: the rolling state hash,
+the belief-store seam, and two toy civilizations trading one
+commodity. Watching now means watching from very nearly the
 beginning, which is rather the point.
 
 ## Building
@@ -81,6 +86,16 @@ How and why the pin is enforced this way is `docs/adr/0002`.
 Same seed, same feed, on every machine — that is the whole promise so
 far. `--why` walks an event's cause links back to genesis, because
 every event in a Sonder universe cites what caused it.
+
+Every run is also written down: a fresh SQLite universe file lands in
+`out/` (gitignored, uniquely named by time, seed, and engine version),
+or wherever `--db PATH` says, or nowhere with `--db none`. The save
+file is a database and the database is a history book — browse it:
+
+```sh
+sqlite3 out/universe-*.db "SELECT key, value FROM provenance"
+sqlite3 out/universe-*.db "SELECT kind, count(*) FROM annals GROUP BY kind"
+```
 
 ## The bets
 
