@@ -5,14 +5,20 @@
 --
 --   ./lua src/main.lua --seed 1893 --ticks 10
 --   ./lua src/main.lua --seed 1893 --ticks 10 --why 21
+--   ./lua src/main.lua --seed 1893 --ticks 10 --db universe.db
 --
 -- Same seed, same feed, on every machine. --why N walks event N's
--- cause links back to genesis.
+-- cause links back to genesis. --db PATH archives the run into a
+-- fresh SQLite universe file (and refuses to overwrite one).
 
 package.path = "src/?.lua;" .. package.path
 
 local Universe = require "sonder.universe"
 local Chronicle = require "sonder.chronicle"
+local Archive = require "sonder.archive"
+
+-- Matches sonder-dev-1.rockspec; versions get real at v0.1 (card 119).
+local ENGINE_VERSION = "dev-1"
 
 local function parse_args(argv)
    local opts = { seed = 1893, ticks = 10 }
@@ -27,6 +33,13 @@ local function parse_args(argv)
          end
          opts[flag:sub(3)] = n
          i = i + 2
+      elseif flag == "--db" then
+         if type(value) ~= "string" or #value == 0 then
+            io.stderr:write("--db wants a path\n")
+            os.exit(1)
+         end
+         opts.db = value
+         i = i + 2
       else
          io.stderr:write(("unknown flag %q\n"):format(tostring(flag)))
          os.exit(1)
@@ -35,8 +48,37 @@ local function parse_args(argv)
    return opts
 end
 
+-- The host facts provenance demands and the sim must never reach for:
+-- shelling out is legal here, on the viewer side of the law-4 line,
+-- and only when an archive actually wants them.
+local function git_commit()
+   local pipe = io.popen("git describe --always --dirty 2>/dev/null")
+   if not pipe then
+      return "unknown"
+   end
+   local described = pipe:read("l")
+   pipe:close()
+   return (described and #described > 0) and described or "unknown"
+end
+
 local opts = parse_args(arg)
 local u = Universe.new(opts.seed)
+
+local archive
+if opts.db then
+   local ok, created = pcall(Archive.create, opts.db, u.annals, {
+      engine_version = ENGINE_VERSION,
+      git_commit = git_commit(),
+      seed = u.seed,
+      config = "{}", -- honestly: there is no config yet (card 118)
+   })
+   if not ok then
+      io.stderr:write(tostring(created) .. "\n")
+      os.exit(1)
+   end
+   archive = created
+   archive:sync() -- genesis, at the tick-0 boundary
+end
 
 -- Placeholder systems, standing where the market and the war machine
 -- will stand (card 118). Instead of muttering into locals they now
@@ -90,8 +132,16 @@ render() -- genesis is already in the annals
 for _ = 1, opts.ticks do
    u:step()
    render()
+   if archive then
+      archive:sync() -- the durability quantum is the tick
+   end
 end
 print(("fingerprint %016x"):format(fingerprint))
+
+if archive then
+   archive:close()
+   print(("annals archived to %s (%d events)"):format(opts.db, u.annals:len()))
+end
 
 -- The annals records not just what happened but why. Walk the cause
 -- links from event N down to the event that needs no cause.
