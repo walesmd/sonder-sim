@@ -169,6 +169,36 @@ information. Sonder's cosmology is not obliged to agree, and by
 writing no mechanism we haven't yet had to decide. If a mechanism
 ever becomes a mechanic, that decision becomes a post.
 
+## Session 5 (2026-07-26) — the shelf is an eval suite
+
+Mike, defining how lore is to be treated (and reversing this
+notebook's own session-2 framing of "priors, not promises — the
+mechanic wins"): this lore is **not definitive** of the worlds,
+species, and civilizations of Sonder's universes. It isn't a PRD.
+It's an **eval**: whatever systems we build must be able to support
+these stories, and we never build something that would block one.
+"These are almost the test cases for all of the systems we'll be
+building."
+
+The presumption therefore flips. Old: mechanic wins, lore revises.
+New: a mechanic that can't host a story has **failed a test** and
+gets redesigned. Two exception paths, both Mike's call, both on the
+record: a story was a bad test (it assumed something the four laws
+forbid — laws outrank the shelf), or a story is consciously retired
+as not worth its cost. Stories never just erode.
+
+Written into `lore/README.md` (new "eval suite, not a PRD" section)
+and the CLAUDE.md vocabulary row. Someday, "the engine can host
+every story on the shelf" may even be checkable in part — the lore
+conformance cousin of card 128 — but that's a thought, not a card,
+yet.
+
+Also decided: this card merges now rather than staying open as a
+standing branch — the shelf is useful, long-lived doc branches
+collect conflicts, and evals sharpen fastest against real systems.
+Ongoing lore work (the road to thirty, commodities, naming) moves to
+a new standing card. Next up: back to technical cards (115).
+
 ### Open threads for future lore sessions
 
 - 27 more species, gap-list first.

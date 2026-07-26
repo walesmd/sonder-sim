@@ -1,15 +1,35 @@
 # The lore shelf
 
 This directory holds the authored side of Sonder's universe: species,
-cosmology, and historical priors, written as prose long before any of
-it is code. Mechanics will arrive card by card and inherit these
+worlds, and historical priors, written as prose long before any of it
+is code. Mechanics will arrive card by card and inherit these
 documents instead of improvising flavor at implementation time.
 
-Lore is **priors, not promises**. When a mechanic arrives and the lore
-doesn't survive contact with it, the mechanic wins, the lore gets
-revised, and the conflict is recorded (in the branch notebook, and in
-the post if it's a good enough lesson). Nothing in this directory is
-canon until a simulation runs it.
+## What this shelf is — an eval suite, not a PRD
+
+Nothing here is definitive of the worlds, species, and civilizations
+that inhabit Sonder's universes. The world catalog is not a menu the
+generator picks from; the cast is not a roster every galaxy must
+contain. This shelf does not tell the engine what to build.
+
+It tells the engine what it must never make impossible. Each story
+here is a **test case** for every system we will ever build: the
+engine must be able to *host* these stories, and we never build
+something that structurally blocks one. If a proposed mechanic cannot
+support the Vess's centuries-long grudges, the Fleet's homeworld-
+shaped absence, or a shellsea civilization that has never seen a
+star, the mechanic has failed an eval — it gets redesigned, not the
+story.
+
+Two exception paths exist, and both go through Mike, on the record:
+a story can turn out to be a **bad test** (it quietly assumed
+something the four laws forbid — the laws outrank the shelf), or a
+story can be **consciously retired** because supporting it isn't
+worth what it costs. Either way the decision gets written down, in
+the notebook and in the story's file. A story never just erodes.
+
+Nothing here is canon until a simulation runs it — but everything
+here is binding on design until Mike retires it.
 
 ## The flexibility principles
 
