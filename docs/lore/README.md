@@ -63,11 +63,26 @@ rules exist so no lore decision ever paints the code into a corner:
   [the Continuance](civilizations/the-continuance.md), and
   [the Marrow Fleet](civilizations/the-marrow-fleet.md).
 
-## One physical constant the lore already obeys
+## The speed of truth (a default, not a law)
 
-Nothing travels faster than ships — not people, not cargo, and above
-all not *news*. This is the project's thesis wearing physics: every
-civilization acts on beliefs, and beliefs age in transit (card 122
-will make it literal). All lore is written against a sublight galaxy,
-and any species concept that quietly assumes instant communication is
-wrong by construction.
+Nothing in the current cast signals or travels faster than light, and
+every profile is written against a galaxy where news rides in hulls
+(card 122 will make that literal). But — Mike's call, reversing an
+earlier draft of this section — **no-FTL is not a cosmological
+constant.** Faster-than-light information is a possible
+*technological achievement*, the same category as stations and
+satellites: an output of civilizations, not a rule the universe
+enforces. The sketch that settled it: a civilization that truly
+masters the quantum might move information faster than light — and if
+a personality and its lived experience are data, then moving *that*
+into a waiting body across the universe is faster-than-light travel
+by any name that matters. We write no mechanism lore yet,
+deliberately; we simply decline to call the wall load-bearing.
+
+What *is* constant is law 3. However fast the channel, what arrives
+is still belief — received, aged, and culturally interpreted. A
+civilization that beats lightspeed does not beat epistemology; it
+gets fresher beliefs than its neighbors, which is power, and story.
+And the default remains ships: a species written with a faster
+channel must earn it in-fiction as technology, never assume it as
+baseline.

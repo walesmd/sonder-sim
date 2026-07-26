@@ -125,6 +125,50 @@ then fifteen types. Decisions worth remembering:
   civilization boundary case), and a wet-and-warm cradle skew to
   either ratify as cosmology or fix on the road to thirty.
 
+## Session 4 (2026-07-26) — FTL is a technology, not a wall
+
+Mike reversed session 2's "no-FTL constant," and the reasoning is
+the same category insight as the habitats exclusion: FTL is an
+*output of civilizations*, like a space station or a satellite — a
+technological achievement some civilization might reach — not a rule
+the universe enforces. His sketch: a civilization that truly
+embraces the quantum might move information faster than light via
+entanglement; and if a personality and its lived experiences are
+just data, downloading that data into another body across the
+universe *is* faster-than-light travel by any name that matters.
+No lore about mechanisms yet, deliberately. His words for the
+stance: "we just don't agree that it is the limitation of the
+universe."
+
+What changed: `lore/README.md`'s constant section became "The speed
+of truth (a default, not a law)"; the Fleet's two universal-sublight
+phrasings became "nothing has *yet* outrun a hull"; the Fleet gained
+the threat it always deserved (**the Whisper** — news that outruns
+hulls guts their margin, which was always in the truth, not the
+cargo); the Continuance's "No FTL" became a 31,000-year open
+research docket ("the Calibration taught them the difference
+between *verified* and *true*").
+
+What deliberately did not change: law 3 — however fast the channel,
+what arrives is belief, aged and interpreted; beating lightspeed
+beats latency, not epistemology. And card 122 is unaffected: it
+models the *default* channel (ships).
+
+**Infrastructure implication, the keeper:** information channel
+speed must be a **parameter, not a constant** — per-channel,
+eventually tech-gated per-civilization — everywhere the belief
+machinery touches it. Card 122 should be built with channel speed
+as data from day one; baking lightspeed into the propagation code
+would be exactly the cheap-now-brutal-later retrofit CLAUDE.md
+warns about. A civ with a faster channel then needs zero new
+mechanics — just a bigger number on its channel row.
+
+Caveat filed for honesty: real-world quantum mechanics (the
+no-communication theorem) holds that entanglement alone carries no
+information. Sonder's cosmology is not obliged to agree, and by
+writing no mechanism we haven't yet had to decide. If a mechanism
+ever becomes a mechanic, that decision becomes a post.
+
 ### Open threads for future lore sessions
 
 - 27 more species, gap-list first.

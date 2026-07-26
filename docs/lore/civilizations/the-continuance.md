@@ -97,8 +97,13 @@ System-scale engineering, no exotic physics: Kardashev I-and-change,
 crawling deliberately toward II. A Dyson swarm is underway and has
 been for millennia; it grows slowly because the Continuance refuses
 to disturb Elyr heritage sites, of which it has declared rather a
-lot. No FTL — they regard the lightspeed limit the way they regard
-all constraints: verified, filed, planned around.
+lot. No FTL — the lightspeed limit has so far survived their
+verification, which is the highest compliment they pay a constraint,
+and they plan around it accordingly. A standing research docket asks
+whether it is a law of the universe or merely of their engineering;
+it has been open for thirty-one thousand years and remains so. They
+would like it noted that the Calibration taught them the difference
+between *verified* and *true*.
 
 Societally, they are a **jurisprudence culture**. The original
 mandate — one sentence — plus forty thousand years of interpretation

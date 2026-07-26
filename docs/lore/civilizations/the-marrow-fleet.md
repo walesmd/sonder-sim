@@ -6,8 +6,8 @@ history is measured in hulls rather than years.*
 
 The Marrow Fleet owns nothing that stands still. They are a
 civilization of grown ships and tight-knit crews, the galaxy's
-merchant marine, couriers, and — in a universe where nothing travels
-faster than a hull — the physical infrastructure of *news itself*.
+merchant marine, couriers, and — in a galaxy where nothing has yet
+outrun a hull — the physical infrastructure of *news itself*.
 Every rumor that crosses the dark rides in a Fleet hold, priced,
 handled, and ever so slightly shaped by the handling. They left home
 before anyone alive can remember, they compost their dead into the
@@ -96,9 +96,9 @@ across forty millennia; both sides privately concede the other has a
 point; the trade continues throughout. It is the galaxy's oldest,
 politest, most profitable theological dispute.
 
-Their deepest export, though, is not cargo. In a sublight galaxy,
-**news travels on merchant ships**, which is to say: news travels on
-*them*. Every fact in every port's ledger about the wider galaxy
+Their deepest export, though, is not cargo. In a galaxy where news
+has never yet outrun a hull, **news travels on merchant ships**,
+which is to say: news travels on *them*. Every fact in every port's ledger about the wider galaxy
 arrived in a Fleet hold — sorted, priced, delivered with provenance
 of varying honesty, and unavoidably filtered through what some crew
 thought worth carrying. The Fleet does not lie, mostly. It selects.
@@ -181,6 +181,16 @@ when caught — reputation is the commons no crew may graze bare.
   favor-ledgers with every major power, and never, ever letting two
   hostile ports learn the same fact on the same day — is engineered
   around a war that must never be allowed to become thinkable.
+- **The Whisper.** The Fleet's quietest nightmare has no confirmed
+  instance: the rumor that somewhere, someone is learning to move
+  *information* without moving a hull — faster than any ship,
+  perhaps faster than light. No physics the Fleet owns says it is
+  possible; none says it isn't. A galaxy where news outruns hulls is
+  a galaxy where the Fleet still carries cargo but no longer carries
+  *truth* — and the margin was always in the truth. Fleet
+  intelligence pays better for entanglement-research gossip than for
+  any commodity it ships, and files each negative result the way the
+  Continuance files theirs: *nothing, so far.*
 - **The Kept.** Some stayed on Marrow, in deep shielded warrens,
   keeping the old reefs. Transmissions continued for generations
   after the Leaving — thinner, stranger, then stopped. That was a
