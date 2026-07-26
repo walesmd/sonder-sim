@@ -117,7 +117,10 @@ post by post.
 There is no release cadence and no roadmap to 1.0. This is a labor of
 love with no end in sight, built slowly in public for the sake of
 learning and sharing. Read the posts if you want the lessons, star the
-repo if you want the universe, or neither — it runs regardless.
+repo if you want the universe, or neither — it runs regardless. The
+cards being worked, and the queue behind them, are on the
+[public project board](https://app.fizzy.do/6237702/public/boards/A7cGuM6i11p3NH8av6LoWxeE)
+— as close to a roadmap as this project will ever have.
 
 Once v0.1 exists, seeds become the local currency: same seed, same
 universe, so "go look at seed 40412" is a complete story recommendation.
