@@ -82,6 +82,16 @@ Same seed, same feed, on every machine — that is the whole promise so
 far. `--why` walks an event's cause links back to genesis, because
 every event in a Sonder universe cites what caused it.
 
+Every run is also written down: a fresh SQLite universe file lands in
+`out/` (gitignored, uniquely named by time, seed, and engine version),
+or wherever `--db PATH` says, or nowhere with `--db none`. The save
+file is a database and the database is a history book — browse it:
+
+```sh
+sqlite3 out/universe-*.db "SELECT key, value FROM provenance"
+sqlite3 out/universe-*.db "SELECT kind, count(*) FROM annals GROUP BY kind"
+```
+
 ## The bets
 
 Lua 5.4, because an economy simulation is mostly bookkeeping and Lua

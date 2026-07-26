@@ -119,6 +119,25 @@ determinism demo that silently drops files feels wrong, and
 error. Flagged for Mike: if "a run" must mean "the bare run", flip
 the default and make the second run's error a feature.
 
+- **Decision (Mike): default-on.** Every bare run archives itself
+  into a uniquely named file in a gitignored directory — for
+  development, browsing the tables *is* the education. Uniqueness
+  scheme delegated to Claude. `--db PATH` still targets an exact
+  path; `--db none` opts out.
+- **The naming scheme (Claude's call, per the delegation):**
+  `out/universe-<yyyymmdd-hhmmss>-seed<seed>-<engine>.db`, with a
+  `-2`, `-3`… probe if the name is somehow taken (same second, same
+  seed) — the default path never trips Q9's refusal. Time leads so
+  `out/` sorts chronologically, like a lab notebook; seed and engine
+  version follow as a courtesy — the provenance table inside stays
+  the authority. `out/` was already gitignored ("share coordinates,
+  not worlds"), and `os.date` is fine *here*: the wall-clock ban
+  covers the sim, and main.lua is host-side, where io.popen and
+  os.exit already live. The timestamp touches only the *name* —
+  the bytes inside remain timestamp-free, so identical runs still
+  produce identical databases under different names. That
+  name-vs-bytes line is post material.
+
 ### What we built
 
 - `src/sonder/archive.lua` — the follower. `Archive.create(path,
