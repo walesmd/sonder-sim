@@ -116,6 +116,7 @@ are jointly owned and published.
 | synopsis | cross-version divergence report: forensic mode finds the first fork (binary search over checkpoint hashes); climate mode compares distributions across many seeds |
 | seed report | a community field report: "go look at seed N" plus what you saw |
 | notebook | per-branch working log of what we learned building a feature; the post's raw material |
+| lore | authored priors for the universe (species archetypes, cosmology, `docs/lore/`); priors, not promises — mechanics win conflicts and the lore revises |
 
 Perspective hierarchy (zoom levels): universe → civilization → (later)
 notable figures, crystallized from aggregates on demand.

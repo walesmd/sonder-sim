@@ -27,7 +27,9 @@ queues arrive because fleets need arrival times, distributed-systems
 theory arrives because light is slow and news travels on merchant ships.
 Posts live in [`docs/posts/`](docs/posts/), each one pinned to a git tag
 pointing at the exact code it describes, so you can stand at any moment of
-this project's history and look around.
+this project's history and look around. The universe's authored side —
+species, cosmology, historical priors, written long before they are
+code — lives in [`docs/lore/`](docs/lore/).
 
 ## Status
 
