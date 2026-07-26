@@ -81,6 +81,41 @@ doctor all green (Lua 5.4, integer subtype, 64-bit, wrapping overflow,
 lsqlite3 against SQLite 3.53.3, busted 2.3.0). Second run is idempotent:
 skips everything, doctor still green.
 
+### lsqlite3 0.9.7, revisited (Mike found the direct URL)
+
+Mike pointed at `https://lua.sqlite.org/home/zip/lsqlite3_v097.zip?uuid=v0.9.7`
+— version 0.9.7, tested with 5.5, designed for 5.4/5.3/5.2/5.1. Findings:
+
+- **The URL works.** And re-probing the 0.9.6 URL now returns 200 too —
+  the 503s earlier today were a transient outage, not a dead host. The
+  earlier notebook entry's "supply-chain lesson" stands, but the honest
+  framing is *intermittently available*, not *gone*: a fresh clone that
+  hits the outage window still fails.
+- **0.9.7 builds and runs clean on our toolchain.** Compiled against
+  lua@5.4 + Homebrew SQLite 3.53.3 into a scratch rocks tree (project
+  tree untouched, still matches rocks.lock). Smoke test passed:
+  `lversion()` 0.9.7, parameterised iterators (`db:urows(sql, params…)`,
+  new in 0.9.6), and `math.maxinteger` round-trips through a table as a
+  true Lua integer.
+- **What 0.9.7 adds over our pinned 0.9.5:** parameterised iterators,
+  doc fixes, CEROD support (commercial, irrelevant), the 5.5-era compat
+  work (irrelevant while ADR 0001 holds). Modest but real.
+- **The catch is pinning it.** 0.9.7 is not on luarocks.org (0.9.6 is
+  the latest rockspec there), so `./luarocks install lsqlite3 0.9.7`
+  cannot resolve. Using it means vendoring the upstream rockspec (it
+  ships one in the zip) and teaching setup.sh a special case: download
+  the zip from lua.sqlite.org, verify our own SHA-256
+  (`de690611e248daceebe85ffeca99899a0fbdac92b91bd7ede11dac66eb290a9a`),
+  unpack, `luarocks make`. ~15 extra lines. Trade-off: clone-time
+  dependence on a host with demonstrated outages, in exchange for
+  current upstream and a checksum *we* control (LuaRocks doesn't verify
+  source hashes at all — the vendored path is arguably more
+  supply-chain-honest than the status quo).
+
+Decision (Mike): stay pinned at 0.9.5 — luarocks.org-only installs, no
+special cases in setup.sh. 0.9.7 is a deliberate bump for a future card,
+ideally when it lands on luarocks.org.
+
 ### Post material
 
 - The brew-lua-5.5 trap: how a package manager's dependency edge can
