@@ -31,15 +31,26 @@ this project's history and look around.
 
 ## Status
 
-**Pre-0.1 — nothing runs yet.** The repository currently holds the
-project's constitution ([`CLAUDE.md`](CLAUDE.md)), this file, and a draft
-of post 0000. The walking skeleton — tick loop, event log, two toy
-civilizations, one market — is the next series of commits. Watching now
-means watching from the actual beginning, which is rather the point.
+**Pre-0.1 — the heartbeat runs.** The walking skeleton has its first
+piece: a deterministic tick loop with a named RNG stream per subsystem,
+so adding a feature to the market never shifts a single draw in the war
+machine. Two placeholder subsystems tick along and the run ends in a
+fingerprint — same seed, same fingerprint, on every machine:
+
+```sh
+./lua src/main.lua --seed 1893 --ticks 10
+```
+
+The design, the CS underneath, and the seed-space arithmetic are in post
+0001, [*Ticks & Determinism*](docs/posts/0001-ticks-and-determinism.md)
+(tag `post/0001`). Still ahead for the skeleton: the event log, two toy
+civilizations with opposed proclivities, and one market. Watching now
+means watching from very nearly the beginning, which is rather the
+point.
 
 ## Building
 
-Nothing simulates yet, but the toolchain is real and pinned. On macOS:
+The toolchain is real and pinned. On macOS:
 
 ```sh
 brew install lua@5.4 sqlite   # Lua 5.4 exactly — see docs/adr/0001
