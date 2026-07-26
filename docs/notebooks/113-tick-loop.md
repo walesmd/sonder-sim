@@ -162,3 +162,23 @@ independence test *is* law-2 as an executable claim.
   worktree). The main checkout got the true fresh-machine experience:
   one `./tools/setup.sh`, doctor all green. Card 112's done-when got
   re-proven by accident.
+
+## Session 2 (2026-07-25, same day) — the post
+
+Mike: draft the post; deep algorithm details matter less than the
+prose ("I trust the great math works of others when tested and
+verified"). Drafted `docs/posts/0001-ticks-and-determinism.md`:
+excerpt (real 1893 run + fingerprint) → design (tick loop, the
+market-declares-war shared-stream failure story, Mike's math.random
+question with the interface answer) → CS (counter+hash vs shift
+register+scrambler, warm-up zeros with real output, birthday
+fingerprint, wrap-around as the load-bearing pin, modulo bias,
+C oracle) → what we got wrong (post 0000's false pairs() prophecy,
+corrected plainly; the test that asserted the wrong promise; the
+worktree/toolchain face-palm).
+
+Two factual bugs caught while drafting: quoted the seed-1894
+fingerprint from a 3-tick run against a 10-tick claim (fingerprints
+depend on run length — obvious in hindsight, worth remembering when
+citing them); attributed the toolchain to post 0000 instead of card
+112.
