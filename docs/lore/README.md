@@ -21,12 +21,25 @@ shaped absence, or a shellsea civilization that has never seen a
 star, the mechanic has failed an eval — it gets redesigned, not the
 story.
 
+**And the shelf is a floor, not a ceiling.** Passing these evals is
+the minimum, never the target. We are not building systems to create
+these three civilizations; we are building systems that could *at
+least* create these three — and could also create things this shelf
+never imagined. A design that hosts exactly the current cast and
+nothing stranger has over-fit the evals and missed the point: the
+generator should eventually surprise the shelf's own authors, and
+when it does, the surprise isn't a violation — it's a candidate for
+the next eval.
+
 Two exception paths exist, and both go through Mike, on the record:
 a story can turn out to be a **bad test** (it quietly assumed
-something the four laws forbid — the laws outrank the shelf), or a
-story can be **consciously retired** because supporting it isn't
-worth what it costs. Either way the decision gets written down, in
-the notebook and in the story's file. A story never just erodes.
+something the four laws forbid — the laws outrank the shelf, though
+the laws themselves are revisable through Mike when a story makes a
+strong enough case; nothing in this project is beyond amendment,
+only beyond *silent* amendment), or a story can be **consciously
+retired** because supporting it isn't worth what it costs. Either
+way the decision gets written down, in the notebook and in the
+story's file. A story never just erodes.
 
 Nothing here is canon until a simulation runs it — but everything
 here is binding on design until Mike retires it.

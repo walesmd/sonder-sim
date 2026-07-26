@@ -193,6 +193,19 @@ every story on the shelf" may even be checkable in part — the lore
 conformance cousin of card 128 — but that's a thought, not a card,
 yet.
 
+Clarified by Mike, same day, and now in the charter: **the shelf is
+a floor, not a ceiling.** The systems we build shouldn't take only
+these evals into account — there is absolutely a world where the
+systems create use cases nobody considered. His words: "We're not
+building systems to create these three civilizations. We're building
+a system that could at least create these three civilizations, but
+it could also create something way more advanced." Over-fitting the
+evals is its own failure mode; a generator that can only produce the
+current cast has missed the point, and a genuine surprise out of the
+generator is a candidate for the next eval, not a violation. He also
+noted the four laws themselves are open to change — through him,
+loudly, never silently — if a story ever makes a strong enough case.
+
 Also decided: this card merges now rather than staying open as a
 standing branch — the shelf is useful, long-lived doc branches
 collect conflicts, and evals sharpen fastest against real systems.
