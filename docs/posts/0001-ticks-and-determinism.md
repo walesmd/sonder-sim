@@ -1,7 +1,7 @@
 # Ticks & Determinism
 
 *Post 0001 · code pinned at tag `post/0001` · Lua 5.4 · this post's
-universe: seed `1893` · ~9 min read*
+universe: seed `1893` · ~10 min read*
 
 ---
 
@@ -227,6 +227,37 @@ fix in `Stream:int(lo, hi)` is mask-and-reject: mask the draw down to
 the smallest power-of-two range covering the span, and if it still
 overshoots, throw it away and draw again. Every value in range ends up
 exactly equally likely, at an average cost of well under two draws.
+
+## Eighteen quintillion universes, give or take a coin flip
+
+A seed is a 64-bit integer, so there are 2^64 of them:
+**18,446,744,073,709,551,616** possible universes per version of the
+code. If that number looks oddly familiar, you may have played
+Minecraft — it names its worlds with 64-bit seeds too, so its catalog
+is exactly the same size, and its players are useful for scale.
+Minecraft has some 200 million active players, and a practiced one can
+beat a world in about half an hour. If every single one of them played
+around the clock — two worlds an hour, forty-eight a day, no sleep, no
+day jobs — the community would clear about 3.5 trillion worlds a year,
+and would need roughly **5.3 million years** to see them all. Nobody
+is running out of seeds.
+
+One honest asterisk: 2^64 is the number of *seeds*, which is an upper
+bound on the number of *distinct universes*, not a guarantee. Each
+stream's starting state comes from hashing `(seed, name)`, and a hash
+is not a bijection — two different seeds can, in principle, collide to
+the same market stream. By the birthday paradox you'd actually expect
+on the order of 2^63 seed pairs to share *some one* stream. But
+sharing one stream isn't sharing a universe: a duplicate pair would
+have to collide on **every** stream at once, and each name is an
+independent roll. With today's two streams, the expected number of
+fully-duplicate pairs across the entire seed space is about 0.5 — a
+coin flip that even one exists. At three subsystems it's effectively
+zero, and every system we add drives it further down. So: at most 2^64
+universes, and almost certainly exactly that — where "almost
+certainly" is a probability argument, not a proof, because we chose a
+hash rather than a bijection. We can afford to lose one universe to a
+coin flip.
 
 ## Trust, but verify against C
 
