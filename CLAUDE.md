@@ -73,7 +73,13 @@ are jointly owned and published.
   Claude in the room.
 - Feature work follows a fixed rhythm, one branch per card: branch → build
   shared understanding of the card → implement → Mike interrogates the
-  code until he owns it → write the post together → pull request.
+  code until he owns it → write the post together → docs sweep → pull
+  request.
+- The docs sweep, before every pull request: update the README (status,
+  install steps) and any other documentation the change makes stale, in
+  the same PR. Post tags are immutable once pushed, so documentation that
+  misses the PR stays wrong at that tag forever (learned the hard way
+  after card 113).
 - Branch names always start with the Fizzy card number, then a short
   summary of the card: card 112 → `112-toolchain`. The branch's notebook
   uses the same name: `docs/notebooks/112-toolchain.md`.
