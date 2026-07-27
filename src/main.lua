@@ -19,6 +19,8 @@ package.path = "src/?.lua;" .. package.path
 local Universe = require "sonder.universe"
 local Chronicle = require "sonder.chronicle"
 local Archive = require "sonder.archive"
+local Seal = require "sonder.seal"
+local fnv = require "sonder.fnv"
 
 -- Matches sonder-dev-1.rockspec; versions get real at v0.1 (card 119).
 local ENGINE_VERSION = "dev-1"
@@ -144,11 +146,9 @@ end)
 
 -- Fold the whole feed into one number, so two runs compare at a
 -- glance instead of line by line.
-local fingerprint = 0xcbf29ce484222325
+local fingerprint = fnv.offset
 local function fold(line)
-   for i = 1, #line do
-      fingerprint = (fingerprint ~ line:byte(i)) * 0x100000001b3
-   end
+   fingerprint = fnv.string(fingerprint, line)
 end
 
 local chronicle = Chronicle.new(u.annals)
@@ -169,7 +169,13 @@ for _ = 1, opts.ticks do
       archive:sync() -- the durability quantum is the tick
    end
 end
+-- Two digests, deliberately both. The fingerprint hashes the *view*
+-- (rendered feed bytes — reword a chronicle template and it changes).
+-- The seal hashes the *state* (canonical event bytes — it changes
+-- only if history itself does). "Same feed?" and "same universe?"
+-- are different questions.
 print(("fingerprint %016x"):format(fingerprint))
+print(("seal %s"):format(Seal.of(u.annals):hex()))
 
 if archive then
    archive:close()

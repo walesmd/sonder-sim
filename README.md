@@ -53,10 +53,14 @@ a SQLite universe file — the annals as rows, causes as a walkable
 graph, and a provenance table so the file can testify about its own
 origins — post 0004,
 [*The History Book*](docs/posts/0004-the-history-book.md) (tag
-`post/0004`). Still ahead for the skeleton: the rolling state hash,
-the belief-store seam, and two toy civilizations trading one
-commodity. Watching now means watching from very nearly the
-beginning, which is rather the point.
+`post/0004`). The history book carries a tamper seal: a rolling
+state hash checkpointed into every universe file, and the golden-
+master replay test every later mechanic lands inside — same seed,
+500 ticks, same sixteen hex digits on every machine — post 0005,
+[*The Tamper Seal*](docs/posts/0005-the-tamper-seal.md) (tag
+`post/0005`). Still ahead for the skeleton: the belief-store seam
+and two toy civilizations trading one commodity. Watching now means
+watching from very nearly the beginning, which is rather the point.
 
 ## Building
 
@@ -95,6 +99,7 @@ file is a database and the database is a history book — browse it:
 ```sh
 sqlite3 out/universe-*.db "SELECT key, value FROM provenance"
 sqlite3 out/universe-*.db "SELECT kind, count(*) FROM annals GROUP BY kind"
+sqlite3 out/universe-*.db "SELECT * FROM checkpoints"   # the seal trail
 ```
 
 ## The bets

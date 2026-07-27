@@ -10,6 +10,8 @@
 -- integers, which wrap on overflow exactly like the reference C's
 -- uint64_t. tests/golden/reference.c is the independent oracle.
 
+local fnv = require "sonder.fnv"
+
 local Stream = {}
 Stream.__index = Stream
 
@@ -26,18 +28,16 @@ local function splitmix64(s)
    return s, z ~ (z >> 31)
 end
 
--- FNV-1a 64 over the seed's 8 bytes (little-endian) then the name's
--- bytes. One running hash over both inputs, rather than two hashes
--- xored together, so seed and name can't cancel each other out.
+-- FNV-1a (see fnv.lua) over the seed's 8 bytes (little-endian) then
+-- the name's bytes. One running hash over both inputs, rather than
+-- two hashes xored together, so seed and name can't cancel each
+-- other out.
 local function stream_hash(seed, name)
-   local h = 0xcbf29ce484222325
+   local h = fnv.offset
    for i = 0, 56, 8 do
-      h = (h ~ ((seed >> i) & 0xff)) * 0x100000001b3
+      h = fnv.byte(h, (seed >> i) & 0xff)
    end
-   for i = 1, #name do
-      h = (h ~ name:byte(i)) * 0x100000001b3
-   end
-   return h
+   return fnv.string(h, name)
 end
 
 function Stream.from_state(s0, s1, s2, s3)

@@ -15,6 +15,8 @@
 -- polite — anyone with a sqlite3 shell gets told no by the file.
 
 local sqlite3 = require "lsqlite3"
+local canon = require "sonder.canon"
+local Seal = require "sonder.seal"
 
 local Archive = {}
 Archive.__index = Archive
@@ -50,6 +52,12 @@ CREATE TABLE causes (
    PRIMARY KEY (event_id, ord)
 ) WITHOUT ROWID;
 
+CREATE TABLE checkpoints (
+   tick   INTEGER PRIMARY KEY,  -- the completed tick this seals
+   events INTEGER NOT NULL,     -- how many events existed through it
+   hash   TEXT    NOT NULL      -- the rolling seal, sixteen hex digits
+) WITHOUT ROWID;
+
 CREATE TRIGGER annals_no_update BEFORE UPDATE ON annals
 BEGIN SELECT RAISE(ABORT, 'annals is append-only'); END;
 CREATE TRIGGER annals_no_delete BEFORE DELETE ON annals
@@ -58,31 +66,11 @@ CREATE TRIGGER causes_no_update BEFORE UPDATE ON causes
 BEGIN SELECT RAISE(ABORT, 'causes are append-only'); END;
 CREATE TRIGGER causes_no_delete BEFORE DELETE ON causes
 BEGIN SELECT RAISE(ABORT, 'causes are append-only'); END;
+CREATE TRIGGER checkpoints_no_update BEFORE UPDATE ON checkpoints
+BEGIN SELECT RAISE(ABORT, 'checkpoints are append-only'); END;
+CREATE TRIGGER checkpoints_no_delete BEFORE DELETE ON checkpoints
+BEGIN SELECT RAISE(ABORT, 'checkpoints are append-only'); END;
 ]]
-
--- Canonical JSON, by construction: payload fields are written in the
--- vocabulary's declaration order (the ordered arrays exist so nothing
--- ever walks pairs()), integers print as integers, and the escaping
--- below is total. Same payload, same bytes, every machine — a
--- dependency's key order is not ours to promise things about.
-local function json_string(s)
-   return '"' .. s:gsub('[%c\\"]', function(c)
-      if c == '"' then return '\\"' end
-      if c == '\\' then return '\\\\' end
-      return ("\\u%04x"):format(c:byte())
-   end) .. '"'
-end
-
-local function json_payload(declared, payload)
-   local parts = {}
-   for i = 1, #declared do
-      local name, want = declared[i][1], declared[i][2]
-      local value = payload[name]
-      parts[i] = json_string(name) .. ":"
-         .. (want == "integer" and ("%d"):format(value) or json_string(value))
-   end
-   return "{" .. table.concat(parts, ",") .. "}"
-end
 
 -- Provenance the caller must supply, because only the host knows:
 -- the archive sits with the viewers, where shells and git are legal,
@@ -99,12 +87,18 @@ end
 -- the given annals. Refuses to touch a path that already exists:
 -- overwriting a universe.db is burning a history book, and that is
 -- the user's explicit act, never our default.
-function Archive.create(path, annals, provenance)
+-- opts (all optional): checkpoint_every — write a seal checkpoint at
+-- every tick divisible by this (default 100).
+function Archive.create(path, annals, provenance, opts)
    assert(type(path) == "string" and #path > 0,
       "archive: path must be a non-empty string")
    assert(type(annals) == "table" and annals.get and annals.len,
       "archive: second argument must be an annals")
    assert(type(provenance) == "table", "archive: provenance must be a table")
+   opts = opts or {}
+   local checkpoint_every = opts.checkpoint_every or 100
+   assert(math.type(checkpoint_every) == "integer" and checkpoint_every >= 1,
+      "archive: checkpoint_every must be a positive integer")
    for i = 1, #REQUIRED do
       local key = REQUIRED[i]
       local value = provenance[key]
@@ -172,6 +166,12 @@ function Archive.create(path, annals, provenance)
       db = db,
       annals = annals,
       cursor = 0,
+      -- The rolling seal, folded as events are copied. last_tick is
+      -- the newest tick seen; a tick is only *complete* — sealable —
+      -- once an event from a later tick proves nothing more is coming.
+      seal = Seal.new(annals.vocabulary),
+      last_tick = 0,
+      checkpoint_every = checkpoint_every,
       insert_event = db:prepare([[
          INSERT INTO annals (id, tick, kind, location, magnitude, visibility, payload)
          VALUES (?, ?, ?, ?, ?, ?, ?)
@@ -179,11 +179,22 @@ function Archive.create(path, annals, provenance)
       insert_cause = db:prepare([[
          INSERT INTO causes (event_id, ord, cause_id) VALUES (?, ?, ?)
       ]]),
+      insert_checkpoint = db:prepare([[
+         INSERT INTO checkpoints (tick, events, hash) VALUES (?, ?, ?)
+      ]]),
    }, Archive)
-   if not self.insert_event or not self.insert_cause then
+   if not self.insert_event or not self.insert_cause or not self.insert_checkpoint then
       fail(db, "preparing event inserts")
    end
    return self
+end
+
+function Archive:write_checkpoint(tick, events)
+   self.insert_checkpoint:bind_values(tick, events, self.seal:hex())
+   if self.insert_checkpoint:step() ~= sqlite3.DONE then
+      error("archive: writing checkpoint at tick " .. tick .. ": " .. self.db:errmsg())
+   end
+   self.insert_checkpoint:reset()
 end
 
 -- Copy everything appended since the last sync, in one transaction:
@@ -203,9 +214,28 @@ function Archive:sync()
    while self.cursor < newest do
       self.cursor = self.cursor + 1
       local e = self.annals:get(self.cursor)
+
+      -- An event from a later tick completes every tick before it:
+      -- seal any newly completed tick divisible by N, with the hash
+      -- as it stood *before* this event — checkpoint T covers exactly
+      -- the events with tick <= T. Derivable purely from the log, so
+      -- any tool replaying this file computes identical rows.
+      if e.tick > self.last_tick then
+         local first = ((self.last_tick + self.checkpoint_every - 1)
+            // self.checkpoint_every) * self.checkpoint_every
+         if first == 0 then
+            first = self.checkpoint_every -- "every N ticks" starts at N
+         end
+         for t = first, e.tick - 1, self.checkpoint_every do
+            self:write_checkpoint(t, e.id - 1)
+         end
+         self.last_tick = e.tick
+      end
+      self.seal:fold(e)
+
       local declared = self.annals.vocabulary.kinds[e.kind].payload
       self.insert_event:bind_values(e.id, e.tick, e.kind, e.location,
-         e.magnitude, e.visibility, json_payload(declared, e.payload))
+         e.magnitude, e.visibility, canon.payload(declared, e.payload))
       if self.insert_event:step() ~= sqlite3.DONE then
          error("archive: writing event " .. e.id .. ": " .. self.db:errmsg())
       end
@@ -225,14 +255,22 @@ function Archive:sync()
    return appended
 end
 
--- Final sync, then let go of the file. The archive is spent: a new
--- run means a new database, never an append to an old one (lineage
--- across runs and versions is card 124's problem).
+-- Final sync, then let go of the file. Closing completes the last
+-- tick (nothing more is coming, by definition), so every file ends
+-- with a checkpoint sealing its entire history — the integrity
+-- check is recomputing the seal and comparing one row. A periodic
+-- row can't already exist at this tick: those are only written when
+-- a *later* tick's event arrives, and none did.
+-- The archive is spent afterward: a new run means a new database,
+-- never an append to an old one (lineage across runs and versions
+-- is card 124's problem).
 function Archive:close()
    assert(self.db, "archive: already closed")
    self:sync()
+   self:write_checkpoint(self.last_tick, self.cursor)
    self.insert_event:finalize()
    self.insert_cause:finalize()
+   self.insert_checkpoint:finalize()
    self.db:close()
    self.db = nil
 end
