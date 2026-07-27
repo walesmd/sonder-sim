@@ -28,6 +28,7 @@ can explain an algorithm better than a paragraph, the post carries one
 | [0004](0004-the-history-book/complete.md) | The History Book | `post/0004` |
 | [0005](0005-the-tamper-seal/complete.md) | The Tamper Seal | `post/0005` |
 | [0006](0006-truth-and-belief/complete.md) | Truth & Belief | `post/0006` |
+| [0008](0008-simple-and-complete/complete.md) | Simple & Complete *(draft, card 147)* | — |
 
 Tags pushed before card 147 point at the old single-file layout
 (`docs/posts/NNNN-slug.md`); posts are era artifacts, and the tags

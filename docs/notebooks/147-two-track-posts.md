@@ -146,9 +146,11 @@ say so plainly:
   stays honest regardless) or keep the old name with the glossary's
   "formerly" note carrying the bridge.
 
-- **The post for card 147 itself** (the working agreement's obligation
-  stands — this notebook is its raw material; write it together with
-  Mike, not solo).
+- **The post for card 147** is drafted (post 0008, *Simple &
+  Complete*, both tracks, `docs/posts/0008-simple-and-complete/`) and
+  awaits Mike's interrogation and edit — a draft, not a ratification;
+  note post 0007's absence from this branch means the 0008 index row
+  and numbering assume card 118's merge lands first.
 - Glossary/docs-sweep verification before PR.
 - The harness-vs-simulation tagging question, deliberately deferred to
   publicity (recorded in ADR 0003).
