@@ -237,3 +237,14 @@ when caught — reputation is the commons no crew may graze bare.
   We won't. But note the temptation — it means the *drama* is real.)
 - What happened to the Kept? (Deliberately unanswered. Possibly
   forever. Some doors are worth more closed.)
+
+## Eval notes
+
+The Marrow Fleet exists to prove the engine can host a civilization
+that stands nowhere: no homeworld, location a set of trajectories,
+wealth held as rights and reputation rather than mass. Systems with a
+mandatory homeworld, with location as a fixed point rather than
+something an entity can lack or carry, or with markets that can price
+only material goods, fail this entry. (When news learns to ride in
+hulls — card 122 — the Fleet is also the eval that the carrier can be
+*somebody*.)

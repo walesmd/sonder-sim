@@ -30,6 +30,7 @@ can explain an algorithm better than a paragraph, the post carries one
 | [0006](0006-truth-and-belief/complete.md) | Truth & Belief | `post/0006` |
 | [0007](0007-a-war-nobody-planned/complete.md) | A War Nobody Planned | `post/0007` |
 | [0008](0008-simple-and-complete/complete.md) | Simple & Complete | `post/0008` |
+| [0009](0009-what-failure-looks-like/complete.md) | What Failure Looks Like *(draft, card 148)* | — |
 
 Tags pushed before card 147 point at the old single-file layout
 (`docs/posts/NNNN-slug.md`); posts are era artifacts, and the tags

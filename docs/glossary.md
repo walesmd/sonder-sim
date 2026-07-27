@@ -178,3 +178,8 @@ adds it here, in the same PR.
 - **lore** — the authored stories and priors in `docs/lore/`; an
   eval suite the systems must be able to host — a floor, never a
   ceiling. (post 0003)
+- **eval note** — the closing section every shelf entry carries:
+  what the entry exists to prove, and what would fail it — an
+  expressibility claim for story-first entries, an emergence claim
+  for engine-first ones. Two to four sentences, one falsifiable
+  minimum, never a feature list. (posts 0007, 0009)
