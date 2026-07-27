@@ -113,6 +113,6 @@ describe("Seal", function()
             id = 1, tick = 0, kind = "future.mystery", location = "x",
             magnitude = 0, visibility = "public", payload = {}, causes = {},
          }
-      end, 'canon: unregistered kind "future.mystery"')
+      end, 'byteform: unregistered kind "future.mystery"')
    end)
 end)

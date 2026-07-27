@@ -15,7 +15,7 @@
 -- polite — anyone with a sqlite3 shell gets told no by the file.
 
 local sqlite3 = require "lsqlite3"
-local canon = require "sonder.canon"
+local byteform = require "sonder.byteform"
 local Seal = require "sonder.seal"
 
 local Archive = {}
@@ -235,7 +235,7 @@ function Archive:sync()
 
       local declared = self.annals.vocabulary.kinds[e.kind].payload
       self.insert_event:bind_values(e.id, e.tick, e.kind, e.location,
-         e.magnitude, e.visibility, canon.payload(declared, e.payload))
+         e.magnitude, e.visibility, byteform.payload(declared, e.payload))
       if self.insert_event:step() ~= sqlite3.DONE then
          error("archive: writing event " .. e.id .. ": " .. self.db:errmsg())
       end

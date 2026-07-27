@@ -159,6 +159,77 @@ events per tick in the toy).
   citations (`cause.tick == e.tick`) is written to be *broken* by
   122, on purpose, as the visible moment news stops being instant.
 
+## Session 2 (2026-07-26, same day) — review, the post, the sweep
+
+Mike reviewed and asked one framing question — what makes market a
+system and war a faction? — whose answer became the post's cleanest
+paragraph: a system is the world (ambient physics, entitled to
+truth, no perspective); a faction is somebody (asks "what do I
+know?" before acting, so it can be *wrong*). The test for every
+future actor: could it ever be wrong about something? Then it's a
+faction, because being wrong requires a gap between belief and
+truth, and only the store can hold that gap.
+
+**Process note (post material): the re-cut policy met reality and
+bent.** Post 0005 said golden constants get re-cut "in their own
+commit" — but a standalone re-cut commit either leaves the
+implementation commit with a red suite (poison for bisecting) or
+moves the constant before the behavior (a lie). Resolution: the
+re-cut rides the history-changing commit in its own loudly-labeled
+paragraph (see 3d6f1a4), and the spec carries the permanent re-cut
+ledger. Spirit kept ("never casually"), letter amended.
+
+Drafted `docs/posts/0006-truth-and-belief.md`. Shape: the 5-tick
+feed where the war office visibly tracks the market, plus the
+`--why 11` ladder crossing subsystems → design (structural vs
+polite, the argument list as the security model, the system/faction
+test, the push-based store that can't cheat, ignorance costing
+nothing, the courier as the seam) → CS (capability-based security
+and POLA, object-capability discipline, Feathers' seam definition,
+belief stores as per-agent projections whose arrival order becomes
+private chronology when couriers slow) → wrong-ledger (the two-bug
+prophecy paid in deliberate failures, the re-cut policy amendment,
+and the same-tick-news spec written to be broken by card 122 on
+purpose).
+
+Docs sweep: README status (post 0006 added, seam out of "still
+ahead"); CLAUDE.md status (117 done, next up 118/119/130);
+vocabulary.lua's visibility comment retensed (belief store exists,
+consumption waits for 122).
+
+### Round 3 — the glossary (riding this PR)
+
+Mike asked where the human-facing vocabulary lives — we'd defined
+annals/chronicle/viewer in conversation and posts, and this card
+minted *faction* without writing it down anywhere durable. Partial
+answer existed: CLAUDE.md's vocabulary table, frozen at session zero
+(nine terms; missing faction, system, belief store, courier, intent,
+seal, fingerprint, archive, checkpoint, golden master, and more).
+
+- **Decision (Mike): build `docs/glossary.md` as the canonical
+  home**, reader-facing, linked from the README; one-line
+  definitions, each pointing at the post that earned the term;
+  organized by theme (laws / log / agents / file / verification /
+  project artifacts).
+- CLAUDE.md's table replaced by a pointer plus the enforcement rule;
+  the lore charter's long form stays in `docs/lore/README.md`.
+- **The working agreement grew a docs-sweep item**: a card that
+  coins a reader-facing term adds it to the glossary in the same PR
+  — the rule that keeps this from lapsing again.
+- Noticed while writing it: **"canon" now collides** — canon the
+  untouched timeline (four laws) vs `canon.lua` the canonical byte
+  form (card 116). Options drafted for Mike: spelling, notation,
+  orthography, byteform, serialize.
+- **Decision (Mike): rename to `byteform.lua`** — says literally
+  what it is, no metaphor to unpack; *canon* is reserved for the
+  timeline sense. Renamed module + two requires + the error prefix
+  (`byteform: unregistered kind ...`) + the seal_spec expectation;
+  98 green after. Post 0005's prose keeps `canon.lua` forever at its
+  tag (posts are era artifacts); the glossary carries the "formerly"
+  bridge, and post 0006's wrong-ledger tells the story — our own
+  use-it-consistently rule should have caught the collision when
+  card 116 coined the module name.
+
 ### Proving "done"
 
 - The capability spec: a spy faction records everything it is

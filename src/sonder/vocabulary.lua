@@ -15,9 +15,11 @@ return {
    -- this into every universe's provenance table (card 115).
    schema_version = 1,
 
-   -- Who could, in principle, come to know of an event. Nothing
-   -- consumes this until the belief store (card 117); emitters stamp
-   -- it honestly anyway, because it can't be added to history later.
+   -- Who could, in principle, come to know of an event. The belief
+   -- store exists (card 117) but its pass-through courier is briefly
+   -- omniscient, so nothing consumes this until news travels at ship
+   -- speed (card 122); emitters stamp it honestly anyway, because it
+   -- can't be added to history later.
    visibilities = { "public", "regional", "secret" },
 
    -- Payload fields are declared as an ordered array of {name, type}
