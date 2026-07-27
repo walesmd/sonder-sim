@@ -4,83 +4,40 @@
 
 local toy = require "support.toy"
 local Chronicle = require "sonder.chronicle"
+local Audit = require "sonder.audit"
 
--- The independent auditor: fold the entire annals into per-civ books,
--- trusting nothing but founding events and the arithmetic of trades,
--- raids, harvests, and meals. This is card 120's double-entry audit
--- in miniature, and it must agree with every self-reported tally —
--- a civ whose beliefs drift from the ledger is either lying or
--- misinformed, and with a pass-through courier it can be neither.
-local function audit(annals)
-   local books = {}
-   local minted, burned_total = 0, 0
-   for id = 1, annals:len() do
-      local e = annals:get(id)
-      local p = e.payload
-      if e.kind == "civ.founded" then
-         books[p.name] = { grain = p.grain, cents = p.cents, home = e.location }
-         minted = minted + p.cents
-      elseif e.kind == "civ.tally" then
-         local mine
-         for _, b in pairs(books) do
-            if b.home == e.location then
-               mine = b
-            end
-         end
-         mine.grain = mine.grain + p.harvested - p.eaten
-         assert(mine.grain == p.stock, ("tally at event %d self-reports "
-            .. "%d sacks; the audit says %d"):format(id, p.stock, mine.grain))
-         assert(mine.cents == p.cents, ("tally at event %d self-reports "
-            .. "%d cents; the audit says %d"):format(id, p.cents, mine.cents))
-      elseif e.kind == "market.trade" then
-         assert(p.total == p.units * p.price, "trade total is not units × price")
-         local buyer, seller = books[p.buyer], books[p.seller]
-         buyer.grain = buyer.grain + p.units
-         buyer.cents = buyer.cents - p.total
-         seller.grain = seller.grain - p.units
-         seller.cents = seller.cents + p.total
-      elseif e.kind == "war.spoils" then
-         local raider, target = books[p.raider], books[p.target]
-         raider.grain = raider.grain + p.seized
-         raider.cents = raider.cents + p.plunder
-         target.grain = target.grain - p.seized - p.burned
-         target.cents = target.cents - p.plunder
-         burned_total = burned_total + p.burned
-      end
-      for name, b in pairs(books) do
-         assert(b.grain >= 0, name .. " holds negative grain at event " .. id)
-         assert(b.cents >= 0, name .. " holds negative cents at event " .. id)
-      end
-   end
-   local cents_now = 0
-   for _, b in pairs(books) do
-      cents_now = cents_now + b.cents
-   end
-   return books, minted, cents_now, burned_total
-end
+-- The independent auditor grew up: what post 0007 kept here as a
+-- spec-local fold is now src/sonder/audit.lua (card 120), and this
+-- file consumes it like any other viewer. The claims are unchanged —
+-- with a pass-through courier a civ can be neither lying nor
+-- misinformed, so mismatches are bugs — audit_spec.lua carries the
+-- audit's own trials (coverage, counterfeits, conservation).
 
 describe("conservation", function()
    it("every cent is founded, traded, or plundered — never conjured", function()
       local u = toy(1893)
       u:run(300)
-      local _, minted, cents_now = audit(u.annals)
-      assert.equal(minted, cents_now)
+      local report = Audit.of(u.annals)
+      assert.equal(0, #report.violations,
+         table.concat(report.violations, "\n"))
+      assert.equal(report.founded.cents, report.held.cents)
    end)
 
    it("every tally agrees with the independent audit", function()
-      -- audit() asserts per-tally as it folds; surviving the fold is
-      -- the assertion. Run long enough to cross war and peace both.
+      -- Run long enough to cross war and peace both. Card 122 will
+      -- relax exactly this assertion — mismatches, never violations.
       local u = toy(1893)
       u:run(300)
-      audit(u.annals)
+      assert.equal(0, #Audit.of(u.annals).mismatches)
    end)
 
    it("holds for other seeds too", function()
       for _, seed in ipairs({ 7, 40412 }) do
          local u = toy(seed)
          u:run(200)
-         local _, minted, cents_now = audit(u.annals)
-         assert.equal(minted, cents_now)
+         local report = Audit.of(u.annals)
+         assert.equal(0, #report.violations)
+         assert.equal(report.founded.cents, report.held.cents)
       end
    end)
 end)
