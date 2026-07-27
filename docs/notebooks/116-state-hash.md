@@ -198,6 +198,29 @@ copies was coincidence, three is a pattern.
   would have failed loudly. Fingerprint and seal for seed 1893 × 500
   ticks came out unchanged (`70483ffb282aa288`, `27e3e0a8080e04f8`).
 
+## Session 2 (2026-07-26, same day) — the post
+
+Implementation committed (b105237) on Mike's word after the fnv
+review. Drafted `docs/posts/0005-the-tamper-seal.md`. Shape: the
+500-tick excerpt (seal printed twice — the claim is the *second*
+number — plus the checkpoints table) → design (state hash = log hash
+via law 2; the seal as a third projection; canon.lua and
+one-event-one-byte-form; FNV-1a as tamper-evidence not
+tamper-proofing; the watermark rule for when a tick is sealable;
+close() sealing every file; the gremlin and the
+divergence-has-a-first-moment property for card 123) → CS
+(golden-master testing and why checkpoint trails fix its
+opaque-failure weakness; avalanche and the birthday bound; watermarks
+in stream processing, with card 122 as the future payoff) →
+wrong-ledger (the three FNVs and the untouched oracle; tick 500's
+checkpoint arriving via close, luck not skill; the
+nothing-broke-and-we're-suspicious entry, prediction published so it
+can embarrass us).
+
+Docs sweep: README status (post 0005 added, state hash out of "still
+ahead") and the seal-trail query added to Running; CLAUDE.md status
+(116 done, next up starts at 117).
+
 ### Proving "done"
 
 - Golden master: seed 1893 × 500 ticks → exact hardcoded seal;

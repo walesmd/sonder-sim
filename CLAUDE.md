@@ -147,9 +147,10 @@ chronicle, visibility stamped on every event (card 114, post 0002
 eval suite, a floor not a ceiling (card 129, post 0003 *The Lore
 Shelf*); SQLite annals + provenance table — every run archives to a
 universe file that is append-only by trigger and self-describing
-(card 115, post 0004 *The History Book*). Next up:
-
-- rolling state hash + golden-master replay test (card 116)
+(card 115, post 0004 *The History Book*); rolling state hash +
+golden-master replay — the seal, checkpointed into every universe
+file, with the gremlin spec proving one stolen draw forks history
+(card 116, post 0005 *The Tamper Seal*). Next up:
 - pass-through belief store — the seam (card 117)
 - toy world: two civilizations with opposed proclivities (mercantile vs
   martial), one commodity, one market with naive price adjustment
