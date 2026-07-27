@@ -16,7 +16,7 @@
 
 package.path = "src/?.lua;" .. package.path
 
-local Universe = require "sonder.universe"
+local Toyworld = require "worlds.toy"
 local Chronicle = require "sonder.chronicle"
 local Archive = require "sonder.archive"
 local Seal = require "sonder.seal"
@@ -95,8 +95,11 @@ local function default_db_path(seed)
    return path
 end
 
+-- The toy world (card 118): the Vessari and the Khedrun, one grain
+-- market, and wars nobody schedules. All the cast and physics live
+-- in worlds/toy.lua — this file stays a window.
 local opts = parse_args(arg)
-local u = Universe.new(opts.seed)
+local u = Toyworld(opts.seed)
 
 local archive
 if opts.db ~= "none" then
@@ -112,43 +115,8 @@ if opts.db ~= "none" then
       os.exit(1)
    end
    archive = created
-   archive:sync() -- genesis, at the tick-0 boundary
+   archive:sync() -- genesis, foundings, opening price: tick 0's record
 end
-
--- The placeholder cast (card 118 replaces both). The market is
--- ambient physics: a system, drifting blindly, each drift citing the
--- one before it. The war office is the first believer (card 117): a
--- faction, so its decision code gets beliefs, a stream, and the tick
--- — never the universe — and musters what it *believes* the market
--- justifies, citing the drift it acted on. Ask --why about a muster
--- and the ladder now crosses subsystems on its way to genesis.
-local last_market = 1
-u:add_system("market", function(universe, stream)
-   local drift = stream:int(-3, 3)
-   last_market = universe:emit{
-      kind = "market.drift",
-      location = "the-void",
-      magnitude = math.abs(drift),
-      visibility = "public",
-      payload = { drift = drift },
-      causes = { last_market },
-   }
-end)
-u:add_faction("war", function(beliefs, stream)
-   local drift = beliefs:latest("market.drift")
-   if not drift then
-      return {} -- ignorance is free: nothing heard, nothing mustered
-   end
-   local muster = drift.magnitude * 2 + stream:int(0, 3)
-   return { {
-      kind = "war.muster",
-      location = "the-void",
-      magnitude = muster,
-      visibility = "regional", -- you'd have to be nearby to count levies
-      payload = { muster = muster },
-      causes = { drift.id },
-   } }
-end)
 
 -- Fold the whole feed into one number, so two runs compare at a
 -- glance instead of line by line.

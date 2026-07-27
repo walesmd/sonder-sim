@@ -102,6 +102,24 @@ function Belief:recall(kind)
    return out
 end
 
+-- The last n beliefs about a kind, arrival order, oldest first —
+-- possibly fewer, possibly none. Minds mostly run on recent memory
+-- (a patience fuse, the last few prices), and recalling all of
+-- history to look at the end of it would price statelessness out of
+-- reach.
+function Belief:recent(kind, n)
+   local held = self.by_kind[kind]
+   local out = {}
+   if not held then
+      return out
+   end
+   local first = math.max(1, #held - n + 1)
+   for i = first, #held do
+      out[#out + 1] = copy(held[i])
+   end
+   return out
+end
+
 function Belief:len()
    return self.received
 end

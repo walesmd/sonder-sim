@@ -13,23 +13,89 @@
 
 local templates = {}
 
+-- 1212 → "1,212": money reads better with its thousands marked.
+local function comma(n)
+   local s, sign = tostring(n), ""
+   if s:sub(1, 1) == "-" then
+      sign, s = "-", s:sub(2)
+   end
+   local grouped = s:reverse():gsub("(%d%d%d)", "%1,"):reverse():gsub("^,", "")
+   return sign .. grouped
+end
+
 templates["universe.genesis"] = function(e)
    return ("a universe begins (seed %d)"):format(e.payload.seed)
 end
 
-templates["market.drift"] = function(e)
-   if e.payload.drift == 0 then
-      return "the market holds steady"
-   end
-   return ("the market drifts %+d"):format(e.payload.drift)
+templates["civ.founded"] = function(e)
+   return ("the %s enter history with %d sacks of grain and %s¢"):format(
+      e.payload.name, e.payload.grain, comma(e.payload.cents))
 end
 
-templates["war.muster"] = function(e)
-   if e.payload.muster == 0 then
-      return "the war office musters nobody"
+templates["civ.tally"] = function(e)
+   return ("the day's books: %d sacks in the granary (+%d, −%d), %s¢ in the treasury")
+      :format(e.payload.stock, e.payload.harvested, e.payload.eaten,
+         comma(e.payload.cents))
+end
+
+templates["grain.hunger"] = function(e)
+   return ("hunger — the granaries came up %d %s short"):format(
+      e.payload.shortfall,
+      e.payload.shortfall == 1 and "sack" or "sacks")
+end
+
+templates["market.order"] = function(e)
+   if e.payload.side == "buy" then
+      return ("a bid for %d sacks at up to %d¢"):format(
+         e.payload.units, e.payload.limit)
    end
-   return ("the war office musters %d %s"):format(e.payload.muster,
-      e.payload.muster == 1 and "levy" or "levies")
+   return ("%d sacks on offer at %d¢ or better"):format(
+      e.payload.units, e.payload.limit)
+end
+
+templates["market.trade"] = function(e)
+   return ("%d sacks pass from the %s to the %s at %d¢ (%s¢ paid)")
+      :format(e.payload.units, e.payload.seller, e.payload.buyer,
+         e.payload.price, comma(e.payload.total))
+end
+
+templates["market.price"] = function(e)
+   if e.payload.delta == 0 then
+      return ("grain holds at %d¢"):format(e.payload.price)
+   end
+   return ("grain settles at %d¢ (%+d)"):format(e.payload.price,
+      e.payload.delta)
+end
+
+templates["war.declared"] = function(e)
+   if e.payload.reason == "hunger" then
+      return ("the %s declare war on the %s — %d hungry days were the last insult")
+         :format(e.payload.aggressor, e.payload.target, e.payload.measure)
+   end
+   return ("the %s declare war on the %s — grain at %d¢ was the last insult")
+      :format(e.payload.aggressor, e.payload.target, e.payload.measure)
+end
+
+templates["war.raid"] = function(e)
+   return ("a %s war party rides against the %s granaries (force %d)")
+      :format(e.payload.raider, e.payload.target, e.payload.force)
+end
+
+templates["war.spoils"] = function(e)
+   local p = e.payload
+   if p.seized == 0 and p.plunder == 0 and p.burned == 0 then
+      return ("the %s raiders find the %s stores bare"):format(
+         p.raider, p.target)
+   end
+   local torched = p.burned > 0
+      and (" and put %d to the torch"):format(p.burned) or ""
+   return ("the %s raiders carry off %d sacks and %s¢ from the %s%s"):format(
+      p.raider, p.seized, comma(p.plunder), p.target, torched)
+end
+
+templates["war.peace"] = function(e)
+   return ("the %s sheathe — grain at %d¢ buys more than blood"):format(
+      e.payload.name, e.payload.price)
 end
 
 -- The unknown-kind fallback. pairs() is allowed here — this is a
