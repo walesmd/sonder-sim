@@ -52,11 +52,11 @@ describe("Universe", function()
       local id
       u:add_system("market", function(universe)
          id = universe:emit{
-            kind = "market.drift",
+            kind = "grain.hunger",
             location = "the-void",
             magnitude = 0,
             visibility = "public",
-            payload = { drift = 0 },
+            payload = { shortfall = 0 },
             causes = { 1 },
          }
       end)

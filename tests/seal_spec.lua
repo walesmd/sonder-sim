@@ -7,7 +7,7 @@
 local Seal = require "sonder.seal"
 local toy = require "support.toy"
 
--- The pinned seal of seed 1893 × 500 ticks (1001 events). If this
+-- The pinned seal of seed 1893 × 500 ticks. If this
 -- fails and you didn't mean to change history, you changed history.
 -- If you did mean to (vocabulary churn, new system, card 118), this
 -- constant is re-cut deliberately, in its own commit, with the reason
@@ -18,9 +18,12 @@ local toy = require "support.toy"
 --                      system drawing its own musters
 --   ae08cb9d02bd99c1 — card 117: the war office became a believer,
 --                      mustering on believed drifts and citing them
+--   ea60291970dba95b — card 118: the toy world; drift and muster
+--                      churned away, the Vessari and Khedrun arrived
+--                      (vocabulary v2, 1589 events in the golden run)
 local GOLDEN_SEED = 1893
 local GOLDEN_TICKS = 500
-local GOLDEN_SEAL = "ae08cb9d02bd99c1"
+local GOLDEN_SEAL = "ea60291970dba95b"
 
 describe("the golden master", function()
    it("seed 1893, 500 ticks, one exact seal", function()
@@ -36,32 +39,37 @@ describe("the golden master", function()
    end)
 
    it("fails when a draw is deliberately perturbed", function()
-      -- The gremlin: same seed, same systems, plus one extra draw
-      -- stolen from the market's own stream at tick 250. One number
-      -- nobody even looked at — and history forks.
+      -- The gremlin: same seed, same world, plus one extra draw
+      -- stolen from the Vessari's own stream at tick 250. One number
+      -- nobody even looked at — and every harvest after it shifts.
       local u = toy(GOLDEN_SEED)
       u:add_system("gremlin", function(universe, _, tick)
          if tick == 250 then
-            universe.rng:stream("market"):int(-3, 3)
+            universe.rng:stream("vessari"):int(0, 4)
          end
       end)
       u:run(GOLDEN_TICKS)
       assert.not_equal(GOLDEN_SEAL, Seal.of(u.annals):hex())
    end)
 
-   it("the gremlin's damage starts exactly where it struck", function()
-      -- Everything through tick 250 is untouched — the stolen draw
+   it("the gremlin's damage starts exactly where it strikes — or near it", function()
+      -- Everything before the theft is untouched — the stolen draw
       -- can only bend the future. Divergence has a first moment;
       -- checkpoint tables exist so tools can binary-search for it
       -- (card 123's synopsis), and this is the property they lean on.
+      -- A delicious wrinkle, pinned deliberately: for THIS seed the
+      -- shifted stream happens to deal identical harvests for two
+      -- days, so the theft at 250 stays invisible until 252. A
+      -- perturbation is only observable when it changes an *event* —
+      -- the seal detects divergence, not tampering.
       local clean, bent = toy(GOLDEN_SEED), toy(GOLDEN_SEED)
       bent:add_system("gremlin", function(universe, _, tick)
          if tick == 250 then
-            universe.rng:stream("market"):int(-3, 3)
+            universe.rng:stream("vessari"):int(0, 4)
          end
       end)
-      clean:run(250)
-      bent:run(250)
+      clean:run(251)
+      bent:run(251)
       assert.equal(Seal.of(clean.annals):hex(), Seal.of(bent.annals):hex())
       clean:run(1)
       bent:run(1)

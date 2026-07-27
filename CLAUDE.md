@@ -168,14 +168,16 @@ file, with the gremlin spec proving one stolen draw forks history
 (card 116, post 0005 *The Tamper Seal*); pass-through belief store —
 law 3 as capabilities, decide(beliefs, stream, tick) returning
 intents, the courier as the card-122 seam, the war office as first
-believer (card 117, post 0006 *Truth & Belief*). In flight on this branch:
+believer (card 117, post 0006 *Truth & Belief*); the toy world —
+the Vessari and the Khedrun in src/worlds/ (content, not engine),
+stateless minds projected from beliefs, money circulating through
+trade one way and plunder the other, and twenty unplanned wars per
+thousand days (card 118, post 0007 *A War Nobody Planned*);
 two-track posts — every post now ships as `complete.md` + `simple.md`
 with Mermaid visuals as a standing question, earned by the
 reading-level experiment in `docs/experiments/reading-levels/`
-(card 147, ADR 0003; its post is still owed). Next up:
-- toy world: two civilizations with opposed proclivities (mercantile vs
-  martial), one commodity, one market with naive price adjustment
-  (card 118)
+(card 147, ADR 0003, post 0008 *Simple & Complete*). Next up:
+
 - cut v0.1 and re-cut post 0000 (card 119)
 - standing lore sessions — the road to thirty species (card 130)
 

@@ -44,6 +44,14 @@ story's file. A story never just erodes.
 Nothing here is canon until a simulation runs it — but everything
 here is binding on design until Mike retires it.
 
+Since card 118, the shelf also holds a second kind of resident:
+**engine-first entries** (the Vessari, the Khedrun), written *from* a
+running world rather than toward one — constants restated as a
+people, each carrying a provenance note saying so and a "hosted
+since" line. The two directions meet in the middle: fiction-first
+entries are evals the engine must grow to host; engine-first entries
+are receipts proving what it already can.
+
 ## The flexibility principles
 
 We are modeling an entire universe over decades, iteratively. These
