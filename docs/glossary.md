@@ -128,12 +128,33 @@ adds it here, in the same PR.
 - **gremlin** — the saboteur in the perturbation spec: one extra
   draw stolen from another actor's stream, proving one stolen random
   number forks a universe. (post 0005)
-- **toy universe** — the shared spec fixture (`tests/support/toy.lua`):
-  the placeholder market and war office, standing where card 118's
-  real civilizations will stand.
+- **audit** — the independent fold in `toyworld_spec`: the whole
+  annals reduced to per-civ books that every self-reported tally
+  must match, cent for cent. Card 120's double-entry audit in
+  miniature. (post 0007)
 - **doctor** — `tools/doctor.lua`: verifies the properties
   determinism leans on (integer subtype, wrapping overflow, pinned
   toolchain) rather than just that programs exist.
+
+## Worlds and their people
+
+- **world** — content the engine hosts: temperaments compiled to
+  constants and decide functions, living in `src/worlds/` (the
+  engine/content line is a directory boundary). The lore shelf is
+  the *expressibility* eval (authored story leads; the engine must
+  host it); a world is the *emergence* eval (temperaments lead;
+  history must precipitate). (post 0007)
+- **the toy world** (`src/worlds/toy.lua`) — the first world: two
+  civilizations, one commodity, one market, wars nobody plans. Also
+  the shared spec fixture, via `tests/support/toy.lua`. (post 0007)
+- **the Vessari** — the toy world's mercantile half: they price
+  things — surplus sellers with a reserve, an undercut, and a floor
+  below which they simply wait. (post 0007; lore:
+  `the-vessari.md`)
+- **the Khedrun** — the toy world's martial half: they cost them
+  out — structural grain deficit, two patience fuses (price and
+  hunger), and raiding as provisioning; plunder is how money flows
+  back. (post 0007; lore: `the-khedrun.md`)
 
 ## The project's own artifacts
 

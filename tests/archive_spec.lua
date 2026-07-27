@@ -101,7 +101,7 @@ describe("Archive", function()
       assert.equal("deadbeef", rows.git_commit)
       assert.equal("7", rows.seed)
       assert.equal("{}", rows.config)
-      assert.equal("1", rows.schema_version)
+      assert.equal("2", rows.schema_version)
       assert.equal("[]", rows.interventions)
       assert.equal(_VERSION, rows.lua_version)
       assert.equal(sqlite3.version(), rows.sqlite_version)
@@ -132,12 +132,12 @@ describe("Archive", function()
    it("sync copies exactly the new suffix, and says how much", function()
       local u = toy(1893)
       local archive = Archive.create(path, u.annals, provenance(1893))
-      assert.equal(1, archive:sync()) -- genesis
+      assert.equal(4, archive:sync()) -- genesis, two foundings, the price
       assert.equal(0, archive:sync()) -- nothing new
-      u:run(3) -- two events per tick: a drift and a muster
-      assert.equal(6, archive:sync())
+      u:run(3)
+      assert.equal(u.annals:len() - 4, archive:sync())
       archive:close()
-      assert.same({ { 7 } }, query(path, "SELECT count(*) FROM annals"))
+      assert.same({ { u.annals:len() } }, query(path, "SELECT count(*) FROM annals"))
    end)
 
    it("archives the same history the memory holds", function()
@@ -166,9 +166,10 @@ describe("Archive", function()
       archive:close()
       assert.same({ { '{"seed":1893}' } },
          query(path, "SELECT payload FROM annals WHERE id = 1"))
-      local drift = u.annals:get(2).payload.drift
-      assert.same({ { drift } },
-         query(path, "SELECT json_extract(payload, '$.drift') FROM annals WHERE id = 2"))
+      assert.same({ { '{"name":"vessari","grain":160,"cents":10000}' } },
+         query(path, "SELECT payload FROM annals WHERE id = 2"))
+      assert.same({ { 160 } },
+         query(path, "SELECT json_extract(payload, '$.grain') FROM annals WHERE id = 2"))
    end)
 
    it("the file itself refuses UPDATE and DELETE", function()
@@ -243,12 +244,12 @@ describe("Archive", function()
       os.remove(lazy)
    end)
 
-   it("every file ends sealed, even a genesis-only one", function()
+   it("every file ends sealed, even one that never ran", function()
       local u = toy(1893)
       local archive = Archive.create(path, u.annals, provenance(1893))
       archive:close()
-      local hash = seal_through(u.annals, 0)
-      assert.same({ { 0, 1, hash } },
+      local hash, events = seal_through(u.annals, 0)
+      assert.same({ { 0, events, hash } },
          query(path, "SELECT tick, events, hash FROM checkpoints"))
    end)
 

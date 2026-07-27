@@ -65,9 +65,15 @@ stores their code is handed instead of a world it never sees, the
 war office became the first believer, and `--why` ladders cross
 subsystems — post 0006,
 [*Truth & Belief*](docs/posts/0006-truth-and-belief.md) (tag
-`post/0006`). Still ahead for the skeleton: two toy civilizations
-trading one commodity, then the v0.1 cut. Watching now means
-watching from very nearly the beginning, which is rather the point.
+`post/0006`). And the universe has its first economy: the Vessari
+and the Khedrun — temperaments compiled to constants — trading one
+commodity across one naive market, with money in integer cents and
+wars nobody planned precipitating out of grain prices roughly every
+forty-five days — post 0007,
+[*A War Nobody Planned*](docs/posts/0007-a-war-nobody-planned.md)
+(tag `post/0007`). Still ahead for the skeleton: the v0.1 cut.
+Watching now means watching from very nearly the beginning, which
+is rather the point.
 
 ## Building
 

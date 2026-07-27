@@ -156,10 +156,12 @@ file, with the gremlin spec proving one stolen draw forks history
 (card 116, post 0005 *The Tamper Seal*); pass-through belief store —
 law 3 as capabilities, decide(beliefs, stream, tick) returning
 intents, the courier as the card-122 seam, the war office as first
-believer (card 117, post 0006 *Truth & Belief*). Next up:
-- toy world: two civilizations with opposed proclivities (mercantile vs
-  martial), one commodity, one market with naive price adjustment
-  (card 118)
+believer (card 117, post 0006 *Truth & Belief*); the toy world —
+the Vessari and the Khedrun in src/worlds/ (content, not engine),
+stateless minds projected from beliefs, money circulating through
+trade one way and plunder the other, and twenty unplanned wars per
+thousand days (card 118, post 0007 *A War Nobody Planned*). Next up:
+
 - cut v0.1 and re-cut post 0000 (card 119)
 - standing lore sessions — the road to thirty species (card 130)
 

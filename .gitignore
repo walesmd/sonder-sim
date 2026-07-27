@@ -23,3 +23,7 @@ out/
 # Local secrets
 .fizzy.yaml
 .env
+
+# Claude Code session-local state (permission grants can embed
+# credentials; worktrees are scratch checkouts)
+.claude/

@@ -14,14 +14,14 @@ local function genesis(seed)
    }
 end
 
-local function drift(cause, n)
+local function hunger(cause, n)
    n = n or 0
    return {
-      kind = "market.drift",
+      kind = "grain.hunger",
       location = "the-void",
       magnitude = n < 0 and -n or n,
       visibility = "public",
-      payload = { drift = n },
+      payload = { shortfall = n },
       causes = { cause },
    }
 end
@@ -37,8 +37,8 @@ end
 describe("Annals", function()
    it("ids are positions: the nth append is event n", function()
       local a = begun()
-      assert.equal(2, a:append(1, drift(1)))
-      assert.equal(3, a:append(1, drift(2)))
+      assert.equal(2, a:append(1, hunger(1)))
+      assert.equal(3, a:append(1, hunger(2)))
       assert.equal(3, a:len())
    end)
 
@@ -58,22 +58,22 @@ describe("Annals", function()
 
    it("time does not flow backwards", function()
       local a = begun()
-      a:append(5, drift(1))
-      assert.has_error(function() a:append(4, drift(2)) end)
-      assert.has_error(function() a:append(5.5, drift(2)) end)
-      assert.has_error(function() a:append(-1, drift(2)) end)
+      a:append(5, hunger(1))
+      assert.has_error(function() a:append(4, hunger(2)) end)
+      assert.has_error(function() a:append(5.5, hunger(2)) end)
+      assert.has_error(function() a:append(-1, hunger(2)) end)
    end)
 
    it("keeps no reference to the caller's tables", function()
       local a = begun()
-      local spec = drift(1, 3)
+      local spec = hunger(1, 3)
       a:append(1, spec)
       spec.magnitude = 99
-      spec.payload.drift = 99
+      spec.payload.shortfall = 99
       spec.causes[1] = 99
       local e = a:get(2)
       assert.equal(3, e.magnitude)
-      assert.equal(3, e.payload.drift)
+      assert.equal(3, e.payload.shortfall)
       assert.same({ 1 }, e.causes)
    end)
 
@@ -99,65 +99,65 @@ describe("Annals", function()
    describe("strictness at the door", function()
       it("rejects unregistered kinds", function()
          local a = begun()
-         local spec = drift(1)
+         local spec = hunger(1)
          spec.kind = "market.hunch"
          assert.has_error(function() a:append(1, spec) end)
       end)
 
       it("rejects a missing envelope field", function()
          local a = begun()
-         local spec = drift(1)
+         local spec = hunger(1)
          spec.location = nil
          assert.has_error(function() a:append(1, spec) end)
       end)
 
       it("rejects strangers in the envelope", function()
          local a = begun()
-         local spec = drift(1)
+         local spec = hunger(1)
          spec.mood = "hopeful"
          assert.has_error(function() a:append(1, spec) end)
       end)
 
       it("rejects float magnitudes — outcomes are integers, law 1", function()
          local a = begun()
-         local spec = drift(1)
+         local spec = hunger(1)
          spec.magnitude = 1.0
          assert.has_error(function() a:append(1, spec) end)
       end)
 
       it("rejects visibilities outside the declared set", function()
          local a = begun()
-         local spec = drift(1)
+         local spec = hunger(1)
          spec.visibility = "classified"
          assert.has_error(function() a:append(1, spec) end)
       end)
 
       it("rejects a mistyped payload field", function()
          local a = begun()
-         local spec = drift(1)
-         spec.payload.drift = "up"
+         local spec = hunger(1)
+         spec.payload.shortfall = "up"
          assert.has_error(function() a:append(1, spec) end)
-         spec.payload.drift = 2.5
+         spec.payload.shortfall = 2.5
          assert.has_error(function() a:append(1, spec) end)
       end)
 
       it("rejects a missing payload field", function()
          local a = begun()
-         local spec = drift(1)
+         local spec = hunger(1)
          spec.payload = {}
          assert.has_error(function() a:append(1, spec) end)
       end)
 
       it("rejects strangers in the payload", function()
          local a = begun()
-         local spec = drift(1)
+         local spec = hunger(1)
          spec.payload.momentum = 2
          assert.has_error(function() a:append(1, spec) end)
       end)
 
       it("rejects nothing it accepted: a failed append appends nothing", function()
          local a = begun()
-         local spec = drift(1)
+         local spec = hunger(1)
          spec.payload.momentum = 2
          pcall(function() a:append(1, spec) end)
          assert.equal(1, a:len())
@@ -167,7 +167,7 @@ describe("Annals", function()
    describe("causes", function()
       it("requires every event except genesis to cite at least one", function()
          local a = begun()
-         local spec = drift(1)
+         local spec = hunger(1)
          spec.causes = {}
          assert.has_error(function() a:append(1, spec) end)
       end)
@@ -175,7 +175,7 @@ describe("Annals", function()
       it("rejects causes that are not past events", function()
          local a = begun()
          for _, bad in ipairs({ 0, 2, 99, 1.5, "1" }) do
-            local spec = drift(1)
+            local spec = hunger(1)
             spec.causes = { bad }
             assert.has_error(function() a:append(1, spec) end)
          end
@@ -183,7 +183,7 @@ describe("Annals", function()
 
       it("an event cannot cause itself — its id doesn't exist until it's in", function()
          local a = begun()
-         local spec = drift(1)
+         local spec = hunger(1)
          spec.causes = { 2 } -- the id this very append would receive
          assert.has_error(function() a:append(1, spec) end)
       end)
@@ -194,7 +194,7 @@ describe("Annals", function()
          assert.has_error(function() a:append(1, genesis()) end)
          -- first: nothing else can open a log (its causes can't resolve)
          local b = Annals.new()
-         assert.has_error(function() b:append(0, drift(1)) end)
+         assert.has_error(function() b:append(0, hunger(1)) end)
          -- uncaused:
          local c = Annals.new()
          local spec = genesis()
@@ -209,7 +209,7 @@ describe("Annals", function()
          a:append(0, genesis(7))
          local last = 1
          for t = 1, 5 do
-            last = a:append(t, drift(last, t - 3))
+            last = a:append(t, hunger(last, t - 3))
          end
          return a
       end

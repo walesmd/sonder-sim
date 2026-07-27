@@ -51,11 +51,11 @@ describe("factions", function()
          end
          local genesis = beliefs:latest("universe.genesis")
          return {
-            { kind = "market.drift", location = "the-void", magnitude = 1,
-              visibility = "public", payload = { drift = 1 },
+            { kind = "grain.hunger", location = "the-void", magnitude = 1,
+              visibility = "public", payload = { shortfall = 1 },
               causes = { genesis.id } },
-            { kind = "market.drift", location = "the-void", magnitude = 2,
-              visibility = "public", payload = { drift = 2 },
+            { kind = "grain.hunger", location = "the-void", magnitude = 2,
+              visibility = "public", payload = { shortfall = 2 },
               causes = { genesis.id } },
          }
       end)
@@ -63,8 +63,8 @@ describe("factions", function()
       assert.equal(3, u.annals:len())
       assert.same({ 1, 1, 2 }, {
          u.annals:get(2).tick,
-         u.annals:get(2).payload.drift,
-         u.annals:get(3).payload.drift,
+         u.annals:get(2).payload.shortfall,
+         u.annals:get(3).payload.shortfall,
       })
    end)
 
@@ -118,39 +118,7 @@ describe("factions", function()
    end)
 end)
 
-describe("the first believer", function()
-   it("musters cite the drift the war office believed", function()
-      local u = toy(1893)
-      u:run(5)
-      for id = 1, u.annals:len() do
-         local e = u.annals:get(id)
-         if e.kind == "war.muster" then
-            assert.equal(1, #e.causes)
-            local cause = u.annals:get(e.causes[1])
-            assert.equal("market.drift", cause.kind)
-            assert.equal(e.tick, cause.tick) -- pass-through: same-tick news
-         end
-      end
-   end)
-
-   it("a war office that hears nothing musters nothing", function()
-      -- Ignorance is free, executably: no market, no drift beliefs,
-      -- no muster events — not zero-levy musters, no events at all.
-      local u = Universe.new(1893)
-      u:add_faction("war", function(beliefs, stream)
-         local drift = beliefs:latest("market.drift")
-         if not drift then
-            return {}
-         end
-         local muster = drift.magnitude * 2 + stream:int(0, 3)
-         return { { kind = "war.muster", location = "the-void",
-            magnitude = muster, visibility = "regional",
-            payload = { muster = muster }, causes = { drift.id } } }
-      end)
-      u:run(50)
-      assert.equal(1, u.annals:len()) -- fifty ticks of silence
-   end)
-
+describe("factions in the toy world", function()
    it("same seed, same beliefs, same decisions, twice", function()
       local a, b = toy(4242), toy(4242)
       a:run(30)
