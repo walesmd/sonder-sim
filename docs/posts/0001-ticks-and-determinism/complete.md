@@ -1,7 +1,13 @@
 # Ticks & Determinism
 
 *Post 0001 · code pinned at tag `post/0001` · Lua 5.4 · this post's
-universe: seed `1893` · ~10 min read*
+universe: seed `1893` · ~10 min read · plain-language version:
+[simple](./simple.md)*
+
+*Previously: post 0000 promised saves that are just a seed plus your
+interventions, perfect replays, and a fast-forward for the days you
+missed. This post builds the heartbeat that makes those promises
+keepable.*
 
 ---
 
@@ -103,6 +109,30 @@ chattier*. Your saved universe is gone. The regression test fails and
 the diff implicates everything at once. The bug report is
 irreproducible unless the reporter's code version matches to the
 commit.
+
+The same disaster, and its cure, in one picture:
+
+```mermaid
+graph TB
+    subgraph shared_before ["One shared stream, before the feature"]
+        direction LR
+        a1["draw 1: market"] --> a2["draw 2: war"] --> a3["draw 3: market"] --> a4["draw 4: war"] --> a5["draw 5: market"] --> a6["draw 6: war"]
+    end
+    subgraph shared_after ["Same shared stream, market checks one extra price"]
+        direction LR
+        b1["draw 1: market"] --> b2["draw 2: market (the extra draw)"] --> b3["draw 3: war (was draw 2)"] --> b4["draw 4: market"] --> b5["draw 5: war (was draw 4)"] --> b6["draw 6: market"]
+    end
+    subgraph named_streams ["Named streams: rng.market and rng.war"]
+        direction LR
+        m1["market draw 1"] --> m2["market draw 2"] --> m3["market draw 3 (extra draws land here)"]
+        w1["war draw 1"] --> w2["war draw 2"] --> w3["war draw 3 (untouched)"]
+    end
+```
+
+In the shared stream, every war draw after the change reads a
+different number, because it sits one position further down. In the
+named streams, the market's extra draw lands in the market's own
+sequence and the war sequence never learns the feature shipped.
 
 So the second law of the heartbeat: **a new feature must never shift
 another subsystem's draws.** And we wanted that structurally — true by
@@ -208,15 +238,22 @@ crunches `(seed, "market")` into 64 bits, **splitmix64** expands those
 into 256, **xoshiro256\*\*** draws from there. The counter-hash seeds
 the shift register; each algorithm sits where its designers intended.
 
+```mermaid
+graph LR
+    a["(seed 1893, name 'market')"] --> b["FNV-1a: hash to 64 bits"] --> c["splitmix64: expand to 256 bits"] --> d["xoshiro256**: every draw the stream ever makes"]
+```
+
 Two Lua-specific notes, one load-bearing and one delightful. The
 load-bearing one: all of this arithmetic — the multiplies, the shifts,
 the adds — silently exceeds 64 bits, and Lua 5.4 integers *wrap
 around* exactly like the C `uint64_t` these algorithms were written
 for. That behavior is why ADR 0001 pinned Lua 5.4, and
 `tools/doctor.lua` checks the property (not the version — versions are
-proxies) on every machine. The delightful one: half our draws print as
-negative numbers, because Lua shows you the signed view of the same 64
-bits. The bits are what we test.
+proxies) on every machine.
+
+> **Aside — the signed-print curiosity.** The delightful one: half our
+> draws print as negative numbers, because Lua shows you the signed
+> view of the same 64 bits. The bits are what we test.
 
 One more trap worth naming, because nearly everyone falls into it once:
 turning a 64-bit draw into a die roll with `draw % 6`. The 2^64
@@ -242,22 +279,23 @@ day jobs — the community would clear about 3.5 trillion worlds a year,
 and would need roughly **5.3 million years** to see them all. Nobody
 is running out of seeds.
 
-One honest asterisk: 2^64 is the number of *seeds*, which is an upper
-bound on the number of *distinct universes*, not a guarantee. Each
-stream's starting state comes from hashing `(seed, name)`, and a hash
-is not a bijection — two different seeds can, in principle, collide to
-the same market stream. By the birthday paradox you'd actually expect
-on the order of 2^63 seed pairs to share *some one* stream. But
-sharing one stream isn't sharing a universe: a duplicate pair would
-have to collide on **every** stream at once, and each name is an
-independent roll. With today's two streams, the expected number of
-fully-duplicate pairs across the entire seed space is about 0.5 — a
-coin flip that even one exists. At three subsystems it's effectively
-zero, and every system we add drives it further down. So: at most 2^64
-universes, and almost certainly exactly that — where "almost
-certainly" is a probability argument, not a proof, because we chose a
-hash rather than a bijection. We can afford to lose one universe to a
-coin flip.
+> **Aside — seeds vs. distinct universes.** One honest asterisk: 2^64
+> is the number of *seeds*, which is an upper bound on the number of
+> *distinct universes*, not a guarantee. Each stream's starting state
+> comes from hashing `(seed, name)`, and a hash is not a bijection —
+> two different seeds can, in principle, collide to the same market
+> stream. By the birthday paradox you'd actually expect on the order
+> of 2^63 seed pairs to share *some one* stream. But sharing one
+> stream isn't sharing a universe: a duplicate pair would have to
+> collide on **every** stream at once, and each name is an independent
+> roll. With today's two streams, the expected number of
+> fully-duplicate pairs across the entire seed space is about 0.5 — a
+> coin flip that even one exists. At three subsystems it's effectively
+> zero, and every system we add drives it further down. So: at most
+> 2^64 universes, and almost certainly exactly that — where "almost
+> certainly" is a probability argument, not a proof, because we chose
+> a hash rather than a bijection. We can afford to lose one universe
+> to a coin flip.
 
 ## Trust, but verify against C
 

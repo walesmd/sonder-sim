@@ -69,6 +69,16 @@ are jointly owned and published.
   showing the new thing in the wild (a chronicle excerpt when there's
   code; the artifact itself when there isn't) → the design → the CS
   underneath → what we got wrong.
+- A post is a directory with two public tracks (ADR 0003, card 147):
+  `docs/posts/NNNN-slug/complete.md` — the canonical collegiate essay —
+  and `simple.md` — a plain-language companion, ~950 words, at most one
+  excerpt, mistakes kept. Same facts, numbers, seeds, and hashes in
+  both; simple simplifies by omission and analogy, never distortion.
+  When a post explains a CS algorithm or mathematical argument, ask
+  explicitly: *does this need a visual?* Diagrams are Mermaid, inline
+  in the post source — the source is canonical, a rendering is a
+  projection. Posts that lean on earlier posts open with a one-line
+  *Previously* note; second-order arguments go in labeled asides.
 - Each published post pins a git tag `post/NNNN` at the exact code it
   describes. Posts live in the repo, next to the code they explain.
 - A post is not done until Mike can explain, unaided: every concept in it,
@@ -82,8 +92,10 @@ are jointly owned and published.
   request.
 - The docs sweep, before every pull request: update the README (status,
   install steps), add any newly coined reader-facing terms to
-  `docs/glossary.md`, and fix any other documentation the change makes
-  stale, in the same PR. Post tags are immutable once pushed, so
+  `docs/glossary.md`, confirm the post's `simple.md` exists and agrees
+  with `complete.md`, confirm the does-this-need-a-visual question was
+  asked, and fix any other documentation the change makes stale, in the
+  same PR. Post tags are immutable once pushed, so
   documentation that misses the PR stays wrong at that tag forever
   (learned the hard way after card 113).
 - Branch names always start with the Fizzy card number, then a short
@@ -156,7 +168,11 @@ file, with the gremlin spec proving one stolen draw forks history
 (card 116, post 0005 *The Tamper Seal*); pass-through belief store —
 law 3 as capabilities, decide(beliefs, stream, tick) returning
 intents, the courier as the card-122 seam, the war office as first
-believer (card 117, post 0006 *Truth & Belief*). Next up:
+believer (card 117, post 0006 *Truth & Belief*). In flight on this branch:
+two-track posts — every post now ships as `complete.md` + `simple.md`
+with Mermaid visuals as a standing question, earned by the
+reading-level experiment in `docs/experiments/reading-levels/`
+(card 147, ADR 0003; its post is still owed). Next up:
 - toy world: two civilizations with opposed proclivities (mercantile vs
   martial), one commodity, one market with naive price adjustment
   (card 118)

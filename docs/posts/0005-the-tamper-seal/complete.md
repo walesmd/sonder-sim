@@ -1,7 +1,12 @@
 # The Tamper Seal
 
 *Post 0005 · code pinned at tag `post/0005` · Lua 5.4 + SQLite ·
-this post's universe: seed `1893` · ~10 min read*
+this post's universe: seed `1893` · ~10 min read ·
+plain-language version: [simple](./simple.md)*
+
+*Previously: post 0004 gave history a home on disk — every run
+archives to a self-describing, append-only universe file — and closed
+by promising that file a tamper seal.*
 
 ---
 
@@ -100,6 +105,16 @@ a row at every hundredth tick (`checkpoint_every`, default 100, an
 opts knob). Each row: the tick, how many events existed through it,
 sixteen hex digits.
 
+```mermaid
+flowchart LR
+    annals["annals: events in tick order"] --> canon["canonical bytes per event (canon.lua)"]
+    canon --> fnv["FNV-1a 64-bit fold"]
+    fnv --> running["running hash"]
+    running --> fnv
+    running -->|"every 100th completed tick"| row["checkpoint row: tick, event count, 16 hex digits"]
+    running -->|"at close()"| final["final seal of the whole history"]
+```
+
 The subtle question is *when it's safe to write one*. Checkpoint 100
 means "the hash of everything through tick 100" — but the archive is
 a follower reading a stream of events, and mid-stream, how does it
@@ -153,6 +168,16 @@ the difference, and find the first fork in O(log n) comparisons
 instead of reading two histories line by line. That's the synopsis
 tool's forensic mode, and its substrate shipped today.
 
+```mermaid
+graph LR
+    t100["tick 100: seals match"] --> t200["tick 200: seals match"]
+    t200 --> t300["tick 300: seals differ"]
+    t300 --> t400["tick 400: seals differ"]
+    t400 --> t500["tick 500: seals differ"]
+    t200 -. "binary search the 200-300 gap" .-> fork["first fork: tick 251 (one draw stolen at 250)"]
+    t300 -.-> fork
+```
+
 ## The CS underneath: nets made of hashes
 
 **Golden-master testing** (the name comes from recording studios —
@@ -170,26 +195,27 @@ it), the constant gets re-cut deliberately, in its own commit, with
 the reason in the message — a golden master you re-cut casually is
 just a cache of your bugs.
 
-**FNV-1a** earns its keep by the avalanche property: flip one input
-bit and, on average, half the output bits flip, so "one payload
-differs by 1 in tick 251" lands as fully different digits, not a
-near-miss a human might skim past. With 64 bits, accidental collision
-needs on the order of 2³² histories before you'd expect a single
-pair (the birthday bound) — astronomically beyond a spec suite,
-meaningless against an adversary, which is why the honest label is
-tamper-evidence.
+> **Aside — avalanche and the birthday bound.** **FNV-1a** earns its
+> keep by the avalanche property: flip one input bit and, on average,
+> half the output bits flip, so "one payload differs by 1 in tick
+> 251" lands as fully different digits, not a near-miss a human might
+> skim past. With 64 bits, accidental collision needs on the order of
+> 2³² histories before you'd expect a single pair (the birthday
+> bound) — astronomically beyond a spec suite, meaningless against an
+> adversary, which is why the honest label is tamper-evidence.
 
-**And the tick-completion rule has a name in industry: a watermark.**
-Stream processors — Flink, Beam, Kafka Streams — face the identical
-question: when can a time window close, given events arrive as a
-stream? Their answer is a watermark: a signal that no events earlier
-than T will arrive again. Ours is the special case where the stream
-is totally ordered (the annals rejects backwards time), so the next
-event *is* the watermark. We found the rule by asking when a
-checkpoint is safe to write; the stream-processing literature found
-it by asking when a billing window can bill. Same shape, and it's the
-shape to remember when news starts traveling at ship speed (card 122)
-and "has everything arrived yet?" stops having easy answers.
+> **Aside — watermarks, generally.** The tick-completion rule has a
+> name in industry: a **watermark**. Stream processors — Flink, Beam,
+> Kafka Streams — face the identical question: when can a time window
+> close, given events arrive as a stream? Their answer is a
+> watermark: a signal that no events earlier than T will arrive
+> again. Ours is the special case where the stream is totally ordered
+> (the annals rejects backwards time), so the next event *is* the
+> watermark. We found the rule by asking when a checkpoint is safe to
+> write; the stream-processing literature found it by asking when a
+> billing window can bill. Same shape, and it's the shape to remember
+> when news starts traveling at ship speed (card 122) and "has
+> everything arrived yet?" stops having easy answers.
 
 ## What we got wrong
 

@@ -1,7 +1,13 @@
 # The History Book
 
 *Post 0004 · code pinned at tag `post/0004` · Lua 5.4 + SQLite ·
-this post's universe: seed `1893` · ~10 min read*
+this post's universe: seed `1893` · ~10 min read ·
+plain-language version: [simple](./simple.md)*
+
+*Previously: post 0002 built the annals — the append-only event log,
+with cause links and a `--why` flag that walks them — as an array in
+RAM, and confessed in its closing lines that closing the terminal
+erased history.*
 
 ---
 
@@ -86,6 +92,21 @@ at most the current tick and can never tear an event in half. The
 durability quantum is the sim's own quantum of time, which is the
 kind of sentence you hope falls out of a design rather than being
 forced into one.
+
+```mermaid
+sequenceDiagram
+    participant Sim as Universe (headless)
+    participant Log as Annals (in memory)
+    participant Arc as Archive (follower)
+    participant DB as universe.db
+    Sim->>Log: append this tick's events
+    Note over Arc: cursor remembers the last id copied
+    Arc->>Log: get() the unseen suffix
+    Arc->>DB: BEGIN
+    Arc->>DB: insert events and causes
+    Arc->>DB: COMMIT (one transaction per tick)
+    Note over Sim: never learns the archive exists
+```
 
 ## The schema: three tables, no apologies
 
@@ -205,29 +226,44 @@ batch-per-tick beats commit-per-event: the fixed cost of durability
 is paid once per tick, not once per happening. Databases at scale
 call the same trick group commit.
 
-How SQLite delivers atomicity is the pleasing part: underneath, it
-keeps a journal — by default a rollback journal, in its more famous
-mode a **write-ahead log**. Every database you've ever used writes
-its WAL first and treats its tables as, formally, a materialized view
-of that log. Post 0002 called this "event sourcing in the basement."
-So watch what this card actually did: our source of truth is an
-append-only event log, which we persist by handing it to an engine
-that persists *everything* via its own internal append-only log. It's
-logs all the way down — the difference is that SQLite hides its log
-as an implementation detail, while Sonder's log *is the product*,
-with a query engine attached.
+> **Aside — logs all the way down.** How SQLite delivers atomicity
+> is the pleasing part: underneath, it keeps a journal — by default a
+> rollback journal, in its more famous mode a **write-ahead log**.
+> Every database you've ever used writes its WAL first and treats its
+> tables as, formally, a materialized view of that log. Post 0002
+> called this "event sourcing in the basement." So watch what this
+> card actually did: our source of truth is an append-only event log,
+> which we persist by handing it to an engine that persists
+> *everything* via its own internal append-only log. It's logs all
+> the way down — the difference is that SQLite hides its log as an
+> implementation detail, while Sonder's log *is the product*, with a
+> query engine attached.
 
 And the query engine is the payoff. **Recursive CTEs** (SQL:1999,
 SQLite since 2014) make SQL Turing-complete-ish enough to walk
 graphs: the `why` query seeds itself with event 9, joins `causes`
-against its own result until nothing new appears — a fixpoint — and
-`UNION`'s duplicate-elimination is the visited-set that makes
-termination guaranteed on any finite graph, cycles included. Ours
-can't have cycles (post 0002's only-the-past-causes-the-present rule
-makes the log a DAG by construction), so the recursion is also just
-*correct* forensics: strictly backwards in time, genesis the only
-fixed point. The README calls SQL a telescope; recursive CTEs are the
+against its own result, and repeats until nothing new appears — a
+fixpoint. For event 9 the walk looks like this:
+
+```mermaid
+graph LR
+    P0["pass 0: seed with 9"] --> P1["pass 1: 9's cause is 7"]
+    P1 --> P2["pass 2: 7's cause is 5"]
+    P2 --> P3["pass 3: 5's cause is 3"]
+    P3 --> P4["pass 4: 3's cause is 1, genesis"]
+    P4 --> P5["pass 5: nothing new - stop"]
+```
+
+The README calls SQL a telescope; recursive CTEs are the
 mount that lets it track a moving argument.
+
+> **Aside — why the walk must stop.** `UNION`'s
+> duplicate-elimination is the visited-set that makes termination
+> guaranteed on any finite graph, cycles included. Ours can't have
+> cycles (post 0002's only-the-past-causes-the-present rule makes the
+> log a DAG by construction), so the recursion is also just *correct*
+> forensics: strictly backwards in time, genesis the only fixed
+> point.
 
 ## What we got wrong
 

@@ -1,7 +1,13 @@
 # Truth & Belief
 
 *Post 0006 · code pinned at tag `post/0006` · Lua 5.4 · this post's
-universe: seed `1893` · ~10 min read*
+universe: seed `1893` · ~10 min read · plain-language version:
+[simple](./simple.md)*
+
+*Previously: for four posts the market and the war office have shared
+a universe without exchanging a word — two random walks in adjacent
+columns. Post 0005 sealed history with a rolling hash, so any change
+to what a seed produces is loudly visible.*
 
 ---
 
@@ -81,6 +87,25 @@ u:add_faction("war", function(beliefs, stream, tick)
 end)
 ```
 
+```mermaid
+graph LR
+    subgraph universe ["the universe — faction code is never handed any of this"]
+        world[world state]
+        annals[annals]
+        emit["emit (strict validation)"]
+    end
+    subgraph handed ["handed to decide()"]
+        beliefs[belief store]
+        stream[named RNG stream]
+        tick[tick]
+    end
+    beliefs --> decide["the faction's decide()"]
+    stream --> decide
+    tick --> decide
+    decide -- "intents" --> emit
+    emit --> annals
+```
+
 Look at the argument list, because the argument list is the entire
 security model: a belief store, a named RNG stream, an integer.
 No universe. No annals. No `emit`. The decision function *returns*
@@ -139,6 +164,15 @@ be retrofitted onto decision code written against world state,
 because every such function would have baked "I can see everything,
 instantly" into its logic.
 
+```mermaid
+graph LR
+    annals[annals] --> courier["courier — the seam (today: pass-through; card 122: distance, delay, degradation)"]
+    courier --> stores[per-faction belief stores]
+    stores --> decide["decide(beliefs, stream, tick)"]
+    decide -- "intents" --> emit[emit]
+    emit --> annals
+```
+
 ## The CS underneath: capabilities, and seams
 
 The security model this card leans on has a name: **capability-based
@@ -150,14 +184,16 @@ enforce it with checks at every door (and politeness between the
 checks). Capability systems ask "what do you *hold*?" Authority is
 a reference; if you were never handed the reference, the resource
 does not exist in your world. There is no check to forget, because
-there is no door to guard. Lua is a good host for this discipline:
-no globals-by-default reaching into the sim, closures that close
-over exactly what they're given, and a function's arguments as its
-entire visible universe. `decide(beliefs, stream, tick)` is a
+there is no door to guard. `decide(beliefs, stream, tick)` is a
 capability list. The **principle of least authority** — give code
 the minimum it needs — is the same idea worn as a design habit, and
 it's why the faction gets a *named* stream rather than the RNG: the
 war office can spend its own luck, and nobody else's.
+
+> **Aside — Lua as a capability host.** Lua is a good host for this
+> discipline: no globals-by-default reaching into the sim, closures
+> that close over exactly what they're given, and a function's
+> arguments as its entire visible universe.
 
 The other name worth knowing is Michael Feathers':
 
@@ -175,16 +211,17 @@ the point of future variation, and "how does knowledge reach an
 agent" is *the* point of variation in a simulation whose thesis is
 that knowledge is partial, late, and bent.
 
-One more thing the store quietly is: a **per-agent projection**. The
-chronicle projects the log into sentences; the archive projects it
-into rows; a belief store projects it into *one faction's
-knowledge*. With a pass-through courier, its arrival order matches
-log order and the projection is boringly faithful. The day couriers
-slow down, each store's arrival order becomes that faction's private
-chronology — two civilizations will hold the same events in
-different orders, disagree about what caused what, and both be
-internally consistent. The mechanism shipped today; only the delay
-is missing.
+> **Aside — the store as a per-agent projection.** One more thing
+> the store quietly is: a **per-agent projection**. The chronicle
+> projects the log into sentences; the archive projects it into
+> rows; a belief store projects it into *one faction's knowledge*.
+> With a pass-through courier, its arrival order matches log order
+> and the projection is boringly faithful. The day couriers slow
+> down, each store's arrival order becomes that faction's private
+> chronology — two civilizations will hold the same events in
+> different orders, disagree about what caused what, and both be
+> internally consistent. The mechanism shipped today; only the delay
+> is missing.
 
 ## What we got wrong
 
