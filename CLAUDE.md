@@ -176,7 +176,11 @@ thousand days (card 118, post 0007 *A War Nobody Planned*);
 two-track posts — every post now ships as `complete.md` + `simple.md`
 with Mermaid visuals as a standing question, earned by the
 reading-level experiment in `docs/experiments/reading-levels/`
-(card 147, ADR 0003, post 0008 *Simple & Complete*). Next up:
+(card 147, ADR 0003, post 0008 *Simple & Complete*). In flight on
+this branch: eval notes on every shelf entry — the three story-first
+civilizations backfilled, the world library's collective note, and
+the practice chartered as flexibility principle 7 (card 148, post
+0009 *What Failure Looks Like*, draft). Next up:
 
 - cut v0.1 and re-cut post 0000 (card 119)
 - standing lore sessions — the road to thirty species (card 130)
