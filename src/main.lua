@@ -22,8 +22,8 @@ local Archive = require "sonder.archive"
 local Seal = require "sonder.seal"
 local fnv = require "sonder.fnv"
 
--- Matches sonder-dev-1.rockspec; versions get real at v0.1 (card 119).
-local ENGINE_VERSION = "dev-1"
+-- Matches sonder-0.1.0-1.rockspec; got real at v0.1 (card 119).
+local ENGINE_VERSION = "0.1.0"
 
 local function parse_args(argv)
    local opts = { seed = 1893, ticks = 10 }

@@ -1,67 +1,120 @@
 # First Tick
 
-*Post 0000 · the simple version — plain language, same facts · the complete essay: [complete.md](./complete.md)*
+*Post 0000 · the simple version — plain language, same facts · the
+complete essay: [complete.md](./complete.md)*
 
 ---
 
-*A note before we start: this post is a draft, written before the code existed. The story and details below describe where the project is headed, not what is finished. It will be re-cut when version 0.1 ships.*
-
-On day 214 of a universe that has never existed, the price of a gas went up, and someone decided a war would be cheaper than the bill. Here is the universe's own record:
+On day 86 of universe number 1893, a hungry nation went to war. Here
+is the universe's own record of it:
 
 ```
-day 214   heliox closes at 9.4 credits — up 21% this season. The
-          Vessari Combine cites "market conditions." The market
-          conditions are that the Vessari Combine owns the market.
-
-day 231   the Khedrun war-moot votes, five banners to two, that it
-          is cheaper to take the Heliox Reach than to keep buying it.
-
-day 246   first blood at Anchor Station Nine. Three hulls lost.
-
-day 638   armistice — of exhaustion, not agreement.
-
-day 1000  run complete. Vessari treasury at 44% of day one.
-          Five of nine Khedrun banners remain.
+tick    0 · the-void · a universe begins (seed 1893)
+      ⋮
+tick   84 · khedrun-holds · hunger — the granaries came up 2 sacks short
+tick   86 · khedrun-holds · the khedrun declare war on the vessari — 4 hungry days were the last insult
+tick   87 · vessar-reaches · a khedrun war party rides against the vessari granaries (force 8)
+tick   96 · khedrun-holds · the khedrun sheathe — grain at 79¢ buys more than blood
+tick  100 · the-exchange · 12 sacks pass from the vessari to the khedrun at 84¢
 ```
 
-Walk through it line by line. Day 214: a gas called heliox now costs 9.4 credits, 21% more than before, because the Vessari, a trading power, own the whole market and blame "conditions" that are really just themselves. Day 231: the warlike Khedrun vote in council, five to two, that fighting for the gas is cheaper than buying it. Day 246: the war starts; three ships are destroyed. Day 638: both sides stop, not because they agree, but because they are exhausted. Day 1000: the run ends. The traders have 44% of the money they started with, and only five of the Khedrun's nine clans are left.
+Read it top to bottom: a universe begins, a people go hungry, they
+declare war, they raid their neighbors' granaries, and ten days later
+— once grain is cheap enough to buy again — they put their spears away
+and go back to shopping.
 
-Nobody wrote that story. We wrote *rules* — like the rulebook of a board game — and the computer played out a thousand days in about two seconds, using roughly eight hundred lines of code. The story fell out of the rules. Learning to be surprised by our own program, on purpose, for years, is basically the whole project.
+Nobody wrote that war. There is no script with day 86 in it. There
+are about two thousand lines of code describing two personalities, one
+grain market, and the weather — and when the computer plays out a
+thousand days, twenty wars break out on their own. Run it again and
+you get the exact same thousand days, down to the last sack of grain.
+Change the starting number — the *seed* — by one digit and you get a
+completely different universe nobody has ever seen.
+
+That's the whole trick, and this project — called **Sonder** — is
+about seeing how far it can go.
 
 ## What this is
 
-Sonder is a **simulation** — a program that imitates a world and lets it run. Many invented civilizations trade, scheme, and sometimes fight across a computer-grown galaxy. You are not a player — more like a subscriber to a newspaper from a universe that keeps going whether or not you read it.
+Sonder is a universe you read, not a game you play. Simulated
+civilizations trade, scheme, and fight across a galaxy, whether or not
+anyone is watching. Your role is somewhere between a god and a
+subscriber: history piles up on its own, and you read it like a
+newspaper from a world that doesn't exist.
 
-Every universe grows from a **seed** — one starting number that decides everything, the way a recipe decides a cake. This post's universe grew from seed 1893. Same seed, same universe, every time, on any computer — down to the last destroyed ship. Change one digit and you get a universe nobody has ever seen. That rule is called **determinism**: the same inputs always produce the same outputs. A whole universe can be shared by texting a friend one number, and saving is nearly free — the save file is just your seed plus anything you personally changed.
+Two ideas make it special. First, everything is *repeatable*: the same
+seed always produces the same universe, so you can share a universe
+with a friend by sharing one number. Second, no civilization in
+Sonder ever acts on the truth. Each one acts only on the news that has
+reached it — and someday soon, news will travel slowly, on ships, and
+two nations will genuinely disagree about how their own war is going.
+(Real history works this way too: the bloodiest battle of the War of
+1812 was fought *after* the peace treaty was signed, because the news
+was still crossing the ocean.)
 
-## History is the product
+There's no finish line and no deadline. We expect to build this for
+decades, one small piece at a time.
 
-Inside the program, nothing happens unless it is written into one big log, like a diary with very strict habits. Every entry records when it happened, where, how big it was, and which earlier entries caused it. Everything you read — the war story above, the statistics — is copied out of that log. Computer scientists call this **event sourcing**: the log *is* the real data, and everything else is a view of it.
+## Why we're doing it
 
-```mermaid
-graph LR
-    seed["one seed number"] --> sim["the simulation runs"]
-    sim --> log["the event log"]
-    log --> chron["the story you read"]
-    log --> stats["the statistics"]
-```
+The learning is the product. Every piece of the simulator ships with
+an essay explaining how it works and the computer science behind it —
+and every essay comes in two versions, the full one and the one you're
+reading now. We build this way because a universe simulator makes
+computer science ideas *necessary* instead of assigned: we needed a
+tamper-proof diary, so we learned about event logs; we needed two
+computers to agree they'd computed the same history, so we learned
+about hash functions. Nothing is taught in the abstract. The universe
+demands it first.
 
-For a game you mostly read, good record-keeping is not a feature — it is the point. The log lives in a real database, so you can ask it questions like "how many wars started over shortages?"
+There's a quieter reason too. Most big systems, you only ever meet
+when they're already grown — nobody can tell you why anything is the
+way it is. Sonder is being built in public from its very first tick,
+and every essay is pinned to the exact version of the code it
+describes. Anyone can rewind to any moment and look around.
 
-## Nobody acts on the truth
+## What exists today
 
-Here is our favorite rule: no civilization in Sonder gets to see the truth. Each acts only on the news that has reached it — and news travels like mail on ships: late, and sometimes garbled. Two empires can disagree about the state of their own war. This happens in human history too: the bloodiest battle of the War of 1812 was fought weeks *after* the peace treaty was signed, because the news was still crossing the Atlantic.
-
-A bonus comes free. Somewhere on the rim of the galaxy is a tiny civilization that has never heard of either empire. Simulating its ignorance costs nothing — no news ever arrived, so its knowledge is just an empty list. This year its records show a good harvest and some troubling lights in the sky.
+Version 0.1 is deliberately a toy: two small civilizations — the
+Vessari, farmers who sell their surplus, and the Khedrun, hill clans
+who buy what they can and take what they can't — one grain market, and
+wars that start when hunger outruns patience. Every run writes a
+history file you can question afterward: ask it *why* the war
+happened, and it answers with the chain of causes, all the way back to
+the hungry days that lit the fuse. Under the hood sit the pieces the
+first nine essays explain: a perfectly repeatable clock, a diary that
+only ever adds pages, a tamper seal on history, and the wall that
+keeps every nation acting on beliefs instead of truth. A thousand days
+takes about an eighth of a second.
 
 ## What we got wrong
 
-We broke our own most important rule within hours. Our programming language, Lua, has a tool that walks through a list in whatever order it feels like — like pulling names from a hat. We used it somewhere the order mattered, so our very first universe quietly came out different every time we ran it. Same seed, different history: exactly the thing we promised could never happen. The fix, and the lesson, became the next post.
+Here's the fun part. The first version of this essay was written
+*before any code existed*, as a dream of where the project would go.
+Now the universe actually runs, and we can grade the dream:
 
-## Why, and who
+- **We predicted the wrong first bug.** The draft claimed a specific
+  famous trap had already bitten us. It never did — our first real bug
+  was a test that was wrong about what it was checking.
+- **The dream got every detail wrong and every name right.** The
+  draft imagined a gas called heliox, a merchant cartel, and a war
+  vote. Reality kept the two nations' names — Vessari and Khedrun —
+  and swapped everything else: the goods became grain, the vote became
+  hunger, and the imagined day-231 war actually arrived on day 86.
+- **Reality was bigger and faster than we guessed.** We promised 800
+  lines of code and a two-second run. It took 1,970 lines — and runs
+  sixteen times faster than we promised.
+- **The old install instructions were fiction.** The real ones exist
+  now, and we tested them the honest way: we built this very version
+  from scratch, in one command, before publishing them.
 
-The learning is not a side effect — it is the product, tied with the universe itself. Every new mechanic ships with an essay explaining the computer science it forced us to learn — nothing is taught in the abstract; the universe has to demand it first.
+## Try it
 
-"We" is two: Mike, a human who works in computer science education, and Claude, an AI. The AI drafts much of the code and writing; the human decides, edits, and owns the consequences. One rule keeps that honest: nothing counts until Mike can explain every piece of it with the AI out of the room. An education you can't repeat back isn't an education — it's a subscription.
+If you're comfortable with a terminal, the complete essay has the full
+instructions — three commands to a running universe. Any whole number
+is a valid seed, and every seed is a universe nobody has watched yet.
+If yours produces a story worth telling, tell us the number. That's
+the local currency here.
 
-The clock is wound. Same seed, same universe — see you at day two thousand.
+The clock is wound. Same seed, same universe — see you at day two
+thousand.

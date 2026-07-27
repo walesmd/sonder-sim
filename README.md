@@ -37,8 +37,10 @@ once, in [`docs/glossary.md`](docs/glossary.md).
 
 ## Status
 
-**Pre-0.1 — the heartbeat runs, and history is written down.** The
-walking skeleton has its first two pieces. A deterministic tick loop
+**v0.1 — the walking skeleton, complete.** Cut at card 119, with
+post 0000 ([*First Tick*](docs/posts/0000-first-tick/complete.md),
+tag `post/0000`) re-cut from aspiration to fact as its front door.
+The pieces, in the order they arrived: A deterministic tick loop
 with a named RNG stream per subsystem, so adding a feature to the
 market never shifts a single draw in the war machine — post 0001,
 [*Ticks & Determinism*](docs/posts/0001-ticks-and-determinism/complete.md)
@@ -73,9 +75,9 @@ commodity across one naive market, with money in integer cents and
 wars nobody planned precipitating out of grain prices roughly every
 forty-five days — post 0007,
 [*A War Nobody Planned*](docs/posts/0007-a-war-nobody-planned/complete.md)
-(tag `post/0007`). Still ahead for the skeleton: the v0.1 cut.
-Watching now means watching from very nearly the beginning, which
-is rather the point.
+(tag `post/0007`). Ahead: news at ship speed (card 122), and the
+lore shelf's road to thirty species. Watching now means watching
+from very nearly the beginning, which is rather the point.
 
 ## Building
 
@@ -142,8 +144,8 @@ cards being worked, and the queue behind them, are on the
 [public project board](https://app.fizzy.do/6237702/public/boards/A7cGuM6i11p3NH8av6LoWxeE)
 — as close to a roadmap as this project will ever have.
 
-Once v0.1 exists, seeds become the local currency: same seed, same
-universe, so "go look at seed 40412" is a complete story recommendation.
+Seeds are the local currency: same seed, same universe, so "go look
+at seed 40412" is a complete story recommendation.
 Field reports from universes behaving badly will be the most welcome kind
 of issue.
 
