@@ -1,7 +1,13 @@
 # A War Nobody Planned
 
 *Post 0007 · code pinned at tag `post/0007` · Lua 5.4 + SQLite ·
-this post's universe: seed `1893` · ~12 min read*
+this post's universe: seed `1893` · ~12 min read ·
+plain-language version: [simple](./simple.md)*
+
+*Previously: post 0006 walled factions off from truth — decision code
+reads a belief store fed by a courier, never the world. This card
+retires the placeholder market and war office every post since 0002
+promised to churn.*
 
 ---
 
@@ -139,6 +145,16 @@ granary drains → hunger → war → plunder carries grain and coin home
 Twenty wars, roughly forty-five days apart, dates jittered by
 harvest luck. The Vessari books, read closely, say the quiet part:
 the wars are how their customers refinance.
+
+```mermaid
+graph LR
+    trade["trade drains the treasury"] --> poverty["poverty: bids stop"]
+    poverty --> hunger["the granary drains — hunger"]
+    hunger --> war["war: the fuse burns"]
+    war --> plunder["plunder carries grain and coin home"]
+    plunder --> peace["peace: trade resumes with stolen silver"]
+    peace --> trade
+```
 
 (Burning earns its law citation: total matter is conserved *unless
 explicitly mined or burned*, and `war.spoils` carries a `burned`

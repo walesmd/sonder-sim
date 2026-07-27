@@ -160,7 +160,10 @@ adds it here, in the same PR.
 
 - **post** — the essay every increment ships with: excerpt → design
   → the CS underneath → what we got wrong. Pinned to a `post/NNNN`
-  git tag at the exact code it describes.
+  git tag at the exact code it describes. Since card 147 a post is a
+  directory with two tracks: **complete** (the canonical collegiate
+  essay) and **simple** (a plain-language companion — same facts,
+  fewer of them). (ADR 0003)
 - **notebook** — a branch's working log in `docs/notebooks/`:
   decisions, rejected alternatives, questions and the answers that
   stuck. The post's raw material; merges with the PR.

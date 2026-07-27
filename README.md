@@ -27,7 +27,9 @@ queues arrive because fleets need arrival times, distributed-systems
 theory arrives because light is slow and news travels on merchant ships.
 Posts live in [`docs/posts/`](docs/posts/), each one pinned to a git tag
 pointing at the exact code it describes, so you can stand at any moment of
-this project's history and look around. The universe's authored side —
+this project's history and look around. Every post comes in two tracks —
+the complete essay, and a plain-language *simple* version that assumes
+nothing but curiosity — so bring whichever background you have. The universe's authored side —
 species, cosmology, historical priors, written long before they are
 code — lives in [`docs/lore/`](docs/lore/). And the words this repo
 leans on — *annals*, *chronicle*, *faction*, *seal* — are each defined
@@ -39,38 +41,38 @@ once, in [`docs/glossary.md`](docs/glossary.md).
 walking skeleton has its first two pieces. A deterministic tick loop
 with a named RNG stream per subsystem, so adding a feature to the
 market never shifts a single draw in the war machine — post 0001,
-[*Ticks & Determinism*](docs/posts/0001-ticks-and-determinism.md)
+[*Ticks & Determinism*](docs/posts/0001-ticks-and-determinism/complete.md)
 (tag `post/0001`). And the annals: an append-only event log with a
 strict vocabulary, where every event cites the events that caused it
 and a terminal chronicle renders the feed — and answers *why* — from
 the log alone — post 0002,
-[*The Event Log*](docs/posts/0002-the-event-log.md) (tag `post/0002`).
+[*The Event Log*](docs/posts/0002-the-event-log/complete.md) (tag `post/0002`).
 The universe also has its first authored inhabitants: three
 civilizations and a fifteen-type world library on the lore shelf,
 chartered as an eval suite — stories the engine must be able to host,
 never a spec of what it builds — post 0003,
-[*The Lore Shelf*](docs/posts/0003-the-lore-shelf.md) (tag
+[*The Lore Shelf*](docs/posts/0003-the-lore-shelf/complete.md) (tag
 `post/0003`). And history now survives the terminal: every run writes
 a SQLite universe file — the annals as rows, causes as a walkable
 graph, and a provenance table so the file can testify about its own
 origins — post 0004,
-[*The History Book*](docs/posts/0004-the-history-book.md) (tag
+[*The History Book*](docs/posts/0004-the-history-book/complete.md) (tag
 `post/0004`). The history book carries a tamper seal: a rolling
 state hash checkpointed into every universe file, and the golden-
 master replay test every later mechanic lands inside — same seed,
 500 ticks, same sixteen hex digits on every machine — post 0005,
-[*The Tamper Seal*](docs/posts/0005-the-tamper-seal.md) (tag
+[*The Tamper Seal*](docs/posts/0005-the-tamper-seal/complete.md) (tag
 `post/0005`). And law 3 is now structural: factions decide on belief
 stores their code is handed instead of a world it never sees, the
 war office became the first believer, and `--why` ladders cross
 subsystems — post 0006,
-[*Truth & Belief*](docs/posts/0006-truth-and-belief.md) (tag
+[*Truth & Belief*](docs/posts/0006-truth-and-belief/complete.md) (tag
 `post/0006`). And the universe has its first economy: the Vessari
 and the Khedrun — temperaments compiled to constants — trading one
 commodity across one naive market, with money in integer cents and
 wars nobody planned precipitating out of grain prices roughly every
 forty-five days — post 0007,
-[*A War Nobody Planned*](docs/posts/0007-a-war-nobody-planned.md)
+[*A War Nobody Planned*](docs/posts/0007-a-war-nobody-planned/complete.md)
 (tag `post/0007`). Still ahead for the skeleton: the v0.1 cut.
 Watching now means watching from very nearly the beginning, which
 is rather the point.

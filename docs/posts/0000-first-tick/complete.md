@@ -4,7 +4,7 @@
 
 # First Tick
 
-*Post 0000 · code pinned at tag `post/0000` · Lua 5.4 · this post's universe: seed `1893` · ~8 min read*
+*Post 0000 · code pinned at tag `post/0000` · Lua 5.4 · this post's universe: seed `1893` · ~8 min read · plain-language version: [simple](./simple.md)*
 
 ---
 
@@ -76,13 +76,13 @@ shows up because light is slow and news travels on merchant ships. Nothing
 gets taught in the abstract; everything gets built because the universe
 demanded it.
 
-There is a second, quieter reason. Most complex systems you will ever
-encounter, you meet full-grown — the codebase at your job is a city with
-no record of why any street goes where it goes. Sonder is being built in
-public from its first tick, and every post pins the exact commit it
-describes. You can stand at any point in this project's history and look
-around. The repository is an experiment in whether a system can stay
-legible for its entire life.
+> **Aside — a second, quieter reason.** Most complex systems you will
+> ever encounter, you meet full-grown — the codebase at your job is a
+> city with no record of why any street goes where it goes. Sonder is
+> being built in public from its first tick, and every post pins the
+> exact commit it describes. You can stand at any point in this
+> project's history and look around. The repository is an experiment in
+> whether a system can stay legible for its entire life.
 
 ## The bets
 
@@ -129,6 +129,20 @@ sqlite3 out/universe-1893.db \
   "SELECT cause_kind, COUNT(*) FROM wars GROUP BY cause_kind;"
 -- resource_shortage | 3
 -- broken_treaty     | 1
+```
+
+These first two bets fit in one picture — three inputs pin exactly one
+universe, and everything you read is a projection of its log:
+
+```mermaid
+graph LR
+    code["code version"] --> sim["the simulation"]
+    seed["seed"] --> sim
+    iv["your interventions"] --> sim
+    sim --> log["one event log = exactly one universe"]
+    log --> chron["chronicle"]
+    log --> term["terminal output"]
+    log --> stats["statistics"]
 ```
 
 **Civilizations do not act on the truth.** The decision layer of every

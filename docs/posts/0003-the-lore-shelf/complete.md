@@ -1,7 +1,11 @@
 # The Lore Shelf
 
 *Post 0003 · pinned at tag `post/0003` · lines of code shipped: 0 ·
-~9 min read*
+~9 min read · plain-language version: [simple](./simple.md)*
+
+*Previously: post 0001 gave the universe its deterministic heartbeat,
+and post 0002 gave it the event log where everything that happens is
+written down. This card shipped zero code, on purpose.*
 
 ---
 
@@ -136,6 +140,23 @@ Someday the generator should surprise the shelf's own authors — and
 when it does, the surprise isn't a violation. It's a candidate for
 the next eval.
 
+The whole relationship fits in one picture — note which way every
+arrow points:
+
+```mermaid
+flowchart TD
+    shelf["The lore shelf — handwritten stories"]
+    mechanic["A proposed mechanic"]
+    redesign["The mechanic gets redesigned — never the story"]
+    floor["Passing — the floor, not the target"]
+    surprise["The engine surprises the shelf's own authors"]
+    shelf -->|"every mechanic is held against the stories"| mechanic
+    mechanic -->|"can't host a story"| redesign
+    redesign -->|"proposed again"| mechanic
+    mechanic -->|"hosts every story"| floor
+    surprise -->|"becomes a candidate for the next eval"| shelf
+```
+
 There are exception paths, and they both run through Mike, on the
 record: a story can turn out to be a **bad test** (it quietly
 assumed something the four laws forbid — the laws outrank the
@@ -191,12 +212,15 @@ specification, and they do different jobs. The four laws are
 **properties** — invariants that must hold for *every* universe
 (determinism, everything-is-an-event, beliefs-not-truth, headless
 core). The shelf is **examples** — specific hard cases that must
-remain constructible. Property-based testing frameworks (QuickCheck
-and its thousand descendants) automate exactly this pairing: state
-properties, generate examples, and keep the pathological examples
-you find as a permanent corpus. Our corpus is just handwritten,
-because the pathology we're hunting is *narrative* — the example
-that breaks your schema is a civilization someone actually wants.
+remain constructible.
+
+> **Aside — QuickCheck and the handwritten corpus.** Property-based
+> testing frameworks (QuickCheck and its thousand descendants)
+> automate exactly this pairing: state properties, generate
+> examples, and keep the pathological examples you find as a
+> permanent corpus. Our corpus is just handwritten, because the
+> pathology we're hunting is *narrative* — the example that breaks
+> your schema is a civilization someone actually wants.
 
 **Goodhart's law, and the floor clause.** "When a measure becomes a
 target, it ceases to be a good measure." In machine learning the

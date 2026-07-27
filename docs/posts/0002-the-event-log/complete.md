@@ -1,7 +1,13 @@
 # The Event Log
 
 *Post 0002 · code pinned at tag `post/0002` · Lua 5.4 · this post's
-universe: seed `1893` · ~10 min read*
+universe: seed `1893` · ~10 min read · plain-language version:
+[simple](./simple.md)*
+
+*Previously: post 0001 built the deterministic heartbeat — a tick loop
+and named RNG streams, so that one seed produces one universe, bit for
+bit. Nothing it did was written down anywhere; that's this post's
+problem.*
 
 ---
 
@@ -131,7 +137,17 @@ through an array: no cycle detection, no graph library, just the fact
 that you cannot reference what hasn't been written yet. Every chain of
 whys bottoms out at event 1 — that's the ladder in the excerpt, and
 it's not a rendering trick; `--why` is fifteen lines of code walking
-`causes` fields.
+`causes` fields. Drawn as the graph it actually is, the excerpt's
+ladder looks like this — every arrow means "cites as cause," and every
+arrow points at a smaller id:
+
+```mermaid
+graph LR
+    E9["event 9<br/>war.muster, tick 4"] --> E7["event 7<br/>war.muster, tick 3"]
+    E7 --> E5["event 5<br/>war.muster, tick 2"]
+    E5 --> E3["event 3<br/>war.muster, tick 1"]
+    E3 --> E1["event 1<br/>universe.genesis, tick 0"]
+```
 
 Our placeholders use it honestly: each drift cites the previous drift,
 each muster the previous muster, the first of each cites genesis. A
@@ -280,20 +296,31 @@ it in the basement: the log is the truth; everything you can look at
 is a **projection** — a pure function from a prefix of the log to a
 view. Same input, same view, which is why our golden feed test can
 hardcode four exact lines of terminal output for seed 1893 and expect
-them on every machine forever.
+them on every machine forever. One write path in, any number of pure
+readers out:
 
-There's one delightfully odd consequence of building event sourcing
-*on top of* post 0001's determinism. The annals is the source of truth
-for every reader — and yet, strictly speaking, it's redundant: the
-whole log is recomputable from eight bytes, because `(code version,
-seed)` regenerates every event bit for bit. Both statements are true
-at once. Relative to the generator, the log is a cache; relative to
-everything downstream — viewers, statistics, the belief store, next
-card's database — it's the authoritative record, and the only
-interface anything is allowed to read. We store it because readers
-want random access, because card 115 wants rows, and because the day
-interventions arrive, apocrypha branches will make the log the *only*
-complete account of what a meddling god actually did.
+```mermaid
+graph TD
+    emit["emit — the only write path"] --> annals["annals<br/>(append-only log)"]
+    annals --> chronicle["chronicle<br/>(projection: sentences)"]
+    annals --> stats["statistics<br/>(projection, later)"]
+    annals --> archive["SQLite archive<br/>(card 115, next)"]
+    annals --> beliefs["belief store<br/>(three cards from now)"]
+```
+
+> **Aside — the log is a cache and the record, at once.** There's one
+> delightfully odd consequence of building event sourcing *on top of*
+> post 0001's determinism. The annals is the source of truth for every
+> reader — and yet, strictly speaking, it's redundant: the whole log
+> is recomputable from eight bytes, because `(code version, seed)`
+> regenerates every event bit for bit. Both statements are true at
+> once. Relative to the generator, the log is a cache; relative to
+> everything downstream — viewers, statistics, the belief store, next
+> card's database — it's the authoritative record, and the only
+> interface anything is allowed to read. We store it because readers
+> want random access, because card 115 wants rows, and because the day
+> interventions arrive, apocrypha branches will make the log the
+> *only* complete account of what a meddling god actually did.
 
 ## What we got wrong
 
