@@ -154,7 +154,7 @@ notable figures, crystallized from aggregates on demand.
 
 ## Status
 
-**Pre-0.1. Session 1 — the walking skeleton — is underway.** Done:
+**v0.1 — session 1's walking skeleton — is cut.** Done:
 deterministic tick loop + named RNG streams (card 113, post 0001
 *Ticks & Determinism*); event bus + event vocabulary v1 + terminal
 chronicle, visibility stamped on every event (card 114, post 0002
@@ -176,18 +176,18 @@ thousand days (card 118, post 0007 *A War Nobody Planned*);
 two-track posts — every post now ships as `complete.md` + `simple.md`
 with Mermaid visuals as a standing question, earned by the
 reading-level experiment in `docs/experiments/reading-levels/`
-(card 147, ADR 0003, post 0008 *Simple & Complete*). In flight on
-this branch: eval notes on every shelf entry — the three story-first
-civilizations backfilled, the world library's collective note, and
-the practice chartered as flexibility principle 7 (card 148, post
-0009 *What Failure Looks Like*, draft). Next up:
+(card 147, ADR 0003, post 0008 *Simple & Complete*); eval notes on
+every shelf entry — the three story-first civilizations backfilled,
+the world library's collective note, the practice chartered as
+flexibility principle 7 (card 148, post 0009 *What Failure Looks
+Like*); and the v0.1 cut itself — engine version 0.1.0, post 0000
+(*First Tick*) re-cut from aspiration to fact with the real day-86
+war as its front-door excerpt (card 119, tag `post/0000`). Next up:
 
-- cut v0.1 and re-cut post 0000 (card 119)
-- standing lore sessions — the road to thirty species (card 130)
-
-A draft of post 0000 (*First Tick*) is in `docs/posts/` — written before
-any code existed; its chronicle excerpt and install steps are aspirational
-until v0.1 ships.
+- news at ship speed — the courier learns distance, delay, and
+  degradation, and one spec finally fails on schedule (card 122)
+- the road to thirty species, one lore card at a time (cards 133–146,
+  each entry arriving with its eval note)
 
 ## Project management
 

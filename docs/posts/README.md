@@ -21,7 +21,7 @@ can explain an algorithm better than a paragraph, the post carries one
 
 | Post | Title | Tags |
 |------|-------|------|
-| [0000](0000-first-tick/complete.md) | First Tick *(draft — re-cut at v0.1)* | — |
+| [0000](0000-first-tick/complete.md) | First Tick *(re-cut at v0.1)* | `post/0000` |
 | [0001](0001-ticks-and-determinism/complete.md) | Ticks & Determinism | `post/0001` |
 | [0002](0002-the-event-log/complete.md) | The Event Log | `post/0002` |
 | [0003](0003-the-lore-shelf/complete.md) | The Lore Shelf | `post/0003` |
@@ -30,7 +30,7 @@ can explain an algorithm better than a paragraph, the post carries one
 | [0006](0006-truth-and-belief/complete.md) | Truth & Belief | `post/0006` |
 | [0007](0007-a-war-nobody-planned/complete.md) | A War Nobody Planned | `post/0007` |
 | [0008](0008-simple-and-complete/complete.md) | Simple & Complete | `post/0008` |
-| [0009](0009-what-failure-looks-like/complete.md) | What Failure Looks Like *(draft, card 148)* | — |
+| [0009](0009-what-failure-looks-like/complete.md) | What Failure Looks Like | `post/0009` |
 
 Tags pushed before card 147 point at the old single-file layout
 (`docs/posts/NNNN-slug.md`); posts are era artifacts, and the tags
