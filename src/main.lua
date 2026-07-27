@@ -115,12 +115,14 @@ if opts.db ~= "none" then
    archive:sync() -- genesis, at the tick-0 boundary
 end
 
--- Placeholder systems, standing where the market and the war machine
--- will stand (card 118). Instead of muttering into locals they now
--- emit, and each event cites the previous event in its own line of
--- causation, so every chain walks back to genesis: markets don't just
--- move, wars don't just start, asteroids don't just exist.
-local last_market, last_war = 1, 1
+-- The placeholder cast (card 118 replaces both). The market is
+-- ambient physics: a system, drifting blindly, each drift citing the
+-- one before it. The war office is the first believer (card 117): a
+-- faction, so its decision code gets beliefs, a stream, and the tick
+-- — never the universe — and musters what it *believes* the market
+-- justifies, citing the drift it acted on. Ask --why about a muster
+-- and the ladder now crosses subsystems on its way to genesis.
+local last_market = 1
 u:add_system("market", function(universe, stream)
    local drift = stream:int(-3, 3)
    last_market = universe:emit{
@@ -132,16 +134,20 @@ u:add_system("market", function(universe, stream)
       causes = { last_market },
    }
 end)
-u:add_system("war", function(universe, stream)
-   local muster = stream:int(0, 9)
-   last_war = universe:emit{
+u:add_faction("war", function(beliefs, stream)
+   local drift = beliefs:latest("market.drift")
+   if not drift then
+      return {} -- ignorance is free: nothing heard, nothing mustered
+   end
+   local muster = drift.magnitude * 2 + stream:int(0, 3)
+   return { {
       kind = "war.muster",
       location = "the-void",
       magnitude = muster,
       visibility = "regional", -- you'd have to be nearby to count levies
       payload = { muster = muster },
-      causes = { last_war },
-   }
+      causes = { drift.id },
+   } }
 end)
 
 -- Fold the whole feed into one number, so two runs compare at a

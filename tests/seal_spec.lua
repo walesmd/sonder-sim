@@ -12,9 +12,15 @@ local toy = require "support.toy"
 -- If you did mean to (vocabulary churn, new system, card 118), this
 -- constant is re-cut deliberately, in its own commit, with the reason
 -- in the message.
+--
+-- Re-cut ledger:
+--   27e3e0a8080e04f8 — first cut (card 116); war office was a blind
+--                      system drawing its own musters
+--   ae08cb9d02bd99c1 — card 117: the war office became a believer,
+--                      mustering on believed drifts and citing them
 local GOLDEN_SEED = 1893
 local GOLDEN_TICKS = 500
-local GOLDEN_SEAL = "27e3e0a8080e04f8"
+local GOLDEN_SEAL = "ae08cb9d02bd99c1"
 
 describe("the golden master", function()
    it("seed 1893, 500 ticks, one exact seal", function()
