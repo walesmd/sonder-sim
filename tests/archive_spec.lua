@@ -5,6 +5,8 @@
 local sqlite3 = require "lsqlite3"
 local Universe = require "sonder.universe"
 local Archive = require "sonder.archive"
+local Seal = require "sonder.seal"
+local toy = require "support.toy"
 
 -- A fresh path in the OS temp dir that no file occupies yet.
 -- os.tmpname() pre-creates the file and Archive.create refuses paths
@@ -24,23 +26,20 @@ local function provenance(seed)
    }
 end
 
--- The placeholder systems from main.lua, so archived universes have
--- some history worth querying.
-local function toy_universe(seed)
-   local u = Universe.new(seed)
-   local last_market = 1
-   u:add_system("market", function(universe, stream)
-      local drift = stream:int(-3, 3)
-      last_market = universe:emit{
-         kind = "market.drift",
-         location = "the-void",
-         magnitude = math.abs(drift),
-         visibility = "public",
-         payload = { drift = drift },
-         causes = { last_market },
-      }
-   end)
-   return u
+-- The seal of every event through a given tick, plus how many there
+-- were — computed independently of the archive, which is the point:
+-- checkpoints must be recomputable from the log by anyone.
+local function seal_through(annals, tick_limit)
+   local seal = Seal.new(annals.vocabulary)
+   local events = 0
+   for id = 1, annals:len() do
+      local e = annals:get(id)
+      if e.tick <= tick_limit then
+         seal:fold(e)
+         events = events + 1
+      end
+   end
+   return seal:hex(), events
 end
 
 -- Run a query against the db file and collect every row as an array
@@ -70,6 +69,9 @@ local function dump(path)
       out[#out + 1] = table.concat(row, "|")
    end
    for row in db:rows("SELECT 'provenance', key, value FROM provenance ORDER BY key") do
+      out[#out + 1] = table.concat(row, "|")
+   end
+   for row in db:rows("SELECT 'checkpoints', tick, events, hash FROM checkpoints ORDER BY tick") do
       out[#out + 1] = table.concat(row, "|")
    end
    db:close()
@@ -128,18 +130,18 @@ describe("Archive", function()
    end)
 
    it("sync copies exactly the new suffix, and says how much", function()
-      local u = toy_universe(1893)
+      local u = toy(1893)
       local archive = Archive.create(path, u.annals, provenance(1893))
       assert.equal(1, archive:sync()) -- genesis
       assert.equal(0, archive:sync()) -- nothing new
-      u:run(3)
-      assert.equal(3, archive:sync())
+      u:run(3) -- two events per tick: a drift and a muster
+      assert.equal(6, archive:sync())
       archive:close()
-      assert.same({ { 4 } }, query(path, "SELECT count(*) FROM annals"))
+      assert.same({ { 7 } }, query(path, "SELECT count(*) FROM annals"))
    end)
 
    it("archives the same history the memory holds", function()
-      local u = toy_universe(1893)
+      local u = toy(1893)
       local archive = Archive.create(path, u.annals, provenance(1893))
       u:run(5)
       archive:close() -- close syncs
@@ -158,7 +160,7 @@ describe("Archive", function()
    end)
 
    it("writes payloads as canonical JSON SQL can reach into", function()
-      local u = toy_universe(1893)
+      local u = toy(1893)
       local archive = Archive.create(path, u.annals, provenance(1893))
       u:run(1)
       archive:close()
@@ -170,7 +172,7 @@ describe("Archive", function()
    end)
 
    it("the file itself refuses UPDATE and DELETE", function()
-      local u = toy_universe(1893)
+      local u = toy(1893)
       local archive = Archive.create(path, u.annals, provenance(1893))
       u:run(2)
       archive:close()
@@ -186,7 +188,7 @@ describe("Archive", function()
    it("same seed, same database, logically byte for byte", function()
       local other = fresh_path()
       for _, p in ipairs({ path, other }) do
-         local u = toy_universe(1893)
+         local u = toy(1893)
          local archive = Archive.create(p, u.annals, provenance(1893))
          u:run(10)
          archive:close()
@@ -196,10 +198,69 @@ describe("Archive", function()
    end)
 
    it("a closed archive is spent", function()
-      local u = toy_universe(1893)
+      local u = toy(1893)
       local archive = Archive.create(path, u.annals, provenance(1893))
       archive:close()
       assert.has_error(function() archive:sync() end, "archive: already closed")
       assert.has_error(function() archive:close() end, "archive: already closed")
+   end)
+
+   it("checkpoints every N ticks, each recomputable from the log", function()
+      local u = toy(1893)
+      local archive = Archive.create(path, u.annals, provenance(1893),
+         { checkpoint_every = 2 })
+      u:run(5)
+      archive:close()
+      -- Periodic seals at ticks 2 and 4, and the final seal at 5
+      -- (close completes the last tick). Each row must match a seal
+      -- computed here, independently, straight off the annals.
+      local rows = query(path, "SELECT tick, events, hash FROM checkpoints ORDER BY tick")
+      assert.equal(3, #rows)
+      for _, row in ipairs(rows) do
+         local hash, events = seal_through(u.annals, row[1])
+         assert.same({ row[1], events, hash }, row)
+      end
+      assert.same({ 2, 4, 5 }, { rows[1][1], rows[2][1], rows[3][1] })
+   end)
+
+   it("syncing mid-tick or per-tick lands the same checkpoints", function()
+      -- Checkpoints derive from the log alone; how often the follower
+      -- happens to look must not change what it writes down.
+      local eager, lazy = fresh_path(), fresh_path()
+      local u = toy(1893)
+      local a = Archive.create(eager, u.annals, provenance(1893), { checkpoint_every = 2 })
+      for _ = 1, 5 do
+         u:step()
+         a:sync() -- looks every tick
+      end
+      a:close()
+      local v = toy(1893)
+      local b = Archive.create(lazy, v.annals, provenance(1893), { checkpoint_every = 2 })
+      v:run(5)
+      b:close() -- looks exactly once
+      assert.equal(dump(eager), dump(lazy))
+      os.remove(eager)
+      os.remove(lazy)
+   end)
+
+   it("every file ends sealed, even a genesis-only one", function()
+      local u = toy(1893)
+      local archive = Archive.create(path, u.annals, provenance(1893))
+      archive:close()
+      local hash = seal_through(u.annals, 0)
+      assert.same({ { 0, 1, hash } },
+         query(path, "SELECT tick, events, hash FROM checkpoints"))
+   end)
+
+   it("checkpoints refuse UPDATE and DELETE like everything else", function()
+      local u = toy(1893)
+      local archive = Archive.create(path, u.annals, provenance(1893))
+      u:run(2)
+      archive:close()
+      local db = sqlite3.open(path)
+      assert.not_equal(sqlite3.OK, db:exec("UPDATE checkpoints SET hash = 'improved'"))
+      assert.matches("append%-only", db:errmsg())
+      assert.not_equal(sqlite3.OK, db:exec("DELETE FROM checkpoints"))
+      db:close()
    end)
 end)
