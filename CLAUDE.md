@@ -182,7 +182,12 @@ the world library's collective note, the practice chartered as
 flexibility principle 7 (card 148, post 0009 *What Failure Looks
 Like*); and the v0.1 cut itself — engine version 0.1.0, post 0000
 (*First Tick*) re-cut from aspiration to fact with the real day-86
-war as its front-door excerpt (card 119, tag `post/0000`). Next up:
+war as its front-door excerpt (card 119, tag `post/0000`); the double-entry audit — audit.lua as a
+projection, money with no doors, matter with two recorded ones,
+violations kept structurally apart from the belief-drift mismatches
+card 122 will legitimize, and a counterfeiter spec proving the annals
+checks grammar while the audit checks arithmetic (card 120, post 0010
+*Double Entry*). Next up:
 
 - news at ship speed — the courier learns distance, delay, and
   degradation, and one spec finally fails on schedule (card 122)

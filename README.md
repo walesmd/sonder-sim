@@ -101,6 +101,7 @@ How and why the pin is enforced this way is `docs/adr/0002`.
 ```sh
 ./lua src/main.lua --seed 1893 --ticks 10           # a universe, narrated
 ./lua src/main.lua --seed 1893 --ticks 10 --why 21  # why did event 21 happen?
+./lua src/main.lua --seed 1893 --ticks 1000 --audit # do the books balance?
 ./lua_modules/bin/busted                            # the spec suite
 ```
 
