@@ -290,6 +290,34 @@ discussion that followed produced the card's best conceptual result.
   One sentence in the README should acknowledge the second
   direction exists.
 
+## Session 2 (2026-07-26, same day) — the post and the sweep
+
+Implementation committed (1bf3106) on Mike's word after the
+interrogation rounds. Drafted
+`docs/posts/0007-a-war-nobody-planned.md`. Shape: the day-84-to-96
+war arc plus the SQL wars/spoils summary as the excerpt →
+design (temperament as constants; stateless minds as belief
+projections and what that sets up for card 122; deterministic
+physics; money circulating through violence; burning's law
+citation) → the tuning journal's four regimes, with the craft
+lesson that every regime was diagnosed by *reading the chronicle*
+while the specs stayed green → CS (agent-based modeling: Schelling,
+Sugarscape and generative social science, with the annals as the
+causal paper trail Sugarscape never had; Walrasian tâtonnement that
+deliberately never converges; the war cycle as a relaxation
+oscillator whose ~45-day period is a derived quantity) →
+wrong-ledger (the plunder-belief bug as the first bug that lives in
+law 3's gap, and the audit net it earned; the gremlin's two lucky
+days; the price fuse that has never fired, stated rather than tuned
+away; the org-chart bend and the two-evals answer).
+
+Docs sweep: README status (post 0007, still-ahead narrows to the
+v0.1 cut); CLAUDE.md status (118 done, next up 119/130); glossary
+(audit entry replaces the stale toy-universe entry; new "Worlds and
+their people" section: world, the toy world, the Vessari, the
+Khedrun — per the coining rule); docs/lore/README.md acknowledges
+engine-first entries as the shelf's second kind of resident.
+
 ### Proving "done"
 
 - Conservation invariants: cents sum constant across all trades;
