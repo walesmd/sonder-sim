@@ -81,10 +81,11 @@ are jointly owned and published.
   code until he owns it → write the post together → docs sweep → pull
   request.
 - The docs sweep, before every pull request: update the README (status,
-  install steps) and any other documentation the change makes stale, in
-  the same PR. Post tags are immutable once pushed, so documentation that
-  misses the PR stays wrong at that tag forever (learned the hard way
-  after card 113).
+  install steps), add any newly coined reader-facing terms to
+  `docs/glossary.md`, and fix any other documentation the change makes
+  stale, in the same PR. Post tags are immutable once pushed, so
+  documentation that misses the PR stays wrong at that tag forever
+  (learned the hard way after card 113).
 - Branch names always start with the Fizzy card number, then a short
   summary of the card: card 112 → `112-toolchain`. The branch's notebook
   uses the same name: `docs/notebooks/112-toolchain.md`.
@@ -111,17 +112,19 @@ are jointly owned and published.
 
 ## Vocabulary (use it consistently, in code and prose)
 
-| term | meaning |
-|---|---|
-| annals | the append-only event log (also the SQLite table name) |
-| chronicle | a rendered, readable feed projected from the annals |
-| history | narrative writing built on top (posts, generated stories) |
-| canon | a universe's untouched timeline |
-| apocrypha | intervention branches forked from canon |
-| synopsis | cross-version divergence report: forensic mode finds the first fork (binary search over checkpoint hashes); climate mode compares distributions across many seeds |
-| seed report | a community field report: "go look at seed N" plus what you saw |
-| notebook | per-branch working log of what we learned building a feature; the post's raw material |
-| lore | authored stories and priors (`docs/lore/`); an eval suite, not a PRD — every system must be able to host these stories, and a mechanic that blocks one has failed a test (exceptions: bad test, or consciously retired — Mike's call, on the record) |
+The project's vocabulary — annals, chronicle, faction, courier, seal,
+and the rest — lives in **`docs/glossary.md`**: one definition per
+term, each pointing at the post that earned it. That file is
+canonical; use its words consistently in code, posts, and
+conversation, and never coin a synonym for a thing the glossary
+already names. A card that introduces a term a reader would need
+adds it to the glossary **in the same PR** (it's a docs-sweep item).
+
+One entry keeps its long form elsewhere: lore is chartered in
+`docs/lore/README.md` — an eval suite, not a PRD; every system must
+be able to host the shelf's stories, and a mechanic that blocks one
+has failed a test (exceptions: bad test, or consciously retired —
+Mike's call, on the record).
 
 Perspective hierarchy (zoom levels): universe → civilization → (later)
 notable figures, crystallized from aggregates on demand.
@@ -150,8 +153,10 @@ universe file that is append-only by trigger and self-describing
 (card 115, post 0004 *The History Book*); rolling state hash +
 golden-master replay — the seal, checkpointed into every universe
 file, with the gremlin spec proving one stolen draw forks history
-(card 116, post 0005 *The Tamper Seal*). Next up:
-- pass-through belief store — the seam (card 117)
+(card 116, post 0005 *The Tamper Seal*); pass-through belief store —
+law 3 as capabilities, decide(beliefs, stream, tick) returning
+intents, the courier as the card-122 seam, the war office as first
+believer (card 117, post 0006 *Truth & Belief*). Next up:
 - toy world: two civilizations with opposed proclivities (mercantile vs
   martial), one commodity, one market with naive price adjustment
   (card 118)

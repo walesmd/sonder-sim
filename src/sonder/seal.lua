@@ -11,13 +11,13 @@
 -- the same answer on any machine.
 --
 -- The function is FNV-1a, 64-bit (fnv.lua), folded over each event's
--- canonical bytes (canon.lua) — pure integer arithmetic whose wrapping
+-- canonical bytes (byteform.lua) — pure integer arithmetic whose wrapping
 -- overflow is exactly what doctor.lua certifies. It is deliberately
 -- not cryptographic: the seal defends against divergence and
 -- accident, not adversaries. Tamper-*evidence*, not tamper-proofing;
 -- nobody is mining collisions against their own save file.
 
-local canon = require "sonder.canon"
+local byteform = require "sonder.byteform"
 local fnv = require "sonder.fnv"
 local default_vocabulary = require "sonder.vocabulary"
 
@@ -35,7 +35,7 @@ end
 -- order — the fold is order-sensitive on purpose (a history is a
 -- sequence, not a set).
 function Seal:fold(e)
-   self.hash = fnv.string(self.hash, canon.event(self.vocabulary, e))
+   self.hash = fnv.string(self.hash, byteform.event(self.vocabulary, e))
    return self
 end
 

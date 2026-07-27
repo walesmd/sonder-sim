@@ -1,4 +1,4 @@
--- src/sonder/canon.lua — one canonical byte form per event.
+-- src/sonder/byteform.lua — the byte form of an event: there is one.
 --
 -- Everything that turns an event into bytes goes through here, so
 -- the bytes can be a promise: envelope fields in fixed order, payload
@@ -13,12 +13,12 @@
 -- humans and SQL's json_extract — but the contract is the *bytes*,
 -- not the format. Same event, same bytes, every machine, every era.
 
-local canon = {}
+local byteform = {}
 
 -- JSON string escaping, total: quote, backslash, and every control
 -- character (as \u00xx), nothing else touched. No dependency gets to
 -- decide what our history looks like.
-function canon.json_string(s)
+function byteform.json_string(s)
    return '"' .. s:gsub('[%c\\"]', function(c)
       if c == '"' then return '\\"' end
       if c == '\\' then return '\\\\' end
@@ -27,13 +27,13 @@ function canon.json_string(s)
 end
 
 -- The payload object, fields in declaration order.
-function canon.payload(declared, payload)
+function byteform.payload(declared, payload)
    local parts = {}
    for i = 1, #declared do
       local name, want = declared[i][1], declared[i][2]
       local value = payload[name]
-      parts[i] = canon.json_string(name) .. ":"
-         .. (want == "integer" and ("%d"):format(value) or canon.json_string(value))
+      parts[i] = byteform.json_string(name) .. ":"
+         .. (want == "integer" and ("%d"):format(value) or byteform.json_string(value))
    end
    return "{" .. table.concat(parts, ",") .. "}"
 end
@@ -42,16 +42,16 @@ end
 -- an event require that era's vocabulary — a seal computed with the
 -- wrong dialect would be quietly meaningless, and quiet is the one
 -- thing a divergence detector must never be.
-function canon.event(vocabulary, e)
+function byteform.event(vocabulary, e)
    local entry = vocabulary.kinds[e.kind]
    if not entry then
-      error(("canon: unregistered kind %q"):format(tostring(e.kind)))
+      error(("byteform: unregistered kind %q"):format(tostring(e.kind)))
    end
    return ('{"id":%d,"tick":%d,"kind":%s,"location":%s,"magnitude":%d,'
       .. '"visibility":%s,"payload":%s,"causes":[%s]}'):format(
-      e.id, e.tick, canon.json_string(e.kind), canon.json_string(e.location),
-      e.magnitude, canon.json_string(e.visibility),
-      canon.payload(entry.payload, e.payload), table.concat(e.causes, ","))
+      e.id, e.tick, byteform.json_string(e.kind), byteform.json_string(e.location),
+      e.magnitude, byteform.json_string(e.visibility),
+      byteform.payload(entry.payload, e.payload), table.concat(e.causes, ","))
 end
 
-return canon
+return byteform

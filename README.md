@@ -29,7 +29,9 @@ Posts live in [`docs/posts/`](docs/posts/), each one pinned to a git tag
 pointing at the exact code it describes, so you can stand at any moment of
 this project's history and look around. The universe's authored side —
 species, cosmology, historical priors, written long before they are
-code — lives in [`docs/lore/`](docs/lore/).
+code — lives in [`docs/lore/`](docs/lore/). And the words this repo
+leans on — *annals*, *chronicle*, *faction*, *seal* — are each defined
+once, in [`docs/glossary.md`](docs/glossary.md).
 
 ## Status
 
@@ -58,8 +60,13 @@ state hash checkpointed into every universe file, and the golden-
 master replay test every later mechanic lands inside — same seed,
 500 ticks, same sixteen hex digits on every machine — post 0005,
 [*The Tamper Seal*](docs/posts/0005-the-tamper-seal.md) (tag
-`post/0005`). Still ahead for the skeleton: the belief-store seam
-and two toy civilizations trading one commodity. Watching now means
+`post/0005`). And law 3 is now structural: factions decide on belief
+stores their code is handed instead of a world it never sees, the
+war office became the first believer, and `--why` ladders cross
+subsystems — post 0006,
+[*Truth & Belief*](docs/posts/0006-truth-and-belief.md) (tag
+`post/0006`). Still ahead for the skeleton: two toy civilizations
+trading one commodity, then the v0.1 cut. Watching now means
 watching from very nearly the beginning, which is rather the point.
 
 ## Building
