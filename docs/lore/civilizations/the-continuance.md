@@ -207,3 +207,13 @@ filed opinions, the Continuance.
   the verification protocol, and what happens when it's ambiguous?
   (They have a contingency docket for this. It is sealed. Even
   from themselves?)
+
+## Eval notes
+
+The Continuance exists to prove the engine can host a civilization
+that is an artifact: descended from one mind, legally singular,
+operationally millions of semi-independent forks — personhood as
+policy, not biology. Systems that require a civilization to be a
+biological species, that force polity granularity to exactly one
+actor or to many with no shared identity, or whose ledgers and
+memories are permitted to forget, fail this entry.

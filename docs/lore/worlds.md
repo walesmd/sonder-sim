@@ -229,3 +229,17 @@ Continuance objects to the word: *it is maintained.*
   liquid water somewhere. Either that's a deliberate cosmology
   stance (life is watery in Sonder) or a failure of imagination —
   decide on the road to thirty, not by accident.
+
+## Eval notes
+
+The library carries its assertions collectively, and every type
+inherits them. **Habitability is a relation, not a column**: whether
+a world can host a species is a join between the world's attributes
+and the species' needs — a schema with a `habitable` boolean fails
+all fifteen entries at once. **Types are presets, not enums**: each
+name is a recognizable cluster of the seven axes, never a constraint
+— a generator that cannot compose a world *between* the types has
+failed the library even if it can render every type in it. And one
+entry doubles as a named eval in the shelf charter: the shellsea,
+whose civilizations have never seen a star, must never become
+structurally impossible to host.

@@ -89,6 +89,15 @@ rules exist so no lore decision ever paints the code into a corner:
    might be. Every lore session should end by noting what the current
    cast *fails* to represent, so the next session fills holes instead
    of deepening grooves.
+7. **Every entry ends with its Eval notes** (card 148). One short
+   section, last in the file: what this entry exists to prove, and
+   what would fail it. Story-first entries state an *expressibility*
+   claim — the engine must be able to host this; engine-first entries
+   state an *emergence* claim — the engine demonstrably grew this.
+   Two to four sentences, one falsifiable minimum capability, never a
+   feature list: the floor-not-a-ceiling clause applies to the notes
+   themselves. An entry whose eval note cannot be written is not
+   shelf-ready — if it proves nothing, it is charm, not test.
 
 ## Shelf contents
 
@@ -100,9 +109,12 @@ rules exist so no lore decision ever paints the code into a corner:
   Types are presets, not enums; habitability is a relation, not a
   column.
 - [`civilizations/`](civilizations/) — deep profiles, one file per
-  species. Current cast: [the Vess](civilizations/the-vess.md),
+  species. Story-first cast: [the Vess](civilizations/the-vess.md),
   [the Continuance](civilizations/the-continuance.md), and
   [the Marrow Fleet](civilizations/the-marrow-fleet.md).
+  Engine-first residents (card 118):
+  [the Vessari](civilizations/the-vessari.md) and
+  [the Khedrun](civilizations/the-khedrun.md).
 
 ## The speed of truth (a default, not a law)
 

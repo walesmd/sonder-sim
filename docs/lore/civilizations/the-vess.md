@@ -188,3 +188,13 @@ usually right.
 - What do they want that they cannot grow? (Every trading partner
   needs to want something; theirs must stay scarce or the liturgy
   starves.)
+
+## Eval notes
+
+The Vess exist to prove the engine can host a mind without a census:
+agents that are *regions* — plural, fuzzy-edged, deciding at the
+speed of consensus — whose memory does not expire and whose violence
+is refusal. Systems that require a civilization to be countable
+individuals, that force repricing at the market's tempo rather than
+the agent's, or that can express war only as combat and never as
+severed connection, fail this entry.
