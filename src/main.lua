@@ -7,6 +7,7 @@
 --   ./lua src/main.lua --seed 1893 --ticks 10 --why 21
 --   ./lua src/main.lua --seed 1893 --ticks 10 --db universe.db
 --   ./lua src/main.lua --seed 1893 --ticks 10 --db none
+--   ./lua src/main.lua --seed 1893 --ticks 1000 --audit
 --
 -- Same seed, same feed, on every machine. --why N walks event N's
 -- cause links back to genesis. Every run is archived into a fresh
@@ -20,6 +21,7 @@ local Toyworld = require "worlds.toy"
 local Chronicle = require "sonder.chronicle"
 local Archive = require "sonder.archive"
 local Seal = require "sonder.seal"
+local Audit = require "sonder.audit"
 local fnv = require "sonder.fnv"
 
 -- Matches sonder-0.1.0-1.rockspec; got real at v0.1 (card 119).
@@ -45,6 +47,9 @@ local function parse_args(argv)
          end
          opts.db = value
          i = i + 2
+      elseif flag == "--audit" then
+         opts.audit = true
+         i = i + 1
       else
          io.stderr:write(("unknown flag %q\n"):format(tostring(flag)))
          os.exit(1)
@@ -154,6 +159,39 @@ print(("seal %s"):format(Seal.of(u.annals):hex()))
 if archive then
    archive:close()
    print(("annals archived to %s (%d events)"):format(opts.db, u.annals:len()))
+end
+
+-- The double-entry audit (card 120), on request: refold the whole
+-- history into books and check the two conservation laws. A viewer
+-- like everything else here — and a second copy of chronicle.lua's
+-- comma(), which the rule of three says may stay a coincidence.
+if opts.audit then
+   local function comma(n)
+      local s = tostring(n)
+      local grouped = s:reverse():gsub("(%d%d%d)", "%1,"):reverse():gsub("^,", "")
+      return grouped
+   end
+   local report = Audit.of(u.annals)
+   print(("audit: %s¢ founded, %s¢ held; %s sacks founded, +%s "
+      .. "harvested, −%s eaten, −%s burned, %s held")
+      :format(comma(report.founded.cents), comma(report.held.cents),
+         comma(report.founded.grain), comma(report.totals.harvested),
+         comma(report.totals.eaten), comma(report.totals.burned),
+         comma(report.held.grain)))
+   for i = 1, #report.violations do
+      print("audit violation: " .. report.violations[i])
+   end
+   if #report.violations == 0 then
+      print("audit: the books balance")
+   end
+   if #report.mismatches > 0 then
+      print(("audit: %d tally mismatches (belief drifted from truth "
+         .. "under a pass-through courier — a bug until card 122)")
+         :format(#report.mismatches))
+   end
+   if #report.violations > 0 or #report.mismatches > 0 then
+      os.exit(1)
+   end
 end
 
 -- The annals records not just what happened but why. Walk the cause

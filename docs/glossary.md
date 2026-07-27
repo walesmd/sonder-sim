@@ -128,10 +128,13 @@ adds it here, in the same PR.
 - **gremlin** — the saboteur in the perturbation spec: one extra
   draw stolen from another actor's stream, proving one stolen random
   number forks a universe. (post 0005)
-- **audit** — the independent fold in `toyworld_spec`: the whole
-  annals reduced to per-civ books that every self-reported tally
-  must match, cent for cent. Card 120's double-entry audit in
-  miniature. (post 0007)
+- **audit** — the double-entry projection (`src/sonder/audit.lua`):
+  the whole annals refolded into per-civ books, checked against two
+  conservation laws — money has no doors; matter has two, both
+  recorded. Violations (impossible arithmetic) are zero forever;
+  mismatches (self-reports drifting from the fold) are bugs until
+  card 122 makes them the product. Born as a spec-local fold in
+  post 0007. (posts 0007, 0010)
 - **doctor** — `tools/doctor.lua`: verifies the properties
   determinism leans on (integer subtype, wrapping overflow, pinned
   toolchain) rather than just that programs exist.
