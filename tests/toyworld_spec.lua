@@ -44,9 +44,13 @@ end)
 
 describe("war discipline", function()
    -- One pass over a long run, checking the shape of every war.
+   -- Discipline lives at the *launch*: no party rides out in
+   -- peacetime. Raids are arrivals — a party eight days out when
+   -- the peace is signed still lands (no recall, card 158), so a
+   -- war's last raids may fall after its peace, on purpose.
    local function war_story(annals)
       local at_war = false
-      local raids_in_peace, bids_in_war, declarations, peaces = 0, 0, 0, 0
+      local marches_in_peace, bids_in_war, declarations, peaces = 0, 0, 0, 0
       for id = 1, annals:len() do
          local e = annals:get(id)
          if e.kind == "war.declared" then
@@ -57,28 +61,47 @@ describe("war discipline", function()
             assert(at_war, "peace with nobody")
             at_war = false
             peaces = peaces + 1
-         elseif e.kind == "war.raid" and not at_war then
-            raids_in_peace = raids_in_peace + 1
+         elseif e.kind == "war.march" and not at_war then
+            marches_in_peace = marches_in_peace + 1
          elseif e.kind == "market.order" and at_war
             and e.payload.side == "buy" then
             bids_in_war = bids_in_war + 1
          end
       end
-      return declarations, peaces, raids_in_peace, bids_in_war
+      return declarations, peaces, marches_in_peace, bids_in_war
    end
 
-   it("raids happen only in wartime; wartime buys nothing", function()
+   it("marches launch only in wartime; wartime buys nothing", function()
       local u = toy(1893)
       u:run(1000)
-      local declarations, peaces, raids_in_peace, bids_in_war =
+      local declarations, peaces, marches_in_peace, bids_in_war =
          war_story(u.annals)
       assert.is_true(declarations > 0)
-      -- A raid intent from the war's last day resolves one tick after
-      -- the peace — the battle system is a day behind the diplomats,
-      -- exactly like the market. Allow one straggler per war.
-      assert.is_true(raids_in_peace <= declarations)
+      assert.equal(0, marches_in_peace)
       assert.equal(0, bids_in_war)
       assert.is_true(peaces == declarations or peaces == declarations - 1)
+   end)
+
+   it("war parties take the road: every raid is a march arrived on schedule", function()
+      -- khedrun-holds → vessar-reaches is 8 days at channel speed 1
+      local u = toy(1893)
+      u:run(1000)
+      local marches, raids = {}, 0
+      for id = 1, u.annals:len() do
+         local e = u.annals:get(id)
+         if e.kind == "war.march" then
+            marches[id] = e
+         elseif e.kind == "war.raid" then
+            raids = raids + 1
+            local m = marches[e.causes[1]]
+            assert.is_not_nil(m, "a raid from no march")
+            assert.equal(8, e.tick - m.tick)
+            assert.equal("khedrun-holds", m.location)
+            assert.equal("vessar-reaches", e.location)
+            assert.equal(m.payload.force, e.payload.force)
+         end
+      end
+      assert.is_true(raids > 0, "a thousand days and no party ever arrived")
    end)
 
    it("declarations cite their insults", function()

@@ -54,6 +54,15 @@ local function distance(from, to, _)
    return d or 0
 end
 
+-- Anything on the road — an order slip, a war party — travels at
+-- news speed: the same integer ceiling the courier uses. Nothing
+-- outruns the concept of distance (card 122's consistency rule);
+-- what gets to move at its own speed someday is cards 150 and 153.
+local function travel(u, from, to, tick)
+   local d = distance(from, to, tick)
+   return (d + u.channel_speed - 1) // u.channel_speed
+end
+
 -- The cast. Tuned against the 1000-day acceptance run (see the
 -- card's notebook); every constant is a temperament in disguise.
 local VESSARI = {
@@ -257,8 +266,8 @@ local function khedrun_decide(beliefs, stream, tick)
       else
          local force = stream:int(KHEDRUN.force_min, KHEDRUN.force_max)
          intents[#intents + 1] = {
-            kind = "war.raid",
-            location = VESSARI.home, -- the raid happens where the grain is
+            kind = "war.march",
+            location = KHEDRUN.home, -- the party rides out from home
             magnitude = force,
             loudness = "local",
             payload = { raider = KHEDRUN.name, target = VESSARI.name,
@@ -370,8 +379,9 @@ local function add_physics(u)
    -- moved).
    local ledger = {} -- civ name → { grain, cents }
    local homes = {} -- location → civ name, learned from foundings
+   local seats = {} -- civ name → home location, the reverse map
    local price, price_id -- the posted price and the event that posted it
-   local orders, raids = {}, {} -- recent, pruned to yesterday's
+   local orders, marches = {}, {} -- in flight or due; pruned once spent
    local cursor = 0
 
    local function catch_up()
@@ -382,6 +392,7 @@ local function add_physics(u)
          if e.kind == "civ.founded" then
             ledger[p.name] = { grain = p.grain, cents = p.cents }
             homes[e.location] = p.name
+            seats[p.name] = e.location
          elseif e.kind == "civ.tally" then
             local books = ledger[homes[e.location]]
             books.grain = books.grain + p.harvested - p.eaten
@@ -400,12 +411,15 @@ local function add_physics(u)
          elseif e.kind == "market.price" then
             price, price_id = p.price, e.id
          elseif e.kind == "market.order" then
-            orders[#orders + 1] = { id = e.id, tick = e.tick,
+            -- an order slip is on the road before the exchange can
+            -- see it: it arrives, then matches the next morning
+            orders[#orders + 1] = { id = e.id,
+               arrives = e.tick + travel(u, e.location, EXCHANGE, e.tick),
                civ = homes[e.location], side = p.side,
                units = p.units, limit = p.limit }
-         elseif e.kind == "war.raid" then
-            raids[#raids + 1] = { id = e.id, tick = e.tick,
-               location = e.location,
+         elseif e.kind == "war.march" then
+            marches[#marches + 1] = { id = e.id,
+               arrives = e.tick + travel(u, e.location, seats[p.target], e.tick),
                raider = p.raider, target = p.target, force = p.force }
          end
       end
@@ -414,19 +428,23 @@ local function add_physics(u)
    local function prune(list, tick)
       local kept = {}
       for i = 1, #list do
-         if list[i].tick >= tick - 1 then
+         if list[i].arrives >= tick - 1 then
             kept[#kept + 1] = list[i]
          end
       end
       return kept
    end
 
-   -- The exchange. Yesterday's orders meet this morning's market:
-   -- willing prices cross → a trade, clamped to what the buyer can
-   -- pay and the seller actually holds; then the posted price moves
-   -- toward the unfilled imbalance, at most PRICE_STEP_CAP a day.
-   -- Naive on purpose — the card asked for a price that a reader
-   -- can watch think.
+   -- The exchange. Orders that *arrived* yesterday meet this
+   -- morning's market — an order placed three days out spends three
+   -- days on the road before the exchange can even see it (the
+   -- step-4 compromise: information travels; settlement clamps stay
+   -- physics; the goods themselves still teleport under card 153's
+   -- license). Willing prices cross → a trade, clamped to what the
+   -- buyer can pay and the seller actually holds; then the posted
+   -- price moves toward the unfilled imbalance, at most
+   -- PRICE_STEP_CAP a day. Naive on purpose — the card asked for a
+   -- price that a reader can watch think.
    u:add_system("exchange", function(universe, _, tick)
       catch_up()
       orders = prune(orders, tick)
@@ -434,7 +452,7 @@ local function add_physics(u)
       local bid_units, offer_units = 0, 0
       for i = 1, #orders do
          local o = orders[i]
-         if o.tick == tick - 1 then
+         if o.arrives == tick - 1 then
             if o.side == "buy" then
                bids[#bids + 1] = o
                bid_units = bid_units + o.units
@@ -495,30 +513,46 @@ local function add_physics(u)
       end
    end)
 
-   -- The battlefield. Yesterday's war parties reach the granaries
-   -- this morning; what they seize is the *actual* stock's verdict,
-   -- not the raider's plan — factions ride on beliefs, physics pays
-   -- out on truth.
+   -- The battlefield. A war party is on the road for
+   -- ceil(distance ÷ channel speed) days — armies travel at news
+   -- speed, so nothing outruns the concept of distance — and there
+   -- is no recall: a party launched is launched, and the last raids
+   -- of a war can land after its peace (card 158 will teach parties
+   -- to hear). On arrival the raid happens where the grain is and
+   -- the verdict follows the same morning: what a party seizes is
+   -- the *actual* stock's answer, not the raider's plan — factions
+   -- ride on beliefs, physics pays out on truth.
    u:add_system("battle", function(universe, _, tick)
       catch_up()
-      raids = prune(raids, tick)
-      for i = 1, #raids do
-         local raid = raids[i]
-         if raid.tick == tick - 1 then
-            local target = ledger[raid.target]
-            local seized = math.min(raid.force, target.grain)
-            local burned = math.min(raid.force // KHEDRUN.torch_divisor,
+      marches = prune(marches, tick)
+      for i = 1, #marches do
+         local m = marches[i]
+         if m.arrives == tick then
+            local where = seats[m.target] -- where the grain is
+            local raid = universe:emit{
+               kind = "war.raid",
+               location = where,
+               magnitude = m.force,
+               loudness = "local",
+               payload = { raider = m.raider, target = m.target,
+                  force = m.force },
+               causes = { m.id },
+            }
+            catch_up()
+            local target = ledger[m.target]
+            local seized = math.min(m.force, target.grain)
+            local burned = math.min(m.force // KHEDRUN.torch_divisor,
                target.grain - seized)
-            local plunder = math.min(raid.force * KHEDRUN.plunder_rate,
+            local plunder = math.min(m.force * KHEDRUN.plunder_rate,
                target.cents)
             universe:emit{
                kind = "war.spoils",
-               location = raid.location,
+               location = where,
                magnitude = seized + burned,
                loudness = "local",
-               payload = { raider = raid.raider, target = raid.target,
+               payload = { raider = m.raider, target = m.target,
                   seized = seized, plunder = plunder, burned = burned },
-               causes = { raid.id },
+               causes = { raid },
             }
             catch_up()
          end

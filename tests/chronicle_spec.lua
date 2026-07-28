@@ -135,9 +135,18 @@ describe("templates", function()
                reason = "hunger", measure = 4 } }))
    end)
 
-   it("render a raid", function()
-      assert.equal("tick   87 · vessar-reaches · a khedrun war party rides"
-         .. " against the vessari granaries (force 8)",
+   it("render a march riding out", function()
+      assert.equal("tick   86 · khedrun-holds · a khedrun war party rides"
+         .. " out against the vessari (force 8)",
+         Chronicle.line(event{ kind = "war.march", tick = 86,
+            location = "khedrun-holds", magnitude = 8,
+            payload = { raider = "khedrun", target = "vessari",
+               force = 8 } }))
+   end)
+
+   it("render a raid arriving", function()
+      assert.equal("tick   87 · vessar-reaches · a khedrun war party falls"
+         .. " on the vessari granaries (force 8)",
          Chronicle.line(event{ kind = "war.raid", tick = 87,
             location = "vessar-reaches", magnitude = 8,
             payload = { raider = "khedrun", target = "vessari",

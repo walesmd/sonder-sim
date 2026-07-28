@@ -88,9 +88,19 @@ return {
          payload = { { "aggressor", "string" }, { "target", "string" },
             { "reason", "string" }, { "measure", "integer" } },
       },
+      ["war.march"] = {
+         doc = "a war party rides out from home against a target — "
+            .. "departure and arrival are different events, with "
+            .. "space and time between them; the battle system "
+            .. "delivers the raid when the road runs out, and there "
+            .. "is no recall (card 158 will teach parties to hear)",
+         payload = { { "raider", "string" }, { "target", "string" },
+            { "force", "integer" } },
+      },
       ["war.raid"] = {
-         doc = "a war party rides against a granary with so much "
-            .. "force; what it will actually seize is the battle "
+         doc = "a war party falls on a granary: the arrival end of a "
+            .. "march, emitted by the battle system when the party "
+            .. "reaches the grain; what it seizes is the battle "
             .. "system's verdict, not the raider's plan",
          payload = { { "raider", "string" }, { "target", "string" },
             { "force", "integer" } },

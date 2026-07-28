@@ -76,8 +76,13 @@ templates["war.declared"] = function(e)
       :format(e.payload.aggressor, e.payload.target, e.payload.measure)
 end
 
+templates["war.march"] = function(e)
+   return ("a %s war party rides out against the %s (force %d)")
+      :format(e.payload.raider, e.payload.target, e.payload.force)
+end
+
 templates["war.raid"] = function(e)
-   return ("a %s war party rides against the %s granaries (force %d)")
+   return ("a %s war party falls on the %s granaries (force %d)")
       :format(e.payload.raider, e.payload.target, e.payload.force)
 end
 

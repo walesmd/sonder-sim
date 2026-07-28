@@ -395,6 +395,78 @@ visibility→loudness rename (see Q4). What remains, in order:
    delay geometry and the two-chronologies diagram both want
    Mermaid).
 
+## Session 3 — step 4, designed (three questions, three verdicts)
+
+Part 1 committed at 8b2d46e ("Card 122, part 1: loudness, the map,
+and the courier"). Then the step-4 design conversation:
+
+**Q-A — armies stop teleporting via two events.** Mike: completely
+agree — declaring war and war happening are different events with
+physics, space, and time as inputs. `war.march` at the raider's
+home (the faction's act), `war.raid` at the target when the battle
+system delivers the party d days later; cause chain declared →
+march → raid → spoils. His caution, comment on card 150: "the
+warning arrives with the sword" is a one-speed artifact, not a law
+— spies, allies with faster hulls, and better channels must
+eventually let warnings outrun armies; early warning is a
+differential-speed phenomenon.
+
+**Q-B — no recall, for now.** Launched is launched; a raid can land
+after the peace (the war that ended before its last battle). Mike's
+real concern, captured as card 158: the system must support news
+reaching and influencing *all* actors involved — a war party that
+hears the peace mid-march and turns around, or stages nearby
+because talks might go sideways. Things in motion are addressable
+actors; the Marrow Fleet's address-that-sails is the same machinery.
+
+**Q-C — the exchange hears at news speed; settlement stays
+physics.** Accepted as a compromise to keep moving. Orders arrive
+at the exchange delayed by the same ceil formula; conservation
+clamps stay truth-side; goods still teleport (card 153's license).
+Mike's reinforcement, comment on card 155: there is no such thing
+as THE exchange — plural, mobile, tech-differentiated, arbitrage
+everywhere. The hardwired exchange is a placeholder twice over
+(singular and omniscient); 122 fixes only the omniscient half.
+
+## Session 3 — step 4, built
+
+Landed: `war.march` (vocabulary append, no version bump — the
+departure, at the raider's home) with `war.raid` re-cast as the
+arrival end, emitted by the battle system when the road runs out;
+`travel()` in toy.lua — the courier's integer ceiling for anything
+on the road; the battle system rewritten from raid-resolver to
+march-deliverer (raid and spoils the same morning; cause chain
+declared → march → raid → spoils); the exchange matching orders by
+*arrival* day, so order slips ride the same roads; chronicle
+templates split ("rides out against" / "falls on"); the audit
+classifies war.march as neutral. War discipline moved from
+raid-time to launch-time: marches launch only in wartime, raids may
+land after the peace on purpose, and a new property spec holds
+every raid to citing a march exactly eight days its senior. Suite:
+128 green, the same six scheduled reds. Violations 0; mismatches
+296 over 300 days.
+
+What seed 1893 shows now — the feed is the report: war declared
+day 82; parties ride out daily; for eight days nothing happens at
+vessar-reaches (the declaration's news arrives day 90, the first
+sword day 91 — the warning arrives with the sword, exactly as
+licensed, card 150's comment holding the future exception); peace
+on day 92 with six parties still on the road; raids keep falling
+through day 98 — the war that ended before its last battle, on the
+first try. And the khedrun sheathe citing cheap grain having *never
+heard whether their war worked*: the first spoils news reaches home
+day 99, seven days after the peace.
+
+New wrinkle on the record: the khedrun then starve beside full
+granaries. Spoils grain teleports home in truth (card 153's
+license) but the *news* of it rides back at road speed, so believed
+stock stays low, they under-eat what they don't know they have, and
+the hunger fuse re-trips (day 97's second war). When goods stop
+teleporting (card 153) the party, the grain, and the news all
+arrive home together and this heals by construction; until then it
+is honest physics under the license — and very fine chronicle
+drama.
+
 ## Session 2/3 — steps 1–3, built
 
 Landed: the toy's map (3/5/8, the exchange on the road between

@@ -54,6 +54,7 @@ local effects = {
    ["market.order"] = false,
    ["market.price"] = false,
    ["war.declared"] = false,
+   ["war.march"] = false,
    ["war.raid"] = false,
    ["war.peace"] = false,
 
