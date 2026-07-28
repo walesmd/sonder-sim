@@ -467,6 +467,54 @@ arrive home together and this heals by construction; until then it
 is honest physics under the license — and very fine chronicle
 drama.
 
+## Session 3 — step 5, built; and a finding that outranks it
+
+Step 5 landed as designed in Q6: vessari_decide reads its believed
+war.declared / war.peace rows (same latest-by-id logic as the
+khedrun's own) and withholds offers while it believes a war is on —
+prudence at the pace of news, no authorial flags. New toyworld
+property spec: replay believed-war windows from truth plus the road
+([declared+8, peace+8) at the toy's distances) and assert no sell
+order ever lands inside one. 129 green, same six scheduled reds.
+
+**The finding: slow news made price wars extinct.** Eight seeds,
+eight thousand days: every single war is hunger-fused — zero price
+wars anywhere — and every believed-war window sits inside a longer
+market closure caused by the price floor, so the step-5 prudence is
+real but *shadowed*: it never gets to close an open market. The new
+economy settles into a ~95-day cycle: prices sag to the vessari
+floor, the market shuts, the khedrun starve, a war pair follows,
+spoils and reopening, repeat. The old ecology's price wars — the
+day-86 "grain at 151¢ was the last insult" war that post 0000 made
+the project's front-door excerpt — cannot happen in the distance
+era with the current temperaments: prices never sustain seven
+believed days above 150, because bidding stops (war) or offering
+stops (floor) long before. The spec carries an honesty note: its
+assertion stands guard, currently unexercised. Decision deferred to
+Mike at the step-8 re-tuning (already planned): retune temperaments
+to re-diversify the war ecology, or accept the hunger-only cycle as
+the honest product of slow news. Post material either way — the
+mechanic changed what kind of wars the world *has*, which is the
+card's thesis working at a scale we didn't ask it to.
+
+**Mike's ruling (session 3, same day): physics wins.** His words,
+kept: "News has to move, goods have to move. If that currently
+changes civilizations' behaviors or how we've been measuring this
+very limited toy universe, that's okay. The toy universe shouldn't
+measure itself against past instantiations of the toy universe."
+We are testing a system against two civilizations, without
+technology, without trade that bypasses the exchange, without the
+rest of the real cast — the old ecology was an artifact of an era,
+not a KPI. Doctrine distilled: golden masters pin *determinism*
+(same code, same seed, same history) and acceptance specs guard
+*coherence* (wars happen and end, discipline holds, money
+balances); neither exists to preserve particular dramas. Post
+0000's tag keeps the day-86 price war forever; the live world owes
+it nothing. Step 8 therefore re-cuts for the new history with no
+temperament-chasing, and step 5's prudence stays as built —
+shadowed today, waiting for the richer ecology (technology,
+bilateral trade, thirty civilizations) to give it a stage.
+
 ## Session 2/3 — steps 1–3, built
 
 Landed: the toy's map (3/5/8, the exchange on the road between

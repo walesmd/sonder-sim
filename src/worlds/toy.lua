@@ -213,11 +213,21 @@ end
 local function vessari_decide(beliefs, stream)
    local intents, stock = open_the_day(VESSARI, beliefs, stream)
    local price = beliefs:latest("market.price")
+   -- Prudence at the pace of news (card 122): merchants hold their
+   -- stores while they *believe* raiders ride. The declaration is
+   -- shouted at khedrun-holds and takes eight days to reach them,
+   -- so the first raids fall on a market still open — and the peace
+   -- arrives just as late, so they keep withholding from a war that
+   -- is already over. Both mistakes are the belief store working as
+   -- built: what the vessari know is what the road has brought.
+   local declared = beliefs:latest("war.declared")
+   local peace = beliefs:latest("war.peace")
+   local at_war = declared ~= nil and (peace == nil or peace.id < declared.id)
    local surplus = stock - VESSARI.reserve
    -- Merchants, not charities: they undercut the posted price to
    -- move grain, but below the floor they hold their stores and
    -- wait for the market to remember what grain is worth.
-   if price and surplus > 0 then
+   if price and surplus > 0 and not at_war then
       local limit = price.payload.price - VESSARI.undercut
       if limit >= VESSARI.floor then
          local units = math.min(surplus, VESSARI.lot)

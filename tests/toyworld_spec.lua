@@ -104,6 +104,59 @@ describe("war discipline", function()
       assert.is_true(raids > 0, "a thousand days and no party ever arrived")
    end)
 
+   it("the vessari hold their grain while they believe raiders ride", function()
+      -- The declaration is shouted at khedrun-holds and reaches
+      -- vessar-reaches eight days later; so does the peace. Between
+      -- those two arrivals the merchants offer nothing — a market
+      -- closed by news of a war that may already be over. Belief
+      -- windows are replayed here from truth plus the road: war is
+      -- believed from declared.tick + 8 up to (not including)
+      -- peace.tick + 8.
+      --
+      -- Honesty note (session 3): as of this cut the property is
+      -- real but unexercised — under distance, every war in every
+      -- seed we tried is hunger-fused, and hunger only ignites after
+      -- the price floor has already closed the market, so the
+      -- believed-war windows sit inside longer price closures. The
+      -- assertion stands guard for the day the war ecology changes
+      -- (see the notebook: price wars went extinct when news slowed
+      -- down — ruled a finding, not a bug: the toy universe doesn't
+      -- measure itself against past instantiations of itself; this
+      -- guard waits for a richer ecology to exercise it).
+      local u = toy(1893)
+      u:run(1000)
+      local windows = {} -- { from, to } in believed-war ticks
+      local sells, withheld = 0, 0
+      for id = 1, u.annals:len() do
+         local e = u.annals:get(id)
+         if e.kind == "war.declared" then
+            windows[#windows + 1] = { from = e.tick + 8, to = math.huge }
+         elseif e.kind == "war.peace" then
+            windows[#windows].to = e.tick + 8
+         elseif e.kind == "market.order" and e.payload.side == "sell" then
+            sells = sells + 1
+            for i = 1, #windows do
+               local w = windows[i]
+               assert.is_true(e.tick < w.from or e.tick >= w.to,
+                  ("a sell order on day %d, inside believed war %d")
+                  :format(e.tick, i))
+            end
+         end
+      end
+      -- and the prudence is real, not vacuous: wars happened, grain
+      -- still moved in peacetime
+      assert.is_true(#windows > 0)
+      assert.is_true(sells > 0)
+      -- count days the market sat closed by belief, for the record
+      for i = 1, #windows do
+         local w = windows[i]
+         if w.to ~= math.huge then
+            withheld = withheld + (w.to - w.from)
+         end
+      end
+      assert.is_true(withheld > 0, "belief never closed the market")
+   end)
+
    it("declarations cite their insults", function()
       local u = toy(1893)
       u:run(1000)
