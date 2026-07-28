@@ -22,13 +22,13 @@ local GENESIS = "universe.genesis"
 
 function Annals.new(vocabulary)
    vocabulary = vocabulary or default_vocabulary
-   local visible = {}
-   for i = 1, #vocabulary.visibilities do
-      visible[vocabulary.visibilities[i]] = true
+   local loudnesses = {}
+   for i = 1, #vocabulary.loudnesses do
+      loudnesses[vocabulary.loudnesses[i]] = true
    end
    return setmetatable({
       vocabulary = vocabulary,
-      visible = visible,
+      loudnesses = loudnesses,
       events = {},
    }, Annals)
 end
@@ -39,7 +39,7 @@ end
 
 -- The envelope: every event of every era carries exactly these
 -- (plus the id and tick the annals stamps itself).
-local ENVELOPE = { "kind", "location", "magnitude", "visibility", "payload", "causes" }
+local ENVELOPE = { "kind", "location", "magnitude", "loudness", "payload", "causes" }
 local IS_ENVELOPE = {}
 for i = 1, #ENVELOPE do
    IS_ENVELOPE[ENVELOPE[i]] = true
@@ -87,8 +87,8 @@ function Annals:append(tick, spec)
       "annals: " .. kind .. ": location must be a non-empty string")
    assert(math.type(spec.magnitude) == "integer",
       "annals: " .. kind .. ": magnitude must be an integer")
-   assert(type(spec.visibility) == "string" and self.visible[spec.visibility],
-      "annals: " .. kind .. ": visibility must be one of the declared set")
+   assert(type(spec.loudness) == "string" and self.loudnesses[spec.loudness],
+      "annals: " .. kind .. ": loudness must be one of the declared set")
 
    -- Payload: exactly the declared fields, correctly typed, nothing
    -- else. Copied field by field off the declaration array, so the
@@ -155,7 +155,7 @@ function Annals:append(tick, spec)
       kind = kind,
       location = spec.location,
       magnitude = spec.magnitude,
-      visibility = spec.visibility,
+      loudness = spec.loudness,
       payload = payload,
       causes = causes,
    }
@@ -184,7 +184,7 @@ function Annals:get(id)
       kind = e.kind,
       location = e.location,
       magnitude = e.magnitude,
-      visibility = e.visibility,
+      loudness = e.loudness,
       payload = payload,
       causes = table.move(e.causes, 1, #e.causes, 1, {}),
    }

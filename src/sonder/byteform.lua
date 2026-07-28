@@ -48,9 +48,9 @@ function byteform.event(vocabulary, e)
       error(("byteform: unregistered kind %q"):format(tostring(e.kind)))
    end
    return ('{"id":%d,"tick":%d,"kind":%s,"location":%s,"magnitude":%d,'
-      .. '"visibility":%s,"payload":%s,"causes":[%s]}'):format(
+      .. '"loudness":%s,"payload":%s,"causes":[%s]}'):format(
       e.id, e.tick, byteform.json_string(e.kind), byteform.json_string(e.location),
-      e.magnitude, byteform.json_string(e.visibility),
+      e.magnitude, byteform.json_string(e.loudness),
       byteform.payload(entry.payload, e.payload), table.concat(e.causes, ","))
 end
 

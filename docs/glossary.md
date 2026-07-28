@@ -34,17 +34,20 @@ adds it here, in the same PR.
 - **event** — the only thing that can happen. Nothing changes in a
   Sonder universe except by appending one. (post 0002)
 - **envelope** — the fields every event of every era carries: id,
-  tick, kind, location, magnitude, visibility, payload, causes.
+  tick, kind, location, magnitude, loudness, payload, causes.
   (post 0002)
 - **kind** — an event's registered type (`market.drift`,
   `war.muster`), declared in the event vocabulary. (post 0002)
 - **event vocabulary** — the versioned, declared list of every kind
   and the exact shape of its payload; a public API. "Vocabulary"
   unqualified usually means this. (post 0002)
-- **visibility** — who could, in principle, come to know of an
-  event: `public`, `regional`, or `secret`. Stamped honestly since
-  day one; consumed for real when news stops being instant.
-  (post 0002; card 122, future)
+- **loudness** — how loudly an act was performed: `loud`, `local`,
+  or `quiet`. The signal an event emitted at its origin, chosen by
+  the emitter as part of acting — never who may come to know, which
+  is the behavior of whoever holds the information (retellings,
+  silence), not event state. Stamped honestly since day one; named
+  `visibility` until card 122 caught the word claiming too much.
+  (post 0002; card 122)
 - **causes** — the ids of the events that caused this one. Required:
   markets don't just move, wars don't just start. Only genesis is
   uncaused. (post 0002)

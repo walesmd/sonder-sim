@@ -114,7 +114,7 @@ local function fallback(e)
       keys[i] = ("%s=%s"):format(k, tostring(e.payload[k]))
    end
    local shown = #keys > 0 and (" — " .. table.concat(keys, ", ")) or ""
-   return ("%s, magnitude %d, %s%s"):format(e.kind, e.magnitude, e.visibility, shown)
+   return ("%s, magnitude %d, %s%s"):format(e.kind, e.magnitude, e.loudness, shown)
 end
 
 local function line(e)

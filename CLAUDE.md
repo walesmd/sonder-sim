@@ -35,7 +35,7 @@ are jointly owned and published.
 2. **Everything is an event.** Nothing "happens" except an append to the
    annals (the event log). All state views, chronicles, and statistics are
    projections of it. Every event carries: tick, kind, location, magnitude,
-   visibility, payload, and cause links (ids of the events that caused it).
+   loudness, payload, and cause links (ids of the events that caused it).
 3. **Agents act on beliefs, never truth.** Faction decision code reads only
    that faction's belief store — structurally, not politely: no reaching
    into world state. (v0.1 ships a pass-through belief store; the seam

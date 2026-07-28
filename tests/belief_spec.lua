@@ -10,7 +10,7 @@ local function drift(id, tick, n)
       kind = "market.drift",
       location = "the-void",
       magnitude = n < 0 and -n or n,
-      visibility = "public",
+      loudness = "loud",
       payload = { drift = n },
       causes = { id - 1 },
    }
@@ -26,7 +26,7 @@ describe("Belief", function()
 
    it("ignorance is free: an unheard kind has no rows, not empty ones", function()
       local b = Belief.new("vess")
-      b:receive(drift(2, 1, 3))
+      b:receive(drift(2, 1, 3), 1)
       assert.is_nil(b:latest("war.muster"))
       assert.same({}, b:recall("war.muster"))
       -- and nothing was allocated to say so
@@ -35,8 +35,8 @@ describe("Belief", function()
 
    it("remembers what it receives, in arrival order", function()
       local b = Belief.new("vess")
-      b:receive(drift(2, 1, 3))
-      b:receive(drift(4, 2, -1))
+      b:receive(drift(2, 1, 3), 1)
+      b:receive(drift(4, 2, -1), 2)
       assert.equal(2, b:len())
       local latest = b:latest("market.drift")
       assert.equal(4, latest.id)
@@ -49,7 +49,7 @@ describe("Belief", function()
    it("copies on the way in: the courier's table is not kept", function()
       local b = Belief.new("vess")
       local e = drift(2, 1, 3)
-      b:receive(e)
+      b:receive(e, 1)
       e.payload.drift = 999
       e.causes[1] = 999
       assert.equal(3, b:latest("market.drift").payload.drift)
@@ -58,7 +58,7 @@ describe("Belief", function()
 
    it("copies on the way out: scribbling on a memory changes nothing", function()
       local b = Belief.new("vess")
-      b:receive(drift(2, 1, 3))
+      b:receive(drift(2, 1, 3), 1)
       local recalled = b:latest("market.drift")
       recalled.payload.drift = 999
       recalled.magnitude = 999
@@ -71,12 +71,30 @@ describe("Belief", function()
       -- fed by couriers younger than it is, and a belief in a strange
       -- kind is still a belief.
       local b = Belief.new("vess")
-      b:receive{
+      b:receive({
          id = 9, tick = 3, kind = "omen.comet", location = "the-sky",
-         magnitude = 7, visibility = "public", payload = { portent = "doom" },
+         magnitude = 7, loudness = "loud", payload = { portent = "doom" },
          causes = { 1 },
-      }
+      }, 3)
       assert.equal("doom", b:latest("omen.comet").payload.portent)
+   end)
+
+   it("stamps when it learned, and keeps the date on the copy", function()
+      local b = Belief.new("vess")
+      b:receive(drift(2, 1, 3), 9)
+      local held = b:latest("market.drift")
+      assert.equal(1, held.tick) -- when it happened
+      assert.equal(9, held.learned) -- when the news landed
+      -- and scribbling on the copy changes nothing, same discipline
+      -- as every other field
+      held.learned = 0
+      assert.equal(9, b:latest("market.drift").learned)
+   end)
+
+   it("rejects a learned tick earlier than the event, or none at all", function()
+      local b = Belief.new("vess")
+      assert.has_error(function() b:receive(drift(2, 5, 3), 4) end)
+      assert.has_error(function() b:receive(drift(2, 5, 3)) end)
    end)
 
    it("holds no road back to the world", function()
@@ -84,7 +102,7 @@ describe("Belief", function()
       -- references an annals, a universe, or an emit. The store can
       -- only be *told* things.
       local b = Belief.new("vess")
-      b:receive(drift(2, 1, 3))
+      b:receive(drift(2, 1, 3), 1)
       for key in pairs(b) do
          assert.is_true(key == "owner" or key == "received" or key == "by_kind",
             "unexpected field on a belief store: " .. tostring(key))

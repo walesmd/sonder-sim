@@ -71,7 +71,7 @@ describe("the counterfeiter", function()
                kind = "market.trade",
                location = "the-exchange",
                magnitude = payload.units,
-               visibility = "public",
+               loudness = "loud",
                payload = payload,
                causes = { 1 },
             }

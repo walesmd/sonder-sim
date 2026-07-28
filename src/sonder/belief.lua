@@ -7,13 +7,13 @@
 -- "please don't," but "there is no door." And the store itself can't
 -- reach truth either: it holds no annals, no cursor, no universe — it
 -- is push-based, knowing only what a courier chose to `receive` into
--- it. Today's courier (universe.lua) is a pass-through and every
--- faction is briefly omniscient; when news learns to travel at ship
--- speed, degrade in transit, and be culturally interpreted (card 122),
--- the courier changes and this store, its queries, and every decision
--- function's signature stay exactly as they are. That is the seam,
--- and it ships early because it cannot be retrofitted onto decision
--- code written against world state.
+-- it. Card 122 kept the seam's promise: the courier learned distance
+-- and delay, and this store, its queries, and every decision
+-- function's signature stayed exactly as they were — the one thing
+-- the store gained is the `learned` stamp on each believed copy, the
+-- tick the news actually reached its owner. Degradation in transit
+-- and cultural interpretation (cards 151, 152) will arrive through
+-- the same door.
 --
 -- Ignorance is free, by structure: kinds index lazily, so a faction
 -- that has received no events about something simply has no rows
@@ -54,9 +54,15 @@ local function copy(e)
       kind = e.kind,
       location = e.location,
       magnitude = e.magnitude,
-      visibility = e.visibility,
+      loudness = e.loudness,
       payload = payload,
       causes = table.move(e.causes, 1, #e.causes, 1, {}),
+      -- Not an envelope field: the tick this owner learned of the
+      -- event, stamped by the courier on the way in. The event is a
+      -- photograph; this is the date written on the back of it. nil
+      -- on the way in (the incoming event never carries one), set by
+      -- receive(); carried faithfully on the way out.
+      learned = e.learned,
    }
 end
 
@@ -66,10 +72,13 @@ end
 -- belief (a viewer-grade tolerance, for the same reason viewers have
 -- it: this store will one day receive events from couriers younger
 -- than it is).
-function Belief:receive(e)
+function Belief:receive(e, learned)
    assert(type(e) == "table" and type(e.kind) == "string",
       "belief: received something that is not an event")
+   assert(math.type(learned) == "integer" and learned >= e.tick,
+      "belief: learned must be an integer tick no earlier than the event")
    local held = copy(e)
+   held.learned = learned
    local kind = self.by_kind[e.kind]
    if not kind then
       kind = {}
@@ -90,9 +99,9 @@ function Belief:latest(kind)
 end
 
 -- Everything believed about a kind, in the order it arrived.
--- Arrival order is the store's own history — with a pass-through
--- courier it matches log order, but the day couriers get slow it
--- becomes the faction's private chronology, which is the point.
+-- Arrival order is the store's own history — and with the card-122
+-- courier that is the faction's private chronology: the order news
+-- reached it, not the order things happened. That gap is the point.
 function Belief:recall(kind)
    local held = self.by_kind[kind]
    local out = {}

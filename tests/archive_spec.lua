@@ -60,7 +60,7 @@ local function dump(path)
    local out = {}
    local db = sqlite3.open(path)
    for row in db:rows([[
-      SELECT 'annals', id, tick, kind, location, magnitude, visibility, payload
+      SELECT 'annals', id, tick, kind, location, magnitude, loudness, payload
       FROM annals ORDER BY id
    ]]) do
       out[#out + 1] = table.concat(row, "|")
@@ -101,11 +101,11 @@ describe("Archive", function()
       assert.equal("deadbeef", rows.git_commit)
       assert.equal("7", rows.seed)
       assert.equal("{}", rows.config)
-      assert.equal("2", rows.schema_version)
+      assert.equal("3", rows.schema_version)
       assert.equal("[]", rows.interventions)
       assert.equal(_VERSION, rows.lua_version)
       assert.equal(sqlite3.version(), rows.sqlite_version)
-      assert.same({ { 1 } }, query(path, "PRAGMA user_version"))
+      assert.same({ { 2 } }, query(path, "PRAGMA user_version"))
    end)
 
    it("demands the host facts it cannot invent", function()
@@ -148,8 +148,8 @@ describe("Archive", function()
       for id = 1, u.annals:len() do
          local e = u.annals:get(id)
          local row = query(path,
-            ("SELECT tick, kind, location, magnitude, visibility FROM annals WHERE id = %d"):format(id))[1]
-         assert.same({ e.tick, e.kind, e.location, e.magnitude, e.visibility }, row)
+            ("SELECT tick, kind, location, magnitude, loudness FROM annals WHERE id = %d"):format(id))[1]
+         assert.same({ e.tick, e.kind, e.location, e.magnitude, e.loudness }, row)
          local causes = {}
          for _, c in ipairs(query(path,
             ("SELECT cause_id FROM causes WHERE event_id = %d ORDER BY ord"):format(id))) do

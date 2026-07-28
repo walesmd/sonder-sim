@@ -221,9 +221,10 @@ when caught — reputation is the commons no crew may graze bare.
 - Drift is **belief-about-population**: the Fleet's self-census as
   aging belief rows is law 3 applied reflexively, and a lovely
   future chronicle beat ("the Wake-Sisters, if they still sail...").
-- The Chalking wants **event visibility** doing real work: a hull
-  concealing sickness is exactly a `secret` event with catastrophic
-  downstream cause links.
+- The Chalking wants **event loudness** doing real work: sickness
+  aboard a hull is exactly a `quiet` event — and concealing it is
+  behavior, a chalk-mark withheld rather than a stamp on the fact
+  (card 122's lesson) — with catastrophic downstream cause links.
 
 ## Open questions
 
@@ -248,3 +249,24 @@ something an entity can lack or carry, or with markets that can price
 only material goods, fail this entry. (When news learns to ride in
 hulls — card 122 — the Fleet is also the eval that the carrier can be
 *somebody*.)
+
+**Checked against card 122's courier (2026-07-28).** The courier
+gave factions a mandatory `home`, which reads like a mandatory
+homeworld — Mike raised it, and the reconciliation is on the
+record. Home is a *name*, not a fixed point: the engine never
+decides where a name is; the world's `distance(from, to, tick)`
+does, and the tick parameter means a name is free to move. A hull
+is an address that sails. So the Fleet enters as a conglomerate —
+each hull or squadron a faction whose home is the hull's own name,
+each with its own belief store — which this entry *requires*, not
+merely tolerates: the Wake-Sisters beat ("if they still sail")
+depends on knowledge fragmented across hulls, and a single
+Fleet-wide store would falsify the drama. "The Marrow Fleet" as a
+civilization is an aggregate, a zoom level, never one faction —
+converging with the fractured species (card 136). Conditions this
+places on the engine, now part of this eval: `home` stays a name
+(never a coordinate, never cached as stationary), and nothing may
+hard-wire faction == civilization. Honestly pending: nothing yet
+moves a name — the static map is the placeholder, and this entry's
+full test runs when the map learns to move (news riding hulls is
+card 150's bar).

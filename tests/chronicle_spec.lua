@@ -16,7 +16,7 @@ local function event(overrides)
       kind = "universe.genesis",
       location = "the-void",
       magnitude = 0,
-      visibility = "public",
+      loudness = "loud",
       payload = { seed = 1893 },
       causes = {},
    }
@@ -38,7 +38,7 @@ local function toy_universe(seed)
          kind = "grain.hunger",
          location = "the-void",
          magnitude = n,
-         visibility = "public",
+         loudness = "loud",
          payload = { shortfall = n },
          causes = { last },
       }
@@ -181,19 +181,19 @@ describe("the unknown-kind fallback", function()
          tick = 512,
          location = "sector:7",
          magnitude = 8,
-         visibility = "secret",
+         loudness = "quiet",
          payload = { traitor = "house-veyl", victim = "house-omast" },
       }
       assert.equal(
-         "tick  512 · sector:7 · diplomacy.betrayal, magnitude 8, secret"
+         "tick  512 · sector:7 · diplomacy.betrayal, magnitude 8, quiet"
          .. " — traitor=house-veyl, victim=house-omast",
          Chronicle.line(e))
    end)
 
    it("survives an empty payload", function()
       local e = event{ kind = "void.hum", tick = 1, magnitude = 2,
-         visibility = "public", payload = {} }
-      assert.equal("tick    1 · the-void · void.hum, magnitude 2, public",
+         loudness = "loud", payload = {} }
+      assert.equal("tick    1 · the-void · void.hum, magnitude 2, loud",
          Chronicle.line(e))
    end)
 end)
