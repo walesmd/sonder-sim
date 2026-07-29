@@ -23,12 +23,21 @@ describe("conservation", function()
       assert.equal(report.founded.cents, report.held.cents)
    end)
 
-   it("every tally agrees with the independent audit", function()
-      -- Run long enough to cross war and peace both. Card 122 will
-      -- relax exactly this assertion — mismatches, never violations.
+   it("every tally disagrees only by what is still on the road", function()
+      -- The card-122 relaxation, exactly as card 120 positioned it.
+      -- The old line here demanded zero mismatches; now drift is the
+      -- product — a tally written while news rides is honestly
+      -- stale — and the audit holds each mismatch to
+      -- reported + in-flight == audited, to the cent. Violations
+      -- stay zero forever; unexplained mismatches are lies, and
+      -- there are none here.
       local u = toy(1893)
       u:run(300)
-      assert.equal(0, #Audit.of(u.annals).mismatches)
+      local report = Audit.of(u.annals,
+         { distance = u.distance, channel_speed = u.channel_speed })
+      assert.is_true(#report.mismatches > 0,
+         "slow news should have made honest drift")
+      assert.equal(0, #report.unexplained)
    end)
 
    it("holds for other seeds too", function()

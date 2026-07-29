@@ -7,10 +7,21 @@ local toy = require "support.toy"
 local Audit = require "sonder.audit"
 local vocabulary = require "sonder.vocabulary"
 
-local function assert_clean(report)
+-- The world's road, as the audit wants it: the same map and divisor
+-- the courier reads.
+local function road(u)
+   return { distance = u.distance, channel_speed = u.channel_speed }
+end
+
+-- Clean, in the card-122 sense: the arithmetic of truth is perfect
+-- (no violations), and every tally's drift is exactly the news still
+-- on the road (no unexplained mismatches). Plain mismatches stopped
+-- being asserted away the day news got slow — drift is the product
+-- now, and the audit accounts for it instead of forbidding it.
+local function assert_honest(report)
    assert.equal(0, #report.violations,
       table.concat(report.violations, "\n"))
-   assert.equal(0, #report.mismatches)
+   assert.equal(0, #report.unexplained)
 end
 
 describe("coverage", function()
@@ -39,8 +50,12 @@ describe("conservation", function()
    it("balances a thousand days of seed 1893", function()
       local u = toy(1893)
       u:run(1000)
-      local report = Audit.of(u.annals)
-      assert_clean(report)
+      local report = Audit.of(u.annals, road(u))
+      assert_honest(report)
+      -- post 0006's promised on-schedule red, resolved the designed
+      -- way: drift exists, because news is slow — and every cent of
+      -- it reconciles against what was still on the road
+      assert.is_true(#report.mismatches > 0)
       assert.equal(report.founded.cents, report.held.cents)
       assert.equal(report.founded.grain + report.totals.harvested
          - report.totals.eaten - report.totals.burned,
@@ -51,8 +66,16 @@ describe("conservation", function()
       for _, seed in ipairs({ 7, 40412 }) do
          local u = toy(seed)
          u:run(300)
-         assert_clean(Audit.of(u.annals))
+         assert_honest(Audit.of(u.annals, road(u)))
       end
+   end)
+
+   it("without the road, mismatches go uncertified, not clean", function()
+      local u = toy(1893)
+      u:run(200)
+      local report = Audit.of(u.annals)
+      assert.is_true(#report.mismatches > 0)
+      assert.is_nil(report.unexplained) -- unchecked is not "none"
    end)
 end)
 
@@ -103,6 +126,39 @@ describe("the counterfeiter", function()
          end
       end
       assert.is_true(caught, "the impossible purchase went unflagged")
+   end)
+end)
+
+describe("the liar", function()
+   -- Ignorance is legitimate drift: reported + in-flight == audited,
+   -- to the cent. A lie is drift no road accounts for. The annals
+   -- admits both — grammar at the door — and card 120's structural
+   -- separation finishes here as three bins: violations (impossible
+   -- arithmetic), explained mismatches (ignorance, the product), and
+   -- unexplained mismatches (somebody's books are lying).
+   it("catches a forged tally the road cannot explain", function()
+      local u = toy(7)
+      u:add_system("liar", function(universe, _, tick)
+         if tick == 5 then
+            universe:emit{
+               kind = "civ.tally",
+               location = "vessar-reaches",
+               magnitude = 9999,
+               loudness = "local",
+               -- harvested/eaten zero: the fold's books stay true,
+               -- so nothing trips a violation — the lie lives
+               -- purely in the claim
+               payload = { harvested = 0, eaten = 0,
+                  stock = 9999, cents = 9999 },
+               causes = { 1 },
+            }
+         end
+      end)
+      u:run(10)
+      local report = Audit.of(u.annals, road(u))
+      assert.equal(0, #report.violations)
+      assert.is_true(#report.unexplained > 0,
+         "a 9,999-sack lie passed as ignorance")
    end)
 end)
 

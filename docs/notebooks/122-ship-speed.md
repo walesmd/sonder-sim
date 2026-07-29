@@ -467,6 +467,37 @@ arrive home together and this heals by construction; until then it
 is honest physics under the license — and very fine chronicle
 drama.
 
+## Session 3 — step 6, built: the audit learns the road
+
+`Audit.of(annals, road)` — the optional road is `{ distance,
+channel_speed }`, the same map and divisor the courier reads (the
+universe exposes both, so callers pass `u.distance` /
+`u.channel_speed`). With it, the fold ships every money-moving
+event's effects toward each involved civ's home on the courier's
+own integer ceiling, and at each tally holds the mismatch to an
+exact identity: **reported + in-flight == audited, to the cent.**
+Mismatch rows gain `in_flight` and `explained`; the report gains
+`unexplained` (nil without a road — unchecked is not clean, so the
+absence of certification is typed as absence, never as zero).
+Card 120's separation finishes as three bins: violations
+(impossible arithmetic — zero forever), explained mismatches
+(ignorance, the product), unexplained mismatches (lies). The new
+liar spec forges a grammatically-valid tally claiming 9,999 sacks:
+zero violations, caught as unexplained — the audit now tells
+ignorance from deceit by arithmetic. main.lua --audit passes the
+road and exits 1 only on violations or unexplained drift; its
+output line is the card in one sentence: "296 tally mismatches;
+296 explained by news still on the road, 0 unexplained."
+
+The identity held on the first run — 134 green, with only the two
+golden-master specs left red for step 8. Worth the note: this is a
+whole-system cross-check, not a unit test. Any off-by-one in the
+courier's delivery ticks, believed_books' learned-watermark, or
+the exchange's arrival math would have broken exactness somewhere
+in thousands of tallies across seeds. It didn't. Post 0006's
+promise is kept the designed way, and the in-world detective's
+tool (card 156: unexplained drift = suspect someone) now exists.
+
 ## Session 3 — step 5, built; and a finding that outranks it
 
 Step 5 landed as designed in Q6: vessari_decide reads its believed

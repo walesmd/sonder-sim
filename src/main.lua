@@ -171,7 +171,8 @@ if opts.audit then
       local grouped = s:reverse():gsub("(%d%d%d)", "%1,"):reverse():gsub("^,", "")
       return grouped
    end
-   local report = Audit.of(u.annals)
+   local report = Audit.of(u.annals,
+      { distance = u.distance, channel_speed = u.channel_speed })
    print(("audit: %s¢ founded, %s¢ held; %s sacks founded, +%s "
       .. "harvested, −%s eaten, −%s burned, %s held")
       :format(comma(report.founded.cents), comma(report.held.cents),
@@ -185,11 +186,20 @@ if opts.audit then
       print("audit: the books balance")
    end
    if #report.mismatches > 0 then
-      print(("audit: %d tally mismatches (belief drifted from truth "
-         .. "under a pass-through courier — a bug until card 122)")
-         :format(#report.mismatches))
+      print(("audit: %d tally mismatches; %d explained by news still "
+         .. "on the road, %d unexplained")
+         :format(#report.mismatches,
+            #report.mismatches - #report.unexplained,
+            #report.unexplained))
    end
-   if #report.violations > 0 or #report.mismatches > 0 then
+   for i = 1, #report.unexplained do
+      local m = report.unexplained[i]
+      print(("audit UNEXPLAINED: event %d, %s %s: reported %d, audited "
+         .. "%d, in flight %d — no road accounts for this")
+         :format(m.id, m.name, m.field, m.reported, m.audited,
+            m.in_flight))
+   end
+   if #report.violations > 0 or #report.unexplained > 0 then
       os.exit(1)
    end
 end
