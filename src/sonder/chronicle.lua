@@ -128,6 +128,19 @@ local function line(e)
    return ("tick %4d · %-8s · %s"):format(e.tick, e.location, sentence)
 end
 
+-- A believed event, double-dated: when this mind learned it ← when
+-- it happened. The arrow is card 122 — news traveling — and the gap
+-- between the two ticks is each line's staleness, visible by
+-- subtraction. Same templates as truth: what differs between the
+-- chronicle and a believes feed is never the words, only the dates
+-- and the order.
+local function believed_line(held)
+   local template = templates[held.kind]
+   local sentence = template and template(held) or fallback(held)
+   return ("tick %4d ← tick %4d · %-8s · %s")
+      :format(held.learned, held.tick, held.location, sentence)
+end
+
 local Chronicle = {}
 Chronicle.__index = Chronicle
 
@@ -150,6 +163,7 @@ end
 return {
    new = new,
    line = line,
+   believed_line = believed_line,
    -- Exported for the coverage spec: this repo's own viewer must have
    -- a sentence for every kind in this repo's vocabulary. Not sim API.
    _templates = templates,

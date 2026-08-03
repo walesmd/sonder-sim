@@ -467,6 +467,54 @@ arrive home together and this heals by construction; until then it
 is honest physics under the license — and very fine chronicle
 drama.
 
+## Session 3, overnight — step 7, built: the believes viewer
+
+Mike went to bed ("just make decisions yourselves"); decisions made
+solo and listed here for morning interrogation. Step 7 is built,
+tested, and left UNCOMMITTED for gutter review; steps 8 and 9 are
+untouched on purpose — the official re-cut and the post are ours to
+do together.
+
+**The store keeps a diary.** Belief gains `journal` (every believed
+event across kinds, arrival order) and `chronology(as_of)` — copies
+out, as always; as_of cuts at a tick, and since beliefs are a pure
+projection of deliveries, every past state of the store is still
+inside it. Q7's "any actor at any given tick" is one filter.
+
+**The double-dated line.** Chronicle gains `believed_line(held)`:
+`tick   94 ← tick   86 · khedrun-holds · the khedrun declare war…`
+— learned ← happened; the arrow is the card, the gap is the
+staleness, and the words are the same templates truth uses: what
+differs between the chronicle and a believes feed is never the
+words, only the dates and the order.
+
+**The flags.** `--believes NAME` silences the live truth feed and
+renders the faction's private chronology after the run;
+`--as-of T` cuts it (rejected without --believes). The fingerprint
+hashes whichever view was rendered; the seal stays the state. Run
+one seed three ways and you get three fingerprints, one seal —
+verified: plain e981…, vessari 9e41…, khedrun 3596…, all sealing
+0004c84f3ec4ba0b. Three pictures, one universe: the zoom thesis's
+first working demo.
+
+**The excerpt the post has been waiting for** (seed 1893, the
+day-82 war): the khedrun's feed is all departures and no arrivals —
+they declare, march daily, and sheathe on day 92 without ever
+having *seen* a raid (spoils news lands day 99). The vessari learn
+of the war on `tick 90 ← tick 82`, one day before the first sword;
+after that, every day delivers a matched pair — the stale news of a
+party that rode out eight days ago arriving the very tick that
+party falls on their granaries. The warning arrives with the sword,
+visible in adjacent lines. As-of check: at tick 89 the vessari's
+chronology contains nothing of a war eight days old.
+
+**Specs:** belief diary (cross-kind arrival order, copies-out,
+as-of cuts including error on non-integer), believed_line (template
+kind + unknown-kind fallback), and the toy property that the
+vessari learn khedrun declarations exactly eight days late, with
+knowledge monotone under as-of. 139 green; the only reds are the
+golden seal ×2 and golden feed, step 8's to move.
+
 ## Session 3 — step 6, built: the audit learns the road
 
 `Audit.of(annals, road)` — the optional road is `{ distance,

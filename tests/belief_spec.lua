@@ -104,11 +104,41 @@ describe("Belief", function()
       local b = Belief.new("vess")
       b:receive(drift(2, 1, 3), 1)
       for key in pairs(b) do
-         assert.is_true(key == "owner" or key == "received" or key == "by_kind",
+         assert.is_true(key == "owner" or key == "received"
+            or key == "by_kind" or key == "journal",
             "unexpected field on a belief store: " .. tostring(key))
       end
       assert.is_nil(b.annals)
       assert.is_nil(b.emit)
+   end)
+
+   it("keeps a diary: chronology crosses kinds in arrival order", function()
+      local b = Belief.new("vess")
+      b:receive(drift(2, 1, 3), 4) -- far news of an early event
+      b:receive({
+         id = 9, tick = 3, kind = "omen.comet", location = "the-sky",
+         magnitude = 7, loudness = "loud", payload = { portent = "doom" },
+         causes = { 1 },
+      }, 4)
+      b:receive(drift(11, 4, -1), 4)
+      local diary = b:chronology()
+      assert.equal(3, #diary)
+      assert.same({ "market.drift", "omen.comet", "market.drift" },
+         { diary[1].kind, diary[2].kind, diary[3].kind })
+      assert.same({ 2, 9, 11 }, { diary[1].id, diary[2].id, diary[3].id })
+      -- copies on the way out, same as every other query
+      diary[2].payload.portent = "hope"
+      assert.equal("doom", b:chronology()[2].payload.portent)
+   end)
+
+   it("chronology as-of a tick is what the mind knew then", function()
+      local b = Belief.new("vess")
+      b:receive(drift(2, 1, 3), 1)
+      b:receive(drift(4, 2, -1), 9) -- slow news
+      assert.equal(1, #b:chronology(5))
+      assert.equal(2, #b:chronology(9))
+      assert.equal(0, #b:chronology(0))
+      assert.has_error(function() b:chronology("yesterday") end)
    end)
 
    it("rejects things that are not events", function()

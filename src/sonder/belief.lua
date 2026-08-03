@@ -29,6 +29,7 @@ function Belief.new(owner)
       owner = owner,
       received = 0, -- how many events have ever arrived
       by_kind = {}, -- kind → array of believed events, received order
+      journal = {}, -- every believed event, across kinds, received order
    }, Belief)
 end
 
@@ -85,7 +86,27 @@ function Belief:receive(e, learned)
       self.by_kind[e.kind] = kind
    end
    kind[#kind + 1] = held
+   self.journal[#self.journal + 1] = held
    self.received = self.received + 1
+end
+
+-- The private chronology: everything ever believed, across every
+-- kind, in arrival order — the diary the courier wrote into this
+-- store. as_of (optional) cuts it at a tick: what this mind knew
+-- *when* — beliefs are a pure projection of deliveries, so every
+-- past state of the store is still inside it, one filter away
+-- (card 122, Q7: observe any actor at any tick). Copies, as always.
+function Belief:chronology(as_of)
+   assert(as_of == nil or math.type(as_of) == "integer",
+      "belief: as_of must be an integer tick")
+   local out = {}
+   for i = 1, #self.journal do
+      local held = self.journal[i]
+      if as_of == nil or held.learned <= as_of then
+         out[#out + 1] = copy(held)
+      end
+   end
+   return out
 end
 
 -- The newest belief about a kind, or nil — and nil is a complete

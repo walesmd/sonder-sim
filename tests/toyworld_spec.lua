@@ -186,6 +186,36 @@ describe("war discipline", function()
    end)
 end)
 
+describe("the believes view", function()
+   it("the vessari learn of khedrun declarations eight days late, to the tick", function()
+      -- The viewer's whole promise in one property: every believed
+      -- row is dated twice, learned never precedes happened, and
+      -- news from khedrun-holds is exactly the road late.
+      local u = toy(1893)
+      u:run(200)
+      local store
+      for i = 1, #u.factions do
+         if u.factions[i].name == "vessari" then
+            store = u.factions[i].store
+         end
+      end
+      local rows = store:chronology()
+      assert.is_true(#rows > 0)
+      local declarations = 0
+      for i = 1, #rows do
+         local r = rows[i]
+         assert.is_true(r.learned >= r.tick)
+         if r.kind == "war.declared" then
+            declarations = declarations + 1
+            assert.equal(8, r.learned - r.tick)
+         end
+      end
+      assert.is_true(declarations > 0)
+      -- and the as-of cut agrees with itself: knowledge only grows
+      assert.is_true(#store:chronology(100) <= #store:chronology(200))
+   end)
+end)
+
 describe("the KPI", function()
    it("a thousand days produce a chronicle worth reading", function()
       -- "Worth reading" needs a human (the notebook records that

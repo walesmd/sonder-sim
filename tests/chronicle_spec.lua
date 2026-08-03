@@ -135,6 +135,32 @@ describe("templates", function()
                reason = "hunger", measure = 4 } }))
    end)
 
+   it("render a believed event double-dated: learned ← happened", function()
+      local held = {
+         id = 40, tick = 86, kind = "war.declared",
+         location = "khedrun-holds", magnitude = 151,
+         loudness = "loud", learned = 94,
+         payload = { aggressor = "khedrun", target = "vessari",
+            reason = "price", measure = 151 },
+         causes = { 12 },
+      }
+      assert.equal("tick   94 ← tick   86 · khedrun-holds · the khedrun"
+         .. " declare war on the vessari — grain at 151¢ was the last"
+         .. " insult",
+         Chronicle.believed_line(held))
+   end)
+
+   it("believed lines survive kinds younger than this viewer", function()
+      local held = {
+         id = 7, tick = 12, kind = "omen.comet", location = "the-sky",
+         magnitude = 7, loudness = "loud", learned = 30,
+         payload = { portent = "doom" }, causes = { 1 },
+      }
+      assert.equal("tick   30 ← tick   12 · the-sky  · omen.comet,"
+         .. " magnitude 7, loud — portent=doom",
+         Chronicle.believed_line(held))
+   end)
+
    it("render a march riding out", function()
       assert.equal("tick   86 · khedrun-holds · a khedrun war party rides"
          .. " out against the vessari (force 8)",
