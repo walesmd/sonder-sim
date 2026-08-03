@@ -47,7 +47,7 @@ adds it here, in the same PR.
   is the behavior of whoever holds the information (retellings,
   silence), not event state. Stamped honestly since day one; named
   `visibility` until card 122 caught the word claiming too much.
-  (post 0002; card 122)
+  (post 0002; post 0011)
 - **causes** — the ids of the events that caused this one. Required:
   markets don't just move, wars don't just start. Only genesis is
   uncaused. (post 0002)
@@ -81,9 +81,21 @@ adds it here, in the same PR.
   a push-based memory of the events that have reached it. Ignorance
   is free — no events received, no rows. (post 0006)
 - **courier** — the machinery that delivers events into belief
-  stores. Today a pass-through (everyone briefly omniscient); the
-  seam where news will learn to travel at ship speed, degrade, and
-  be culturally interpreted. (post 0006; card 122, future)
+  stores, at the pace of distance: every event reaches every
+  faction ceil(distance ÷ channel speed) ticks after it happens,
+  stamped with the tick it arrived. Degradation and interpretation
+  will arrive through the same door. (post 0006; post 0011)
+- **channel speed** — the divisor that turns distance into delay.
+  A parameter, not a constant; today it is 1 everywhere. (post 0011)
+- **learned** — the arrival stamp on a believed copy: the tick the
+  news actually reached its owner. The event is a photograph; this
+  is the date written on the back. The left-hand date on every
+  believes-feed line. (post 0011)
+- **private chronology** — the order news reached one faction: its
+  belief store's diary, rendered double-dated by `--believes`
+  (learned ← happened). Same templates as the chronicle — what
+  differs is never the words, only the dates and the order.
+  (post 0011)
 - **intent** — an event spec a faction's decide() returns; the
   universe emits it through the same strict validation as
   everything else. Factions don't write history, they petition it.

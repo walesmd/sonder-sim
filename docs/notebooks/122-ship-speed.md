@@ -1,5 +1,19 @@
 # Notebook — card 122: news at ship speed (belief store v2)
 
+*(Closed 2026-08-03, session 4: step 8's official re-cut landed —
+golden seal a3b626e777c0eaff with its ledger entry, the golden feed
+re-cut to eight lines of opening silence ("the silence is the
+card") — and step 9 shipped post 0011 in both tracks with the
+same-war-twice excerpt at the front door, plus the docs sweep:
+glossary (courier updated; channel speed, learned, private
+chronology added; loudness recited to post 0011), README status
+brought current through 0011, CLAUDE.md status and next-up
+rewritten. 142 specs green, zero failures. The card's ledger:
+9 future cards seeded (150–158), 2 mistakes confessed in the post,
+1 doctrine ruled — the toy universe doesn't measure itself against
+past instantiations of itself. Post tag `post/0011` goes on the
+merge commit, per standing practice.)*
+
 Branch: `122-ship-speed`. Card text: "Fill the seam: events propagate
 at travel speed, degrade in transit, and get culturally interpreted
 on arrival — until two empires disagree about the current state of
