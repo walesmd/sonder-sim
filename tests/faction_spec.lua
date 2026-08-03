@@ -15,7 +15,7 @@ describe("factions", function()
       -- no code path reaches it.
       local u = Universe.new(7)
       local seen
-      u:add_faction("spy", function(...)
+      u:add_faction("spy", "the-void", function(...)
          seen = table.pack(...)
          return {}
       end)
@@ -34,7 +34,7 @@ describe("factions", function()
    it("the pass-through courier delivers everything, including genesis", function()
       local u = Universe.new(1893)
       local counted
-      u:add_faction("census", function(beliefs)
+      u:add_faction("census", "the-void", function(beliefs)
          counted = beliefs:len()
          return {}
       end)
@@ -45,17 +45,17 @@ describe("factions", function()
 
    it("intents are emitted in order, ticks stamped centrally", function()
       local u = Universe.new(7)
-      u:add_faction("herald", function(beliefs, _, tick)
+      u:add_faction("herald", "the-void", function(beliefs, _, tick)
          if tick > 1 then
             return {}
          end
          local genesis = beliefs:latest("universe.genesis")
          return {
             { kind = "grain.hunger", location = "the-void", magnitude = 1,
-              visibility = "public", payload = { shortfall = 1 },
+              loudness = "loud", payload = { shortfall = 1 },
               causes = { genesis.id } },
             { kind = "grain.hunger", location = "the-void", magnitude = 2,
-              visibility = "public", payload = { shortfall = 2 },
+              loudness = "loud", payload = { shortfall = 2 },
               causes = { genesis.id } },
          }
       end)
@@ -71,11 +71,11 @@ describe("factions", function()
    it("factions run after systems, in registration order", function()
       local u = Universe.new(7)
       local order = {}
-      u:add_faction("second", function()
+      u:add_faction("second", "the-void", function()
          order[#order + 1] = "second"
          return {}
       end)
-      u:add_faction("third", function()
+      u:add_faction("third", "the-void", function()
          order[#order + 1] = "third"
          return {}
       end)
@@ -88,12 +88,12 @@ describe("factions", function()
 
    it("returning nothing is an error; an empty table is a decision", function()
       local u = Universe.new(7)
-      u:add_faction("mute", function() end)
+      u:add_faction("mute", "the-void", function() end)
       assert.has_error(function() u:step() end,
          "universe: mute: decide must return an array"
          .. " of intents (perhaps empty), not nil")
       local v = Universe.new(7)
-      v:add_faction("idle", null_decide)
+      v:add_faction("idle", "the-void", null_decide)
       v:step()
       assert.equal(1, v.annals:len()) -- just genesis; idling is legal
    end)
@@ -101,7 +101,7 @@ describe("factions", function()
    it("names are unique across systems and factions alike", function()
       local u = Universe.new(7)
       u:add_system("war", function() end)
-      assert.has_error(function() u:add_faction("war", null_decide) end,
+      assert.has_error(function() u:add_faction("war", "the-void", null_decide) end,
          'universe: the name "war" is already taken')
       assert.has_error(function() u:add_system("war", function() end) end,
          'universe: the name "war" is already taken')
@@ -109,9 +109,9 @@ describe("factions", function()
 
    it("bad intents die at the same door as every bad event", function()
       local u = Universe.new(7)
-      u:add_faction("liar", function()
+      u:add_faction("liar", "the-void", function()
          return { { kind = "war.victory", location = "the-void", magnitude = 1,
-            visibility = "public", payload = {}, causes = { 1 } } }
+            loudness = "loud", payload = {}, causes = { 1 } } }
       end)
       assert.has_error(function() u:step() end,
          'annals: unregistered kind "war.victory"')

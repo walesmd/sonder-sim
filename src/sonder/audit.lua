@@ -18,11 +18,19 @@
 --     trade whose total is not units × price, conservation broken
 --     across the whole history.
 --   mismatches — a civ's self-reported tally disagreeing with the
---     independent fold. With today's pass-through courier this is
---     always a bug: a civ can be neither lying nor misinformed. The
---     day news travels at ship speed (card 122), drift between
---     belief and truth becomes the product, not the crime — specs
---     will relax THIS list, and only this list.
+--     independent fold. Once news travels at ship speed (card 122),
+--     drift is the product, not the crime: a tally written while a
+--     trade's news is still on the road is honestly stale. But
+--     honesty has an arithmetic: hand Audit.of the world's road —
+--     { distance, channel_speed }, the same map the courier reads —
+--     and it replays what was still in flight at each tally,
+--     holding every mismatch to reported + in-flight == audited,
+--     to the cent. A mismatch that passes is *explained*:
+--     ignorance, working as built. One that fails lands in
+--     report.unexplained: somebody's books are lying, and no road
+--     accounts for it. Without the road the audit still lists
+--     mismatches; it just can't certify them (unexplained is nil,
+--     not empty — "unchecked" is not "clean").
 
 local Audit = {}
 
@@ -41,10 +49,35 @@ local function flag(s, id, fmt, ...)
       ("event %d: " .. fmt):format(id, ...)
 end
 
-local function mismatch(s, id, name, field, reported, audited)
-   s.mismatches[#s.mismatches + 1] = {
+local function mismatch(s, id, name, field, reported, audited, on_road)
+   local row = {
       id = id, name = name, field = field,
       reported = reported, audited = audited,
+   }
+   if on_road ~= nil then
+      row.in_flight = on_road
+      row.explained = reported + on_road == audited
+      if not row.explained then
+         s.unexplained[#s.unexplained + 1] = row
+      end
+   end
+   s.mismatches[#s.mismatches + 1] = row
+end
+
+-- When a money-moving event happens, its news starts riding toward
+-- each involved civ's home — the same integer ceiling the courier
+-- uses, replayed from the log. Until it lands, its effect is what a
+-- civ's claim is honestly missing.
+local function ship(s, e, name, grain, cents)
+   if not s.road then
+      return
+   end
+   local d = s.road.distance(e.location, s.seats[name], e.tick)
+   local speed = s.road.channel_speed
+   local list = s.pending[name]
+   list[#list + 1] = {
+      arrives = e.tick + (d + speed - 1) // speed,
+      grain = grain, cents = cents,
    }
 end
 
@@ -54,6 +87,7 @@ local effects = {
    ["market.order"] = false,
    ["market.price"] = false,
    ["war.declared"] = false,
+   ["war.march"] = false,
    ["war.raid"] = false,
    ["war.peace"] = false,
 
@@ -62,6 +96,8 @@ local effects = {
       s.books[p.name] = { grain = p.grain, cents = p.cents }
       s.names[#s.names + 1] = p.name
       s.homes[e.location] = p.name
+      s.seats[p.name] = e.location
+      s.pending[p.name] = {}
       s.founded.grain = s.founded.grain + p.grain
       s.founded.cents = s.founded.cents + p.cents
    end,
@@ -81,11 +117,30 @@ local effects = {
       b.grain = b.grain + p.harvested - p.eaten
       s.totals.harvested = s.totals.harvested + p.harvested
       s.totals.eaten = s.totals.eaten + p.eaten
+      -- What is still on the road to this civ — and so honestly
+      -- absent from its claim. Entries that have landed are in the
+      -- civ's own books by the courier's contract, so they prune;
+      -- entries still riding sum into the expected drift.
+      local road_grain, road_cents
+      if s.road then
+         road_grain, road_cents = 0, 0
+         local kept = {}
+         local list = s.pending[name]
+         for i = 1, #list do
+            local x = list[i]
+            if x.arrives > e.tick then
+               kept[#kept + 1] = x
+               road_grain = road_grain + x.grain
+               road_cents = road_cents + x.cents
+            end
+         end
+         s.pending[name] = kept
+      end
       if b.grain ~= p.stock then
-         mismatch(s, e.id, name, "grain", p.stock, b.grain)
+         mismatch(s, e.id, name, "grain", p.stock, b.grain, road_grain)
       end
       if b.cents ~= p.cents then
-         mismatch(s, e.id, name, "cents", p.cents, b.cents)
+         mismatch(s, e.id, name, "cents", p.cents, b.cents, road_cents)
       end
    end,
 
@@ -107,6 +162,8 @@ local effects = {
       seller.cents = seller.cents + p.total
       s.totals.traded_units = s.totals.traded_units + p.units
       s.totals.traded_cents = s.totals.traded_cents + p.total
+      ship(s, e, p.buyer, p.units, -p.total)
+      ship(s, e, p.seller, -p.units, p.total)
    end,
 
    ["war.spoils"] = function(s, e)
@@ -124,6 +181,8 @@ local effects = {
       s.totals.seized = s.totals.seized + p.seized
       s.totals.plunder = s.totals.plunder + p.plunder
       s.totals.burned = s.totals.burned + p.burned
+      ship(s, e, p.raider, p.seized, p.plunder)
+      ship(s, e, p.target, -p.seized - p.burned, -p.plunder)
    end,
 }
 
@@ -135,14 +194,29 @@ end
 
 -- Fold the annals into a report. Pure: same log, same report, on
 -- every machine — which is why the negative-balance sweep iterates
--- founding order, never pairs().
-function Audit.of(annals)
+-- founding order, never pairs(). The optional road —
+-- { distance = function(from, to, tick) -> days, channel_speed }, the
+-- same map and divisor the courier reads — lets the fold certify
+-- mismatches (see the header); annals + road produce the same
+-- report for any holder of both.
+function Audit.of(annals, road)
+   if road ~= nil then
+      assert(type(road) == "table" and type(road.distance) == "function",
+         "audit: road must carry distance(from, to, tick)")
+      road = { distance = road.distance,
+         channel_speed = road.channel_speed or 1 }
+      assert(math.type(road.channel_speed) == "integer"
+         and road.channel_speed >= 1,
+         "audit: road.channel_speed must be a positive integer")
+   end
    local s = {
-      books = {}, names = {}, homes = {},
+      books = {}, names = {}, homes = {}, seats = {},
       founded = { grain = 0, cents = 0 },
       totals = { harvested = 0, eaten = 0, burned = 0,
          seized = 0, plunder = 0, traded_units = 0, traded_cents = 0 },
       violations = {}, mismatches = {}, unclassified = {},
+      road = road, pending = {},
+      unexplained = road and {} or nil,
    }
    for id = 1, annals:len() do
       local e = annals:get(id)
@@ -199,6 +273,7 @@ function Audit.of(annals)
       totals = s.totals,
       violations = s.violations,
       mismatches = s.mismatches,
+      unexplained = s.unexplained, -- nil without a road: unchecked ≠ clean
       unclassified = s.unclassified,
    }
 end

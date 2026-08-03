@@ -25,6 +25,44 @@ local EXCHANGE = "the-exchange"
 local OPENING_PRICE = 100 -- cents per sack, posted at tick 0
 local PRICE_STEP_CAP = 4 -- the exchange moves at most this per day
 
+-- The map. Distances in days at channel speed 1, declared once per
+-- pair (the lookup tries both directions). The exchange sits on the
+-- road between the two civilizations — 3 + 5 = 8, exactly — and the
+-- Khedrun live farther out, so their prices always arrive staler
+-- and their wars are declared on older grievances. Undeclared pairs
+-- are adjacent: the void is at distance zero from everywhere, which
+-- is why genesis is heard the instant the universe begins.
+local DISTANCES = {
+   ["vessar-reaches"] = { ["the-exchange"] = 3, ["khedrun-holds"] = 8 },
+   ["khedrun-holds"] = { ["the-exchange"] = 5 },
+}
+
+-- The world's answer to "how far?" — consulted by the courier at
+-- each event's departure. The tick goes unused because this map
+-- stands still; the day the map moves (card 125 and beyond), only
+-- this function needs to hear about it.
+local function distance(from, to, _)
+   if from == to then
+      return 0
+   end
+   local row = DISTANCES[from]
+   local d = row and row[to]
+   if d == nil then
+      row = DISTANCES[to]
+      d = row and row[from]
+   end
+   return d or 0
+end
+
+-- Anything on the road — an order slip, a war party — travels at
+-- news speed: the same integer ceiling the courier uses. Nothing
+-- outruns the concept of distance (card 122's consistency rule);
+-- what gets to move at its own speed someday is cards 150 and 153.
+local function travel(u, from, to, tick)
+   local d = distance(from, to, tick)
+   return (d + u.channel_speed - 1) // u.channel_speed
+end
+
 -- The cast. Tuned against the 1000-day acceptance run (see the
 -- card's notebook); every constant is a temperament in disguise.
 local VESSARI = {
@@ -63,10 +101,11 @@ local KHEDRUN = {
 -- in this section can reach truth; that's the point of it.
 -- ---------------------------------------------------------------
 
--- With a pass-through courier both civs' reports arrive in every
--- store, so "my" latest tally is a short backward scan, not a
--- latest(). The margins on these recent() windows are generous:
--- a day produces at most one tally per civ, one trade, one spoils.
+-- Both civs' reports still arrive in every store — the other civ's
+-- just arrive eight days stale now — so "my" latest tally is a short
+-- backward scan, not a latest(). The margins on these recent()
+-- windows are generous: arrivals stay at most one tally per civ, one
+-- trade, one spoils per day, staggered by distance, never bunched.
 local function my_latest_tally(beliefs, civ)
    local tallies = beliefs:recent("civ.tally", 6)
    for i = #tallies, 1, -1 do
@@ -88,19 +127,32 @@ local function my_founding(beliefs, civ)
 end
 
 -- What the civ believes it holds: the last self-report, plus every
--- believed trade and raid since. Returns grain, cents, and the id of
--- the report it grew from (the day's bookkeeping cause).
+-- believed trade and raid the books haven't absorbed yet. Returns
+-- grain, cents, and the id of the report it grew from (the day's
+-- bookkeeping cause).
+--
+-- "Absorbed yet" is judged by the courier's `learned` stamp, never
+-- by event id: news that crossed distance carries an old id, and an
+-- id watermark would drop it forever the moment it finally arrived
+-- (the adversarial review caught exactly that — the Khedrun's
+-- believed treasury froze at its founding value for sixty days
+-- while phantom hunger tripped the war fuse). The tally written on
+-- day T absorbed everything learned by day T, by induction: each
+-- believed trade or spoils integrates into exactly the first tally
+-- decided after it lands. So the filter is learned > basis day.
 local function believed_books(beliefs, civ)
-   local grain, cents, since
+   local grain, cents, since, absorbed
    local tally = my_latest_tally(beliefs, civ)
    if tally then
       grain, cents, since = tally.payload.stock, tally.payload.cents, tally.id
+      absorbed = tally.tick
    else
       local founded = my_founding(beliefs, civ)
       grain, cents, since = founded.payload.grain, founded.payload.cents, founded.id
+      absorbed = founded.tick
    end
    for _, t in ipairs(beliefs:recent("market.trade", 6)) do
-      if t.id > since then
+      if t.learned > absorbed then
          if t.payload.buyer == civ.name then
             grain, cents = grain + t.payload.units, cents - t.payload.total
          elseif t.payload.seller == civ.name then
@@ -109,7 +161,7 @@ local function believed_books(beliefs, civ)
       end
    end
    for _, s in ipairs(beliefs:recent("war.spoils", 6)) do
-      if s.id > since then
+      if s.learned > absorbed then
          if s.payload.raider == civ.name then
             grain = grain + s.payload.seized
             cents = cents + s.payload.plunder
@@ -135,7 +187,7 @@ local function open_the_day(civ, beliefs, stream)
       kind = "civ.tally",
       location = civ.home,
       magnitude = stock,
-      visibility = "regional",
+      loudness = "local",
       payload = { harvested = harvested, eaten = eaten,
          stock = stock, cents = cents },
       causes = { prev },
@@ -146,7 +198,7 @@ local function open_the_day(civ, beliefs, stream)
          kind = "grain.hunger",
          location = civ.home,
          magnitude = shortfall,
-         visibility = "regional",
+         loudness = "local",
          payload = { shortfall = shortfall },
          causes = { prev },
       }
@@ -161,11 +213,21 @@ end
 local function vessari_decide(beliefs, stream)
    local intents, stock = open_the_day(VESSARI, beliefs, stream)
    local price = beliefs:latest("market.price")
+   -- Prudence at the pace of news (card 122): merchants hold their
+   -- stores while they *believe* raiders ride. The declaration is
+   -- shouted at khedrun-holds and takes eight days to reach them,
+   -- so the first raids fall on a market still open — and the peace
+   -- arrives just as late, so they keep withholding from a war that
+   -- is already over. Both mistakes are the belief store working as
+   -- built: what the vessari know is what the road has brought.
+   local declared = beliefs:latest("war.declared")
+   local peace = beliefs:latest("war.peace")
+   local at_war = declared ~= nil and (peace == nil or peace.id < declared.id)
    local surplus = stock - VESSARI.reserve
    -- Merchants, not charities: they undercut the posted price to
    -- move grain, but below the floor they hold their stores and
    -- wait for the market to remember what grain is worth.
-   if price and surplus > 0 then
+   if price and surplus > 0 and not at_war then
       local limit = price.payload.price - VESSARI.undercut
       if limit >= VESSARI.floor then
          local units = math.min(surplus, VESSARI.lot)
@@ -173,7 +235,7 @@ local function vessari_decide(beliefs, stream)
             kind = "market.order",
             location = VESSARI.home,
             magnitude = units,
-            visibility = "public",
+            loudness = "loud",
             payload = { side = "sell", units = units, limit = limit },
             causes = { price.id },
          }
@@ -207,17 +269,17 @@ local function khedrun_decide(beliefs, stream, tick)
             kind = "war.peace",
             location = KHEDRUN.home,
             magnitude = price.payload.price,
-            visibility = "public",
+            loudness = "loud",
             payload = { name = KHEDRUN.name, price = price.payload.price },
             causes = { declared.id, price.id },
          }
       else
          local force = stream:int(KHEDRUN.force_min, KHEDRUN.force_max)
          intents[#intents + 1] = {
-            kind = "war.raid",
-            location = VESSARI.home, -- the raid happens where the grain is
+            kind = "war.march",
+            location = KHEDRUN.home, -- the party rides out from home
             magnitude = force,
-            visibility = "regional",
+            loudness = "local",
             payload = { raider = KHEDRUN.name, target = VESSARI.name,
                force = force },
             causes = { declared.id },
@@ -249,7 +311,7 @@ local function khedrun_decide(beliefs, stream, tick)
             kind = "war.declared",
             location = KHEDRUN.home,
             magnitude = last,
-            visibility = "public",
+            loudness = "loud",
             payload = { aggressor = KHEDRUN.name, target = VESSARI.name,
                reason = "price", measure = last },
             causes = causes,
@@ -277,7 +339,7 @@ local function khedrun_decide(beliefs, stream, tick)
          kind = "war.declared",
          location = KHEDRUN.home,
          magnitude = hungry,
-         visibility = "public",
+         loudness = "loud",
          payload = { aggressor = KHEDRUN.name, target = VESSARI.name,
             reason = "hunger", measure = hungry },
          causes = hunger_causes,
@@ -296,7 +358,7 @@ local function khedrun_decide(beliefs, stream, tick)
             kind = "market.order",
             location = KHEDRUN.home,
             magnitude = units,
-            visibility = "public",
+            loudness = "loud",
             payload = { side = "buy", units = units, limit = limit },
             causes = { price.id },
          }
@@ -327,8 +389,9 @@ local function add_physics(u)
    -- moved).
    local ledger = {} -- civ name → { grain, cents }
    local homes = {} -- location → civ name, learned from foundings
+   local seats = {} -- civ name → home location, the reverse map
    local price, price_id -- the posted price and the event that posted it
-   local orders, raids = {}, {} -- recent, pruned to yesterday's
+   local orders, marches = {}, {} -- in flight or due; pruned once spent
    local cursor = 0
 
    local function catch_up()
@@ -339,6 +402,7 @@ local function add_physics(u)
          if e.kind == "civ.founded" then
             ledger[p.name] = { grain = p.grain, cents = p.cents }
             homes[e.location] = p.name
+            seats[p.name] = e.location
          elseif e.kind == "civ.tally" then
             local books = ledger[homes[e.location]]
             books.grain = books.grain + p.harvested - p.eaten
@@ -357,12 +421,15 @@ local function add_physics(u)
          elseif e.kind == "market.price" then
             price, price_id = p.price, e.id
          elseif e.kind == "market.order" then
-            orders[#orders + 1] = { id = e.id, tick = e.tick,
+            -- an order slip is on the road before the exchange can
+            -- see it: it arrives, then matches the next morning
+            orders[#orders + 1] = { id = e.id,
+               arrives = e.tick + travel(u, e.location, EXCHANGE, e.tick),
                civ = homes[e.location], side = p.side,
                units = p.units, limit = p.limit }
-         elseif e.kind == "war.raid" then
-            raids[#raids + 1] = { id = e.id, tick = e.tick,
-               location = e.location,
+         elseif e.kind == "war.march" then
+            marches[#marches + 1] = { id = e.id,
+               arrives = e.tick + travel(u, e.location, seats[p.target], e.tick),
                raider = p.raider, target = p.target, force = p.force }
          end
       end
@@ -371,19 +438,23 @@ local function add_physics(u)
    local function prune(list, tick)
       local kept = {}
       for i = 1, #list do
-         if list[i].tick >= tick - 1 then
+         if list[i].arrives >= tick - 1 then
             kept[#kept + 1] = list[i]
          end
       end
       return kept
    end
 
-   -- The exchange. Yesterday's orders meet this morning's market:
-   -- willing prices cross → a trade, clamped to what the buyer can
-   -- pay and the seller actually holds; then the posted price moves
-   -- toward the unfilled imbalance, at most PRICE_STEP_CAP a day.
-   -- Naive on purpose — the card asked for a price that a reader
-   -- can watch think.
+   -- The exchange. Orders that *arrived* yesterday meet this
+   -- morning's market — an order placed three days out spends three
+   -- days on the road before the exchange can even see it (the
+   -- step-4 compromise: information travels; settlement clamps stay
+   -- physics; the goods themselves still teleport under card 153's
+   -- license). Willing prices cross → a trade, clamped to what the
+   -- buyer can pay and the seller actually holds; then the posted
+   -- price moves toward the unfilled imbalance, at most
+   -- PRICE_STEP_CAP a day. Naive on purpose — the card asked for a
+   -- price that a reader can watch think.
    u:add_system("exchange", function(universe, _, tick)
       catch_up()
       orders = prune(orders, tick)
@@ -391,7 +462,7 @@ local function add_physics(u)
       local bid_units, offer_units = 0, 0
       for i = 1, #orders do
          local o = orders[i]
-         if o.tick == tick - 1 then
+         if o.arrives == tick - 1 then
             if o.side == "buy" then
                bids[#bids + 1] = o
                bid_units = bid_units + o.units
@@ -414,7 +485,7 @@ local function add_physics(u)
                   kind = "market.trade",
                   location = EXCHANGE,
                   magnitude = units,
-                  visibility = "public",
+                  loudness = "loud",
                   payload = { buyer = bid.civ, seller = offer.civ,
                      units = units, price = at, total = units * at },
                   causes = { bid.id, offer.id },
@@ -442,7 +513,7 @@ local function add_physics(u)
                   location = EXCHANGE,
                   magnitude = reposted - price >= 0 and reposted - price
                      or price - reposted,
-                  visibility = "public",
+                  loudness = "loud",
                   payload = { price = reposted, delta = reposted - price },
                   causes = causes,
                }
@@ -452,30 +523,46 @@ local function add_physics(u)
       end
    end)
 
-   -- The battlefield. Yesterday's war parties reach the granaries
-   -- this morning; what they seize is the *actual* stock's verdict,
-   -- not the raider's plan — factions ride on beliefs, physics pays
-   -- out on truth.
+   -- The battlefield. A war party is on the road for
+   -- ceil(distance ÷ channel speed) days — armies travel at news
+   -- speed, so nothing outruns the concept of distance — and there
+   -- is no recall: a party launched is launched, and the last raids
+   -- of a war can land after its peace (card 158 will teach parties
+   -- to hear). On arrival the raid happens where the grain is and
+   -- the verdict follows the same morning: what a party seizes is
+   -- the *actual* stock's answer, not the raider's plan — factions
+   -- ride on beliefs, physics pays out on truth.
    u:add_system("battle", function(universe, _, tick)
       catch_up()
-      raids = prune(raids, tick)
-      for i = 1, #raids do
-         local raid = raids[i]
-         if raid.tick == tick - 1 then
-            local target = ledger[raid.target]
-            local seized = math.min(raid.force, target.grain)
-            local burned = math.min(raid.force // KHEDRUN.torch_divisor,
+      marches = prune(marches, tick)
+      for i = 1, #marches do
+         local m = marches[i]
+         if m.arrives == tick then
+            local where = seats[m.target] -- where the grain is
+            local raid = universe:emit{
+               kind = "war.raid",
+               location = where,
+               magnitude = m.force,
+               loudness = "local",
+               payload = { raider = m.raider, target = m.target,
+                  force = m.force },
+               causes = { m.id },
+            }
+            catch_up()
+            local target = ledger[m.target]
+            local seized = math.min(m.force, target.grain)
+            local burned = math.min(m.force // KHEDRUN.torch_divisor,
                target.grain - seized)
-            local plunder = math.min(raid.force * KHEDRUN.plunder_rate,
+            local plunder = math.min(m.force * KHEDRUN.plunder_rate,
                target.cents)
             universe:emit{
                kind = "war.spoils",
-               location = raid.location,
+               location = where,
                magnitude = seized + burned,
-               visibility = "regional",
-               payload = { raider = raid.raider, target = raid.target,
+               loudness = "local",
+               payload = { raider = m.raider, target = m.target,
                   seized = seized, plunder = plunder, burned = burned },
-               causes = { raid.id },
+               causes = { raid },
             }
             catch_up()
          end
@@ -492,26 +579,26 @@ local function found(u, civ)
       kind = "civ.founded",
       location = civ.home,
       magnitude = civ.grain,
-      visibility = "public",
+      loudness = "loud",
       payload = { name = civ.name, grain = civ.grain, cents = civ.cents },
       causes = { 1 }, -- genesis; a founding needs no other excuse yet
    }
 end
 
 return function(seed)
-   local u = Universe.new(seed)
+   local u = Universe.new(seed, { distance = distance })
    found(u, VESSARI)
    found(u, KHEDRUN)
    u:emit{
       kind = "market.price",
       location = EXCHANGE,
       magnitude = 0,
-      visibility = "public",
+      loudness = "loud",
       payload = { price = OPENING_PRICE, delta = 0 },
       causes = { 1 },
    }
    add_physics(u)
-   u:add_faction(VESSARI.name, vessari_decide)
-   u:add_faction(KHEDRUN.name, khedrun_decide)
+   u:add_faction(VESSARI.name, VESSARI.home, vessari_decide)
+   u:add_faction(KHEDRUN.name, KHEDRUN.home, khedrun_decide)
    return u
 end

@@ -35,7 +35,7 @@ are jointly owned and published.
 2. **Everything is an event.** Nothing "happens" except an append to the
    annals (the event log). All state views, chronicles, and statistics are
    projections of it. Every event carries: tick, kind, location, magnitude,
-   visibility, payload, and cause links (ids of the events that caused it).
+   loudness, payload, and cause links (ids of the events that caused it).
 3. **Agents act on beliefs, never truth.** Faction decision code reads only
    that faction's belief store — structurally, not politely: no reaching
    into world state. (v0.1 ships a pass-through belief store; the seam
@@ -187,10 +187,25 @@ projection, money with no doors, matter with two recorded ones,
 violations kept structurally apart from the belief-drift mismatches
 card 122 will legitimize, and a counterfeiter spec proving the annals
 checks grammar while the audit checks arithmetic (card 120, post 0010
-*Double Entry*). Next up:
+*Double Entry*); and news at ship speed — the toy world gained a map
+(distance as content behind `distance(from, to, tick)`, the unused
+tick the moving-map door), the courier delivers every event
+ceil(distance ÷ channel speed) ticks late and stamps each believed
+copy with the tick it was `learned`, visibility became loudness
+(vocabulary v3 — who may know is behavior, never event state),
+armies take the road (`war.march` departs, `war.raid` arrives, no
+recall — a war ended before its last battle on the first try), the
+exchange hears orders at arrival day, the audit certifies drift with
+the road (reported + in-flight = audited to the cent; explained
+mismatches are the product, unexplained are lies, violations stay
+zero), and `--believes NAME [--as-of T]` renders any faction's
+private chronology double-dated — three fingerprints, one seal
+(card 122, post 0011 *News at Ship Speed*). Next up:
 
-- news at ship speed — the courier learns distance, delay, and
-  degradation, and one spec finally fails on schedule (card 122)
+- the courier's successors, seeded by card 122 as cards 150–158:
+  carriers that can be somebody, degradation, interpretation, goods
+  that stop teleporting, exchanges in the plural, counterfeiting as
+  content, reception-side loudness, and in-flight actors
 - the road to thirty species, one lore card at a time (cards 133–146,
   each entry arriving with its eval note)
 

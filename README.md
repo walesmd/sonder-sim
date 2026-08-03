@@ -75,9 +75,29 @@ commodity across one naive market, with money in integer cents and
 wars nobody planned precipitating out of grain prices roughly every
 forty-five days — post 0007,
 [*A War Nobody Planned*](docs/posts/0007-a-war-nobody-planned/complete.md)
-(tag `post/0007`). Ahead: news at ship speed (card 122), and the
-lore shelf's road to thirty species. Watching now means watching
-from very nearly the beginning, which is rather the point.
+(tag `post/0007`). Every post since ships on two tracks — the
+collegiate essay and a plain-language companion, same facts and
+hashes in both — post 0008,
+[*Simple & Complete*](docs/posts/0008-simple-and-complete/complete.md)
+(tag `post/0008`), and every entry on the lore shelf carries an
+eval note recording what the engine owes it — post 0009,
+[*What Failure Looks Like*](docs/posts/0009-what-failure-looks-like/complete.md)
+(tag `post/0009`). The economy answers to an independent
+double-entry audit that refolds all of history from the log alone —
+post 0010,
+[*Double Entry*](docs/posts/0010-double-entry/complete.md) (tag
+`post/0010`). And news now travels: the world has a map, every
+event reaches every faction days late at channel speed, armies take
+the road, the audit certifies that belief drifts from truth by
+exactly the news still in flight — and `--believes` renders any
+faction's private newspaper, double-dated, at any tick. Three
+fingerprints, one seal — post 0011,
+[*News at Ship Speed*](docs/posts/0011-news-at-ship-speed/complete.md)
+(tag `post/0011`). Ahead: the courier's successors (carriers that
+can be somebody, degradation, goods that stop teleporting — cards
+150–158), and the lore shelf's road to thirty species. Watching now
+means watching from very nearly the beginning, which is rather the
+point.
 
 ## Building
 

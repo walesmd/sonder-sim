@@ -50,10 +50,30 @@ local function parse_args(argv)
       elseif flag == "--audit" then
          opts.audit = true
          i = i + 1
+      elseif flag == "--believes" then
+         if type(value) ~= "string" or #value == 0 then
+            io.stderr:write("--believes wants a faction name\n")
+            os.exit(1)
+         end
+         opts.believes = value
+         i = i + 2
+      elseif flag == "--as-of" then
+         local n = math.tointeger(value)
+         if not n then
+            io.stderr:write(("--as-of wants an integer tick, got %q\n")
+               :format(tostring(value)))
+            os.exit(1)
+         end
+         opts.as_of = n
+         i = i + 2
       else
          io.stderr:write(("unknown flag %q\n"):format(tostring(flag)))
          os.exit(1)
       end
+   end
+   if opts.as_of and not opts.believes then
+      io.stderr:write("--as-of only means something with --believes\n")
+      os.exit(1)
    end
    return opts
 end
@@ -140,12 +160,47 @@ local function render()
 end
 
 print(("universe %d — %d ticks"):format(opts.seed, opts.ticks))
-render() -- genesis is already in the annals
+-- With --believes, the live truth feed stays silent: the view is a
+-- mind's picture, rendered after the run from its private
+-- chronology. The fingerprint hashes whichever view was rendered —
+-- run the same seed under --believes vessari, --believes khedrun,
+-- and plain, and you get three fingerprints and one seal: three
+-- pictures, one universe.
+if not opts.believes then
+   render() -- genesis is already in the annals
+end
 for _ = 1, opts.ticks do
    u:step()
-   render()
+   if not opts.believes then
+      render()
+   end
    if archive then
       archive:sync() -- the durability quantum is the tick
+   end
+end
+if opts.believes then
+   local store
+   for i = 1, #u.factions do
+      if u.factions[i].name == opts.believes then
+         store = u.factions[i].store
+      end
+   end
+   if not store then
+      io.stderr:write(("--believes %s: no such faction\n")
+         :format(opts.believes))
+      os.exit(1)
+   end
+   -- Law 4 pointed the other way: a viewer subscribing to a mind's
+   -- picture instead of the universe's. The as-of cut is Q7's "any
+   -- actor at any given tick" — beliefs are a pure projection of
+   -- deliveries, so every past state of the store is still in it.
+   print(("the feed as the %s received it%s"):format(opts.believes,
+      opts.as_of and (" — as of tick %d"):format(opts.as_of) or ""))
+   local held = store:chronology(opts.as_of)
+   for i = 1, #held do
+      local believed = Chronicle.believed_line(held[i])
+      fold(believed)
+      print(believed)
    end
 end
 -- Two digests, deliberately both. The fingerprint hashes the *view*
@@ -171,7 +226,8 @@ if opts.audit then
       local grouped = s:reverse():gsub("(%d%d%d)", "%1,"):reverse():gsub("^,", "")
       return grouped
    end
-   local report = Audit.of(u.annals)
+   local report = Audit.of(u.annals,
+      { distance = u.distance, channel_speed = u.channel_speed })
    print(("audit: %s¢ founded, %s¢ held; %s sacks founded, +%s "
       .. "harvested, −%s eaten, −%s burned, %s held")
       :format(comma(report.founded.cents), comma(report.held.cents),
@@ -185,11 +241,20 @@ if opts.audit then
       print("audit: the books balance")
    end
    if #report.mismatches > 0 then
-      print(("audit: %d tally mismatches (belief drifted from truth "
-         .. "under a pass-through courier — a bug until card 122)")
-         :format(#report.mismatches))
+      print(("audit: %d tally mismatches; %d explained by news still "
+         .. "on the road, %d unexplained")
+         :format(#report.mismatches,
+            #report.mismatches - #report.unexplained,
+            #report.unexplained))
    end
-   if #report.violations > 0 or #report.mismatches > 0 then
+   for i = 1, #report.unexplained do
+      local m = report.unexplained[i]
+      print(("audit UNEXPLAINED: event %d, %s %s: reported %d, audited "
+         .. "%d, in flight %d — no road accounts for this")
+         :format(m.id, m.name, m.field, m.reported, m.audited,
+            m.in_flight))
+   end
+   if #report.violations > 0 or #report.unexplained > 0 then
       os.exit(1)
    end
 end

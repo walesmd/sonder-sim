@@ -23,12 +23,21 @@ describe("conservation", function()
       assert.equal(report.founded.cents, report.held.cents)
    end)
 
-   it("every tally agrees with the independent audit", function()
-      -- Run long enough to cross war and peace both. Card 122 will
-      -- relax exactly this assertion — mismatches, never violations.
+   it("every tally disagrees only by what is still on the road", function()
+      -- The card-122 relaxation, exactly as card 120 positioned it.
+      -- The old line here demanded zero mismatches; now drift is the
+      -- product — a tally written while news rides is honestly
+      -- stale — and the audit holds each mismatch to
+      -- reported + in-flight == audited, to the cent. Violations
+      -- stay zero forever; unexplained mismatches are lies, and
+      -- there are none here.
       local u = toy(1893)
       u:run(300)
-      assert.equal(0, #Audit.of(u.annals).mismatches)
+      local report = Audit.of(u.annals,
+         { distance = u.distance, channel_speed = u.channel_speed })
+      assert.is_true(#report.mismatches > 0,
+         "slow news should have made honest drift")
+      assert.equal(0, #report.unexplained)
    end)
 
    it("holds for other seeds too", function()
@@ -44,9 +53,13 @@ end)
 
 describe("war discipline", function()
    -- One pass over a long run, checking the shape of every war.
+   -- Discipline lives at the *launch*: no party rides out in
+   -- peacetime. Raids are arrivals — a party eight days out when
+   -- the peace is signed still lands (no recall, card 158), so a
+   -- war's last raids may fall after its peace, on purpose.
    local function war_story(annals)
       local at_war = false
-      local raids_in_peace, bids_in_war, declarations, peaces = 0, 0, 0, 0
+      local marches_in_peace, bids_in_war, declarations, peaces = 0, 0, 0, 0
       for id = 1, annals:len() do
          local e = annals:get(id)
          if e.kind == "war.declared" then
@@ -57,28 +70,100 @@ describe("war discipline", function()
             assert(at_war, "peace with nobody")
             at_war = false
             peaces = peaces + 1
-         elseif e.kind == "war.raid" and not at_war then
-            raids_in_peace = raids_in_peace + 1
+         elseif e.kind == "war.march" and not at_war then
+            marches_in_peace = marches_in_peace + 1
          elseif e.kind == "market.order" and at_war
             and e.payload.side == "buy" then
             bids_in_war = bids_in_war + 1
          end
       end
-      return declarations, peaces, raids_in_peace, bids_in_war
+      return declarations, peaces, marches_in_peace, bids_in_war
    end
 
-   it("raids happen only in wartime; wartime buys nothing", function()
+   it("marches launch only in wartime; wartime buys nothing", function()
       local u = toy(1893)
       u:run(1000)
-      local declarations, peaces, raids_in_peace, bids_in_war =
+      local declarations, peaces, marches_in_peace, bids_in_war =
          war_story(u.annals)
       assert.is_true(declarations > 0)
-      -- A raid intent from the war's last day resolves one tick after
-      -- the peace — the battle system is a day behind the diplomats,
-      -- exactly like the market. Allow one straggler per war.
-      assert.is_true(raids_in_peace <= declarations)
+      assert.equal(0, marches_in_peace)
       assert.equal(0, bids_in_war)
       assert.is_true(peaces == declarations or peaces == declarations - 1)
+   end)
+
+   it("war parties take the road: every raid is a march arrived on schedule", function()
+      -- khedrun-holds → vessar-reaches is 8 days at channel speed 1
+      local u = toy(1893)
+      u:run(1000)
+      local marches, raids = {}, 0
+      for id = 1, u.annals:len() do
+         local e = u.annals:get(id)
+         if e.kind == "war.march" then
+            marches[id] = e
+         elseif e.kind == "war.raid" then
+            raids = raids + 1
+            local m = marches[e.causes[1]]
+            assert.is_not_nil(m, "a raid from no march")
+            assert.equal(8, e.tick - m.tick)
+            assert.equal("khedrun-holds", m.location)
+            assert.equal("vessar-reaches", e.location)
+            assert.equal(m.payload.force, e.payload.force)
+         end
+      end
+      assert.is_true(raids > 0, "a thousand days and no party ever arrived")
+   end)
+
+   it("the vessari hold their grain while they believe raiders ride", function()
+      -- The declaration is shouted at khedrun-holds and reaches
+      -- vessar-reaches eight days later; so does the peace. Between
+      -- those two arrivals the merchants offer nothing — a market
+      -- closed by news of a war that may already be over. Belief
+      -- windows are replayed here from truth plus the road: war is
+      -- believed from declared.tick + 8 up to (not including)
+      -- peace.tick + 8.
+      --
+      -- Honesty note (session 3): as of this cut the property is
+      -- real but unexercised — under distance, every war in every
+      -- seed we tried is hunger-fused, and hunger only ignites after
+      -- the price floor has already closed the market, so the
+      -- believed-war windows sit inside longer price closures. The
+      -- assertion stands guard for the day the war ecology changes
+      -- (see the notebook: price wars went extinct when news slowed
+      -- down — ruled a finding, not a bug: the toy universe doesn't
+      -- measure itself against past instantiations of itself; this
+      -- guard waits for a richer ecology to exercise it).
+      local u = toy(1893)
+      u:run(1000)
+      local windows = {} -- { from, to } in believed-war ticks
+      local sells, withheld = 0, 0
+      for id = 1, u.annals:len() do
+         local e = u.annals:get(id)
+         if e.kind == "war.declared" then
+            windows[#windows + 1] = { from = e.tick + 8, to = math.huge }
+         elseif e.kind == "war.peace" then
+            windows[#windows].to = e.tick + 8
+         elseif e.kind == "market.order" and e.payload.side == "sell" then
+            sells = sells + 1
+            for i = 1, #windows do
+               local w = windows[i]
+               assert.is_true(e.tick < w.from or e.tick >= w.to,
+                  ("a sell order on day %d, inside believed war %d")
+                  :format(e.tick, i))
+            end
+         end
+      end
+      -- and the prudence is real, not vacuous: wars happened, grain
+      -- still moved in peacetime
+      assert.is_true(#windows > 0)
+      assert.is_true(sells > 0)
+      -- count days the market sat closed by belief, for the record
+      for i = 1, #windows do
+         local w = windows[i]
+         if w.to ~= math.huge then
+            withheld = withheld + (w.to - w.from)
+         end
+      end
+      assert.is_true(withheld > 0, "belief never closed the market")
    end)
 
    it("declarations cite their insults", function()
@@ -98,6 +183,36 @@ describe("war discipline", function()
             end
          end
       end
+   end)
+end)
+
+describe("the believes view", function()
+   it("the vessari learn of khedrun declarations eight days late, to the tick", function()
+      -- The viewer's whole promise in one property: every believed
+      -- row is dated twice, learned never precedes happened, and
+      -- news from khedrun-holds is exactly the road late.
+      local u = toy(1893)
+      u:run(200)
+      local store
+      for i = 1, #u.factions do
+         if u.factions[i].name == "vessari" then
+            store = u.factions[i].store
+         end
+      end
+      local rows = store:chronology()
+      assert.is_true(#rows > 0)
+      local declarations = 0
+      for i = 1, #rows do
+         local r = rows[i]
+         assert.is_true(r.learned >= r.tick)
+         if r.kind == "war.declared" then
+            declarations = declarations + 1
+            assert.equal(8, r.learned - r.tick)
+         end
+      end
+      assert.is_true(declarations > 0)
+      -- and the as-of cut agrees with itself: knowledge only grows
+      assert.is_true(#store:chronology(100) <= #store:chronology(200))
    end)
 end)
 

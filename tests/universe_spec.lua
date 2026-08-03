@@ -55,7 +55,7 @@ describe("Universe", function()
             kind = "grain.hunger",
             location = "the-void",
             magnitude = 0,
-            visibility = "public",
+            loudness = "loud",
             payload = { shortfall = 0 },
             causes = { 1 },
          }

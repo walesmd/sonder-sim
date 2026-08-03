@@ -11,9 +11,13 @@
 -- directly. Factions are the governed side of law 3: their decision
 -- code is handed a belief store, a stream, and the tick — never the
 -- universe — and *returns* intents for the universe to emit. The
--- courier lives here too: pass-through for v0.1 (deliver everything,
--- immediately; everyone briefly omniscient), replaced wholesale by
--- card 122 without any decide() noticing.
+-- courier lives here too (card 122): news crosses distance, so an
+-- event reaches each faction ceil(distance ÷ channel speed) ticks
+-- after it happens, and every store becomes a private chronology.
+-- The pass-through era (v0.1, everyone briefly omniscient) ended
+-- exactly as promised: without any decide() noticing. A universe
+-- built without a distance function still gets that era — nil
+-- distance means everywhere is adjacent and news is instant.
 
 local Rng = require "sonder.rng"
 local Annals = require "sonder.annals"
@@ -22,15 +26,32 @@ local Belief = require "sonder.belief"
 local Universe = {}
 Universe.__index = Universe
 
-function Universe.new(seed)
+-- opts (all optional):
+--   distance — the world's answer to "how far?": a function
+--     (from, to, tick) → days at channel speed 1, consulted per event
+--     at its departure. Declared by content, consumed only here; nil
+--     means everywhere is adjacent. The tick parameter is passed even
+--     though today's tables ignore it — the door a moving map (card
+--     125 and beyond) walks through without touching this file.
+--   channel_speed — the divisor that turns distance into delay;
+--     default 1. A parameter, not a constant, on lore's orders.
+function Universe.new(seed, opts)
    assert(math.type(seed) == "integer", "universe: seed must be an integer")
+   opts = opts or {}
+   assert(opts.distance == nil or type(opts.distance) == "function",
+      "universe: opts.distance must be a function (from, to, tick) -> days")
+   local channel_speed = opts.channel_speed or 1
+   assert(math.type(channel_speed) == "integer" and channel_speed >= 1,
+      "universe: opts.channel_speed must be a positive integer")
    local u = setmetatable({
       seed = seed,
       tick = 0, -- integer sim-time; the only clock the sim has
       rng = Rng.new(seed),
       annals = Annals.new(),
+      distance = opts.distance,
+      channel_speed = channel_speed,
       systems = {}, -- array of {name, fn}; order is part of the physics
-      factions = {}, -- array of {name, decide, store, cursor}; ditto
+      factions = {}, -- array of {name, home, decide, store, cursor, pending}
       names = {}, -- every actor name ever claimed, systems and factions
    }, Universe)
    -- In the beginning there was an event, because there is nothing
@@ -43,7 +64,7 @@ function Universe.new(seed)
       kind = "universe.genesis",
       location = "the-void",
       magnitude = 0,
-      visibility = "public",
+      loudness = "loud",
       payload = { seed = seed },
       causes = {},
    }
@@ -83,14 +104,36 @@ end
 -- universe to emit. That argument list is law 3's whole enforcement:
 -- decision code cannot reach what it was never handed — no universe,
 -- no annals, no emit. Not "please don't"; there is no door.
-function Universe:add_faction(name, decide)
+-- A faction lives somewhere: home is the name news travels to —
+-- an address, not a fixed point. The map decides where a name is,
+-- and a name is free to move (a hull that sails is still an
+-- address). Its own distant deeds report back to the same place.
+function Universe:add_faction(name, home, decide)
    claim(self, name, "faction")
+   assert(type(home) == "string" and #home > 0,
+      "universe: " .. name .. ": home must be a non-empty string")
    self.factions[#self.factions + 1] = {
       name = name,
+      home = home,
       decide = decide,
       store = Belief.new(name),
       cursor = 0, -- the courier's bookmark into the annals
+      pending = {}, -- arrival tick → in-flight events, in id order
    }
+end
+
+-- How long news takes: distance at the event's departure, divided by
+-- the channel speed, rounded up — in integer arithmetic, because a
+-- delay decides outcomes and law 1 tolerates no floats near one.
+local function delay(self, e, faction)
+   if not self.distance then
+      return 0
+   end
+   local d = self.distance(e.location, faction.home, e.tick)
+   assert(math.type(d) == "integer" and d >= 0,
+      ("universe: distance(%q, %q) must be a non-negative integer")
+      :format(e.location, faction.home))
+   return (d + self.channel_speed - 1) // self.channel_speed
 end
 
 function Universe:step()
@@ -101,13 +144,39 @@ function Universe:step()
    end
    for i = 1, #self.factions do
       local faction = self.factions[i]
-      -- The courier, pass-through edition: everything the faction
-      -- hasn't heard yet, delivered as copies, in log order. Card 122
-      -- replaces exactly this loop with distance, delay, and loss —
-      -- nothing downstream of the store will notice.
+      -- The courier (card 122). An event departs its location when
+      -- emitted and reaches this faction's home after delay() ticks.
+      -- What is due today goes first — in-flight events are older
+      -- than anything the bookmark hasn't seen, so ids stay ordered
+      -- within the tick — then the bookmark advances over everything
+      -- new: what has already arrived is handed over now, the rest
+      -- is scheduled. pending is indexed by arrival tick and only
+      -- ever read at exactly self.tick — no iteration, no pairs(),
+      -- nothing for law 1 to fear. Each believed copy is stamped
+      -- with the tick this faction learned it, so the store keeps a
+      -- private chronology: the order news reached it, not the order
+      -- things happened. That gap is the card.
+      local due = faction.pending[self.tick]
+      if due then
+         faction.pending[self.tick] = nil
+         for j = 1, #due do
+            faction.store:receive(due[j], self.tick)
+         end
+      end
       while faction.cursor < self.annals:len() do
          faction.cursor = faction.cursor + 1
-         faction.store:receive(self.annals:get(faction.cursor))
+         local e = self.annals:get(faction.cursor)
+         local arrives = e.tick + delay(self, e, faction)
+         if arrives <= self.tick then
+            faction.store:receive(e, self.tick)
+         else
+            local bucket = faction.pending[arrives]
+            if not bucket then
+               bucket = {}
+               faction.pending[arrives] = bucket
+            end
+            bucket[#bucket + 1] = e
+         end
       end
       local intents = faction.decide(faction.store,
          self.rng:stream(faction.name), self.tick)

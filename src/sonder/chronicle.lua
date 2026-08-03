@@ -76,8 +76,13 @@ templates["war.declared"] = function(e)
       :format(e.payload.aggressor, e.payload.target, e.payload.measure)
 end
 
+templates["war.march"] = function(e)
+   return ("a %s war party rides out against the %s (force %d)")
+      :format(e.payload.raider, e.payload.target, e.payload.force)
+end
+
 templates["war.raid"] = function(e)
-   return ("a %s war party rides against the %s granaries (force %d)")
+   return ("a %s war party falls on the %s granaries (force %d)")
       :format(e.payload.raider, e.payload.target, e.payload.force)
 end
 
@@ -114,13 +119,26 @@ local function fallback(e)
       keys[i] = ("%s=%s"):format(k, tostring(e.payload[k]))
    end
    local shown = #keys > 0 and (" — " .. table.concat(keys, ", ")) or ""
-   return ("%s, magnitude %d, %s%s"):format(e.kind, e.magnitude, e.visibility, shown)
+   return ("%s, magnitude %d, %s%s"):format(e.kind, e.magnitude, e.loudness, shown)
 end
 
 local function line(e)
    local template = templates[e.kind]
    local sentence = template and template(e) or fallback(e)
    return ("tick %4d · %-8s · %s"):format(e.tick, e.location, sentence)
+end
+
+-- A believed event, double-dated: when this mind learned it ← when
+-- it happened. The arrow is card 122 — news traveling — and the gap
+-- between the two ticks is each line's staleness, visible by
+-- subtraction. Same templates as truth: what differs between the
+-- chronicle and a believes feed is never the words, only the dates
+-- and the order.
+local function believed_line(held)
+   local template = templates[held.kind]
+   local sentence = template and template(held) or fallback(held)
+   return ("tick %4d ← tick %4d · %-8s · %s")
+      :format(held.learned, held.tick, held.location, sentence)
 end
 
 local Chronicle = {}
@@ -145,6 +163,7 @@ end
 return {
    new = new,
    line = line,
+   believed_line = believed_line,
    -- Exported for the coverage spec: this repo's own viewer must have
    -- a sentence for every kind in this repo's vocabulary. Not sim API.
    _templates = templates,

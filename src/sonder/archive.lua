@@ -25,7 +25,10 @@ Archive.__index = Archive
 -- Distinct from the event vocabulary's schema_version (a provenance
 -- row): tables can be rearranged without a single event kind changing
 -- shape, and vice versa.
-local LAYOUT_VERSION = 1
+-- v2: the annals table's visibility column became loudness (card 122,
+-- alongside vocabulary v3 — here the envelope change *is* a layout
+-- change, because the envelope has a column).
+local LAYOUT_VERSION = 2
 
 local SCHEMA = [[
 PRAGMA user_version = ]] .. LAYOUT_VERSION .. [[;
@@ -41,7 +44,7 @@ CREATE TABLE annals (
    kind       TEXT    NOT NULL,
    location   TEXT    NOT NULL,
    magnitude  INTEGER NOT NULL,
-   visibility TEXT    NOT NULL,
+   loudness   TEXT    NOT NULL,
    payload    TEXT    NOT NULL      -- canonical JSON, fields in declaration order
 );
 
@@ -173,7 +176,7 @@ function Archive.create(path, annals, provenance, opts)
       last_tick = 0,
       checkpoint_every = checkpoint_every,
       insert_event = db:prepare([[
-         INSERT INTO annals (id, tick, kind, location, magnitude, visibility, payload)
+         INSERT INTO annals (id, tick, kind, location, magnitude, loudness, payload)
          VALUES (?, ?, ?, ?, ?, ?, ?)
       ]]),
       insert_cause = db:prepare([[
@@ -235,7 +238,7 @@ function Archive:sync()
 
       local declared = self.annals.vocabulary.kinds[e.kind].payload
       self.insert_event:bind_values(e.id, e.tick, e.kind, e.location,
-         e.magnitude, e.visibility, byteform.payload(declared, e.payload))
+         e.magnitude, e.loudness, byteform.payload(declared, e.payload))
       if self.insert_event:step() ~= sqlite3.DONE then
          error("archive: writing event " .. e.id .. ": " .. self.db:errmsg())
       end

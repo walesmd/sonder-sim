@@ -10,11 +10,11 @@ describe("vocabulary", function()
       assert.is_true(vocabulary.schema_version >= 1)
    end)
 
-   it("declares a non-empty set of distinct visibilities", function()
-      assert.is_true(#vocabulary.visibilities > 0)
+   it("declares a non-empty set of distinct loudnesses", function()
+      assert.is_true(#vocabulary.loudnesses > 0)
       local seen = {}
-      for i = 1, #vocabulary.visibilities do
-         local v = vocabulary.visibilities[i]
+      for i = 1, #vocabulary.loudnesses do
+         local v = vocabulary.loudnesses[i]
          assert.equal("string", type(v))
          assert.is_nil(seen[v], tostring(v) .. " declared twice")
          seen[v] = true

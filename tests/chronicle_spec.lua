@@ -16,7 +16,7 @@ local function event(overrides)
       kind = "universe.genesis",
       location = "the-void",
       magnitude = 0,
-      visibility = "public",
+      loudness = "loud",
       payload = { seed = 1893 },
       causes = {},
    }
@@ -38,7 +38,7 @@ local function toy_universe(seed)
          kind = "grain.hunger",
          location = "the-void",
          magnitude = n,
-         visibility = "public",
+         loudness = "loud",
          payload = { shortfall = n },
          causes = { last },
       }
@@ -135,9 +135,44 @@ describe("templates", function()
                reason = "hunger", measure = 4 } }))
    end)
 
-   it("render a raid", function()
-      assert.equal("tick   87 · vessar-reaches · a khedrun war party rides"
-         .. " against the vessari granaries (force 8)",
+   it("render a believed event double-dated: learned ← happened", function()
+      local held = {
+         id = 40, tick = 86, kind = "war.declared",
+         location = "khedrun-holds", magnitude = 151,
+         loudness = "loud", learned = 94,
+         payload = { aggressor = "khedrun", target = "vessari",
+            reason = "price", measure = 151 },
+         causes = { 12 },
+      }
+      assert.equal("tick   94 ← tick   86 · khedrun-holds · the khedrun"
+         .. " declare war on the vessari — grain at 151¢ was the last"
+         .. " insult",
+         Chronicle.believed_line(held))
+   end)
+
+   it("believed lines survive kinds younger than this viewer", function()
+      local held = {
+         id = 7, tick = 12, kind = "omen.comet", location = "the-sky",
+         magnitude = 7, loudness = "loud", learned = 30,
+         payload = { portent = "doom" }, causes = { 1 },
+      }
+      assert.equal("tick   30 ← tick   12 · the-sky  · omen.comet,"
+         .. " magnitude 7, loud — portent=doom",
+         Chronicle.believed_line(held))
+   end)
+
+   it("render a march riding out", function()
+      assert.equal("tick   86 · khedrun-holds · a khedrun war party rides"
+         .. " out against the vessari (force 8)",
+         Chronicle.line(event{ kind = "war.march", tick = 86,
+            location = "khedrun-holds", magnitude = 8,
+            payload = { raider = "khedrun", target = "vessari",
+               force = 8 } }))
+   end)
+
+   it("render a raid arriving", function()
+      assert.equal("tick   87 · vessar-reaches · a khedrun war party falls"
+         .. " on the vessari granaries (force 8)",
          Chronicle.line(event{ kind = "war.raid", tick = 87,
             location = "vessar-reaches", magnitude = 8,
             payload = { raider = "khedrun", target = "vessari",
@@ -181,19 +216,19 @@ describe("the unknown-kind fallback", function()
          tick = 512,
          location = "sector:7",
          magnitude = 8,
-         visibility = "secret",
+         loudness = "quiet",
          payload = { traitor = "house-veyl", victim = "house-omast" },
       }
       assert.equal(
-         "tick  512 · sector:7 · diplomacy.betrayal, magnitude 8, secret"
+         "tick  512 · sector:7 · diplomacy.betrayal, magnitude 8, quiet"
          .. " — traitor=house-veyl, victim=house-omast",
          Chronicle.line(e))
    end)
 
    it("survives an empty payload", function()
       local e = event{ kind = "void.hum", tick = 1, magnitude = 2,
-         visibility = "public", payload = {} }
-      assert.equal("tick    1 · the-void · void.hum, magnitude 2, public",
+         loudness = "loud", payload = {} }
+      assert.equal("tick    1 · the-void · void.hum, magnitude 2, loud",
          Chronicle.line(e))
    end)
 end)
@@ -230,21 +265,23 @@ describe("the golden feed", function()
       local toy = require "support.toy"
       local u = toy(1893)
       u:run(2)
+      -- Re-cut for card 122 (news at ship speed): the old feed's
+      -- first days held offers, bids, and a tick-2 trade — born
+      -- omniscient, everyone trading at once. Under distance the
+      -- opening is eight lines of silence: books and nothing else,
+      -- because the opening price is still on the road (3 days to
+      -- vessar-reaches, 5 to khedrun-holds) and neither civ knows a
+      -- market exists yet. The first offer lands tick 3, the first
+      -- trade tick 6. The silence is the card.
       assert.same({
          "tick    0 · the-void · a universe begins (seed 1893)",
          "tick    0 · vessar-reaches · the vessari enter history with 160 sacks of grain and 10,000¢",
          "tick    0 · khedrun-holds · the khedrun enter history with 80 sacks of grain and 14,000¢",
          "tick    0 · the-exchange · grain holds at 100¢",
          "tick    1 · vessar-reaches · the day's books: 165 sacks in the granary (+13, −8), 10,000¢ in the treasury",
-         "tick    1 · vessar-reaches · 12 sacks on offer at 98¢ or better",
          "tick    1 · khedrun-holds · the day's books: 78 sacks in the granary (+8, −10), 14,000¢ in the treasury",
-         "tick    1 · khedrun-holds · a bid for 15 sacks at up to 103¢",
-         "tick    2 · the-exchange · 12 sacks pass from the vessari to the khedrun at 100¢ (1,200¢ paid)",
-         "tick    2 · the-exchange · grain settles at 101¢ (+1)",
-         "tick    2 · vessar-reaches · the day's books: 157 sacks in the granary (+12, −8), 11,200¢ in the treasury",
-         "tick    2 · vessar-reaches · 12 sacks on offer at 99¢ or better",
-         "tick    2 · khedrun-holds · the day's books: 87 sacks in the granary (+7, −10), 12,800¢ in the treasury",
-         "tick    2 · khedrun-holds · a bid for 13 sacks at up to 104¢",
+         "tick    2 · vessar-reaches · the day's books: 169 sacks in the granary (+12, −8), 10,000¢ in the treasury",
+         "tick    2 · khedrun-holds · the day's books: 75 sacks in the granary (+7, −10), 14,000¢ in the treasury",
       }, Chronicle.new(u.annals):lines())
    end)
 end)

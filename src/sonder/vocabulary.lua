@@ -17,14 +17,22 @@ return {
    -- churned away, the Vessari and the Khedrun arrived. Universe
    -- files written under v1 replay only under v1 code; crossing that
    -- line is lineage, card 124's problem.
-   schema_version = 2,
+   -- v3: loudness (card 122) — the envelope field "visibility"
+   -- renamed, its values public/regional/secret now loud/local/quiet.
+   -- The old name claimed to say who may come to know, which is
+   -- never event state: it's the behavior of whoever holds the
+   -- information.
+   schema_version = 3,
 
-   -- Who could, in principle, come to know of an event. The belief
-   -- store exists (card 117) but its pass-through courier is briefly
-   -- omniscient, so nothing consumes this until news travels at ship
-   -- speed (card 122); emitters stamp it honestly anyway, because it
-   -- can't be added to history later.
-   visibilities = { "public", "regional", "secret" },
+   -- How loudly the act was performed — the signal an event emitted
+   -- at its origin, chosen by the emitter as part of acting and a
+   -- fact of the occurrence ever after. It is an *input*, never the
+   -- answer to who observes: observability is computed by the
+   -- environment (mechanisms, distance — cards 150–152) or emerges
+   -- through consequences, and ongoing secrecy is holders declining
+   -- to retell. Nothing consumes the stamp yet; emitters stamp it
+   -- honestly anyway, because it can't be added to history later.
+   loudnesses = { "loud", "local", "quiet" },
 
    -- Payload fields are declared as an ordered array of {name, type}
    -- pairs — an array, so nothing that walks a payload ever needs
@@ -80,9 +88,19 @@ return {
          payload = { { "aggressor", "string" }, { "target", "string" },
             { "reason", "string" }, { "measure", "integer" } },
       },
+      ["war.march"] = {
+         doc = "a war party rides out from home against a target — "
+            .. "departure and arrival are different events, with "
+            .. "space and time between them; the battle system "
+            .. "delivers the raid when the road runs out, and there "
+            .. "is no recall (card 158 will teach parties to hear)",
+         payload = { { "raider", "string" }, { "target", "string" },
+            { "force", "integer" } },
+      },
       ["war.raid"] = {
-         doc = "a war party rides against a granary with so much "
-            .. "force; what it will actually seize is the battle "
+         doc = "a war party falls on a granary: the arrival end of a "
+            .. "march, emitted by the battle system when the party "
+            .. "reaches the grain; what it seizes is the battle "
             .. "system's verdict, not the raider's plan",
          payload = { { "raider", "string" }, { "target", "string" },
             { "force", "integer" } },

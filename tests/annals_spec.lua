@@ -8,7 +8,7 @@ local function genesis(seed)
       kind = "universe.genesis",
       location = "the-void",
       magnitude = 0,
-      visibility = "public",
+      loudness = "loud",
       payload = { seed = seed or 1 },
       causes = {},
    }
@@ -20,7 +20,7 @@ local function hunger(cause, n)
       kind = "grain.hunger",
       location = "the-void",
       magnitude = n < 0 and -n or n,
-      visibility = "public",
+      loudness = "loud",
       payload = { shortfall = n },
       causes = { cause },
    }
@@ -51,7 +51,7 @@ describe("Annals", function()
       assert.equal("universe.genesis", e.kind)
       assert.equal("the-void", e.location)
       assert.equal(0, e.magnitude)
-      assert.equal("public", e.visibility)
+      assert.equal("loud", e.loudness)
       assert.equal(1893, e.payload.seed)
       assert.same({}, e.causes)
    end)
@@ -125,10 +125,10 @@ describe("Annals", function()
          assert.has_error(function() a:append(1, spec) end)
       end)
 
-      it("rejects visibilities outside the declared set", function()
+      it("rejects loudnesses outside the declared set", function()
          local a = begun()
          local spec = hunger(1)
-         spec.visibility = "classified"
+         spec.loudness = "classified"
          assert.has_error(function() a:append(1, spec) end)
       end)
 
