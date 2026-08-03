@@ -26,9 +26,23 @@ local toy = require "support.toy"
 --                      same draws, same 1589 events — the first
 --                      re-cut where history didn't change, only our
 --                      name for one fact of it
+--   a3b626e777c0eaff — card 122, the loud one: news at ship speed.
+--                      The toy world gained distances (3/5/8, the
+--                      exchange on the road between the civs), the
+--                      courier learned delay, armies took the road
+--                      (war.march joined the vocabulary), the
+--                      exchange stopped hearing orders instantly,
+--                      and the vessari learned prudence. History
+--                      re-cut from born-omniscient to
+--                      discovery-then-trade: first trade tick 6
+--                      (was 2), first war day 82 and hunger-fused
+--                      (was day 86 and priced), peace signed with
+--                      six parties still on the road. Drift became
+--                      the product: 296 mismatches over 300 days,
+--                      every one explained by news still riding
 local GOLDEN_SEED = 1893
 local GOLDEN_TICKS = 500
-local GOLDEN_SEAL = "af26f37ad52c3762"
+local GOLDEN_SEAL = "a3b626e777c0eaff"
 
 describe("the golden master", function()
    it("seed 1893, 500 ticks, one exact seal", function()
