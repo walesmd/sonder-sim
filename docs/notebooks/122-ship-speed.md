@@ -12,7 +12,14 @@ rewritten. 142 specs green, zero failures. The card's ledger:
 9 future cards seeded (150–158), 2 mistakes confessed in the post,
 1 doctrine ruled — the toy universe doesn't measure itself against
 past instantiations of itself. Post tag `post/0011` goes on the
-merge commit, per standing practice.)*
+merge commit, per standing practice. Two closure decisions, same
+day: the Q4 stamp-walk open item is punted to card 157 by Mike's
+call — reception is where stamps first get consumed, so the ten
+kinds get re-judged there against real stakes, at the cost of one
+more byte-level seal re-cut — and the card's scope is stated
+plainly on the board: of the card text's three behaviors, delay
+shipped; degradation and interpretation are cards 151 and 152,
+by the Q3 verdict, with the card's own bar met and exceeded.)*
 
 Branch: `122-ship-speed`. Card text: "Fill the seam: events propagate
 at travel speed, degrade in transit, and get culturally interpreted
