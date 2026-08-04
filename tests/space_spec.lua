@@ -1,11 +1,11 @@
--- tests/toyworld_spec.lua — the toy world kept honest: conservation
+-- tests/space_spec.lua — the space world kept honest: conservation
 -- from the log alone, war discipline, and the card's only KPI as an
 -- executable claim.
 
-local toy = require "support.toy"
+local space = require "support.space"
 local Chronicle = require "sonder.chronicle"
 local Audit = require "sonder.audit"
-local legs = require "worlds.toy_audit"
+local legs = require "worlds.space_audit"
 
 -- The independent auditor grew up: what post 0007 kept here as a
 -- spec-local fold is now src/sonder/audit.lua (card 120), and this
@@ -16,7 +16,7 @@ local legs = require "worlds.toy_audit"
 
 describe("conservation", function()
    it("every cent is founded, held, or on the road — never conjured", function()
-      local u = toy(1893)
+      local u = space(1893)
       u:run(300)
       local report = Audit.of(u.annals, legs)
       assert.equal(0, #report.violations,
@@ -35,7 +35,7 @@ describe("conservation", function()
       -- gates, at distance zero, so self-knowledge is exact. The
       -- 122 machinery stays — it certifies the zero, and the liar
       -- spec proves it still catches books that lie.
-      local u = toy(1893)
+      local u = space(1893)
       u:run(300)
       local report = Audit.of(u.annals, legs,
          { distance = u.distance, channel_speed = u.channel_speed })
@@ -45,7 +45,7 @@ describe("conservation", function()
 
    it("holds for other seeds too", function()
       for _, seed in ipairs({ 7, 40412 }) do
-         local u = toy(seed)
+         local u = space(seed)
          u:run(200)
          local report = Audit.of(u.annals, legs)
          assert.equal(0, #report.violations)
@@ -85,7 +85,7 @@ describe("war discipline", function()
    end
 
    it("marches launch only in wartime; wartime buys nothing", function()
-      local u = toy(1893)
+      local u = space(1893)
       u:run(1000)
       local declarations, peaces, marches_in_peace, bids_in_war =
          war_story(u.annals)
@@ -97,7 +97,7 @@ describe("war discipline", function()
 
    it("war parties take the road: every raid is a march arrived on schedule", function()
       -- khedrun-holds → vessar-reaches is 8 days at channel speed 1
-      local u = toy(1893)
+      local u = space(1893)
       u:run(1000)
       local marches, raids = {}, 0
       for id = 1, u.annals:len() do
@@ -136,7 +136,7 @@ describe("war discipline", function()
       -- down — ruled a finding, not a bug: the toy universe doesn't
       -- measure itself against past instantiations of itself; this
       -- guard waits for a richer ecology to exercise it).
-      local u = toy(1893)
+      local u = space(1893)
       u:run(1000)
       local windows = {} -- { from, to } in believed-war ticks
       local sells, withheld = 0, 0
@@ -171,7 +171,7 @@ describe("war discipline", function()
    end)
 
    it("declarations cite their insults", function()
-      local u = toy(1893)
+      local u = space(1893)
       u:run(1000)
       for id = 1, u.annals:len() do
          local e = u.annals:get(id)
@@ -200,7 +200,7 @@ describe("the roads", function()
       -- wrinkle's honest form (the grain and the news of it now
       -- travel together, but bellies still empty while both ride).
       -- Only real travel can produce this state of being.
-      local u = toy(1893)
+      local u = space(1893)
       u:run(1000)
       local riding = {} -- departure id → the civ the grain rides toward
       local hungry_beside = 0
@@ -240,7 +240,7 @@ describe("the believes view", function()
       -- The viewer's whole promise in one property: every believed
       -- row is dated twice, learned never precedes happened, and
       -- news from khedrun-holds is exactly the road late.
-      local u = toy(1893)
+      local u = space(1893)
       u:run(200)
       local store
       for i = 1, #u.factions do
@@ -271,7 +271,7 @@ describe("the KPI", function()
       -- reading); what a spec can hold: a thousand days render
       -- cleanly end to end, trade happens, and at least one war
       -- nobody planned breaks out and ends.
-      local u = toy(1893)
+      local u = space(1893)
       u:run(1000)
       local wars, peaces, trades = 0, 0, 0
       for id = 1, u.annals:len() do

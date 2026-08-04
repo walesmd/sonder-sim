@@ -3,7 +3,7 @@
 
 local Universe = require "sonder.universe"
 local VOCAB = require "support.vocabulary"
-local toy = require "support.toy"
+local space = require "support.space"
 
 local function null_decide()
    return {}
@@ -119,9 +119,9 @@ describe("factions", function()
    end)
 end)
 
-describe("factions in the toy world", function()
+describe("factions in the space world", function()
    it("same seed, same beliefs, same decisions, twice", function()
-      local a, b = toy(4242), toy(4242)
+      local a, b = space(4242), space(4242)
       a:run(30)
       b:run(30)
       assert.equal(a.annals:len(), b.annals:len())

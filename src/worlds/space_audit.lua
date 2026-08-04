@@ -1,4 +1,4 @@
--- src/worlds/toy_audit.lua — the toy space world's ledger legs:
+-- src/worlds/space_audit.lua — the space world's ledger legs:
 -- what each of its kinds does to the books, and the conservation
 -- laws its closed economy answers to. Content, not engine (card
 -- 160) — these lived inside the audit until the office proved the

@@ -1,4 +1,4 @@
--- src/worlds/toy.lua — two civilizations, one commodity, one
+-- src/worlds/space.lua — two civilizations, one commodity, one
 -- market. The Vessari price things; the Khedrun cost them out.
 --
 -- This is content, not engine: the first world the machinery hosts,
@@ -706,7 +706,7 @@ end
 return function(seed)
    local u = Universe.new(seed, {
       distance = distance,
-      vocabulary = require "worlds.toy_vocabulary",
+      vocabulary = require "worlds.space_vocabulary",
    })
    found(u, VESSARI)
    found(u, KHEDRUN)

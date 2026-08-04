@@ -94,7 +94,7 @@ local function distance(from, to, _)
 end
 
 -- ---------------------------------------------------------------
--- Believed bookkeeping: pure functions of a belief store, the toy
+-- Believed bookkeeping: pure functions of a belief store, the space
 -- world's pattern at desk scale. A person's books are two columns —
 -- cents and work — and every event that moves them happens at their
 -- own desk, so self-knowledge stays exact (card 153's dividend).

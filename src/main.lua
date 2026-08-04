@@ -20,7 +20,7 @@ package.path = "src/?.lua;" .. package.path
 -- Worlds are content; this file stays a window on whichever one
 -- --world names (card 160). The whitelist lives in parse_args.
 local WORLDS = {
-   toy = { build = "worlds.toy", audit = "worlds.toy_audit" },
+   space = { build = "worlds.space", audit = "worlds.space_audit" },
    office = { build = "worlds.office", audit = "worlds.office_audit" },
 }
 local Chronicle = require "sonder.chronicle"
@@ -56,7 +56,7 @@ local function parse_args(argv)
          opts.audit = true
          i = i + 1
       elseif flag == "--world" then
-         if value ~= "toy" and value ~= "office" then
+         if value ~= "space" and value ~= "office" then
             io.stderr:write(("--world wants a known world, got %q\n")
                :format(tostring(value)))
             os.exit(1)
@@ -133,11 +133,12 @@ local function default_db_path(seed)
    return path
 end
 
--- The toy world (card 118): the Vessari and the Khedrun, one grain
--- market, and wars nobody schedules. All the cast and physics live
--- in worlds/toy.lua — this file stays a window.
+-- The default is the space world (card 118, renamed at card 160):
+-- the Vessari and the Khedrun, one grain market, and wars nobody
+-- schedules — the project's destination and the engine's regression
+-- anchor. The office is the eval next door.
 local opts = parse_args(arg)
-local WORLD = WORLDS[opts.world or "toy"]
+local WORLD = WORLDS[opts.world or "space"]
 local u = require(WORLD.build)(opts.seed)
 
 local archive

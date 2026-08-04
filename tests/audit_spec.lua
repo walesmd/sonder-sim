@@ -1,12 +1,12 @@
 -- tests/audit_spec.lua — the double-entry audit held to its own
 -- standard: it must classify every kind the vocabulary can utter,
--- balance every universe the toy world can produce, and catch the
+-- balance every universe the space world can produce, and catch the
 -- counterfeits the annals has no grounds to refuse.
 
-local toy = require "support.toy"
+local space = require "support.space"
 local Audit = require "sonder.audit"
-local vocabulary = require "worlds.toy_vocabulary"
-local legs = require "worlds.toy_audit"
+local vocabulary = require "worlds.space_vocabulary"
+local legs = require "worlds.space_audit"
 
 -- The world's road, as the audit wants it: the same map and divisor
 -- the courier reads.
@@ -49,7 +49,7 @@ end)
 
 describe("conservation", function()
    it("balances a thousand days of seed 1893", function()
-      local u = toy(1893)
+      local u = space(1893)
       u:run(1000)
       local report = Audit.of(u.annals, legs, road(u))
       assert_honest(report)
@@ -71,7 +71,7 @@ describe("conservation", function()
 
    it("balances other seeds too", function()
       for _, seed in ipairs({ 7, 40412 }) do
-         local u = toy(seed)
+         local u = space(seed)
          u:run(300)
          local report = Audit.of(u.annals, legs, road(u))
          assert_honest(report)
@@ -81,9 +81,9 @@ describe("conservation", function()
    end)
 
    it("without the road, mismatches go uncertified, not clean", function()
-      -- The toy no longer drifts, so a liar provides the mismatch:
+      -- The space world no longer drifts, so a liar provides the mismatch:
       -- detection works roadless, certification doesn't.
-      local u = toy(1893)
+      local u = space(1893)
       u:add_system("liar", function(universe, _, tick)
          if tick == 5 then
             universe:emit{
@@ -112,7 +112,7 @@ describe("the counterfeiter", function()
    -- demands the audit name it.
 
    local function forge(seed, payload)
-      local u = toy(seed)
+      local u = space(seed)
       u:add_system("counterfeiter", function(universe, _, tick)
          if tick == 5 then
             universe:emit{
@@ -146,7 +146,7 @@ describe("the counterfeiter", function()
       -- its road legs — so the impossible purchase is now an
       -- impossible *dispatch*: a payment.shipped for more cents
       -- than the payer ever held.
-      local u = toy(7)
+      local u = space(7)
       u:add_system("counterfeiter", function(universe, _, tick)
          if tick == 5 then
             universe:emit{
@@ -180,7 +180,7 @@ describe("the liar", function()
    -- arithmetic), explained mismatches (ignorance, the product), and
    -- unexplained mismatches (somebody's books are lying).
    it("catches a forged tally the road cannot explain", function()
-      local u = toy(7)
+      local u = space(7)
       u:add_system("liar", function(universe, _, tick)
          if tick == 5 then
             universe:emit{
@@ -210,10 +210,10 @@ describe("the report", function()
       -- Determinism of the report itself: same log, same report,
       -- field for field — the audit is a projection, so two folds of
       -- one history may not disagree.
-      local u1 = toy(1893)
+      local u1 = space(1893)
       u1:run(200)
       local a = Audit.of(u1.annals, legs)
-      local u2 = toy(1893)
+      local u2 = space(1893)
       u2:run(200)
       local b = Audit.of(u2.annals, legs)
       assert.equal(#a.violations, #b.violations)

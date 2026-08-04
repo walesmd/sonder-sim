@@ -367,3 +367,24 @@ leak ledger: vocabulary closed, audit legs closed, main closed.
 Chronicle templates remain (office prose rides toy templates —
 functional, wrong-world wording; extraction when we want office
 sentences, likely with the continent). Uncommitted for the gutter.
+
+## Session 2 — toy becomes space
+
+Mike's call before the continent: "rename toy to space. That is the
+primary world we're going to be focused on. Office and continent
+are just evals to test the system." Renamed throughout — modules
+(worlds/space.lua, space_vocabulary, space_audit), the spec fixture
+(support/space.lua), the world's spec file (space_spec.lua), main's
+--world whitelist and default, and every live prose reference.
+Historical text keeps the old word where it is history: the seal
+ledger's card-118/122 entries, the vocabulary's version comments,
+and the ruling that named itself ("the toy universe doesn't measure
+itself against past instantiations of itself"). The proof, as
+always: 153 green and the seal bit-identical under the new name.
+
+**For post 0013 (Mike's framing, verbatim spirit):** we are
+building a universe simulator *for the space sim*. The lower-level
+evals — worlds that think at the continent level, worlds that think
+at the person level — are important precisely as we move toward
+building out the universal simulator: they are the standard
+everything must clear on the way. Stress this in the post.

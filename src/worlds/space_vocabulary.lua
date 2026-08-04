@@ -1,4 +1,4 @@
--- src/worlds/toy_vocabulary.lua — what can happen in the toy space
+-- src/worlds/space_vocabulary.lua — what can happen in the space
 -- world, declared. Content, not engine (card 160): a vocabulary is
 -- something a world *supplies* — the engine's schema machinery
 -- (envelope, validation, byteform) serves any vocabulary, and lived

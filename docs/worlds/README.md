@@ -20,7 +20,7 @@ a chartered story has failed a test.
 
 Current worlds:
 
-- **the toy space world** — the Vessari and the Khedrun; the first
+- **the space world** — the Vessari and the Khedrun; the first
   world, the seed of the project's destination, and the regression
   anchor for the engine itself (its golden seal must not move while
   the framework generalizes). Its shelf
