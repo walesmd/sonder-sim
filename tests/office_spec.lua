@@ -16,6 +16,16 @@ describe("the office", function()
       assert.equal(Seal.of(a.annals):hex(), Seal.of(b.annals):hex())
    end)
 
+   it("the golden company: seed 7, 200 days, one exact seal", function()
+      -- The office's own regression anchor. Re-cut ledger:
+      --   10fc9a5781a44136 — first cut (card 160): Bellwether & Co.
+      --                      as founded, ten minds, single-fire
+      --                      settlement not yet needed here
+      local u = office(7)
+      u:run(200)
+      assert.equal("10fc9a5781a44136", Seal.of(u.annals):hex())
+   end)
+
    it("the business actually runs: work flows, deals close, salaries ride", function()
       local u = office(7)
       u:run(120)
@@ -121,6 +131,15 @@ describe("the office", function()
          if held.kind == "office.deal_lost" and held.tick == lost_tick then
             assert.equal(lost_tick + lag, held.learned)
          end
+      end
+   end)
+
+   it("every office kind has an office sentence", function()
+      local vocabulary = require "worlds.office_vocabulary"
+      local templates = require "worlds.office_templates"
+      for kind in pairs(vocabulary.kinds) do
+         assert.equal("function", type(templates[kind]),
+            "no office sentence for " .. kind)
       end
    end)
 

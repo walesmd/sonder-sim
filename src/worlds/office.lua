@@ -19,6 +19,7 @@
 
 local Universe = require "sonder.universe"
 local Travel = require "sonder.travel"
+local Roads = require "sonder.roads"
 
 -- The cast. Salaries are weekly; cents are starting savings;
 -- temperament constants are per-role, the Vessari/Khedrun pattern
@@ -326,14 +327,12 @@ local DECIDERS = {
 
 local function add_physics(u)
    local ledger = {} -- name → { work, cents }, folded truth
-   local freight = Travel.new()
+   local roads = Roads.new(u, {
+      resolve = function(name) return name end, -- a person is a place
+      payment_loudness = "quiet", -- a payslip lands without fanfare
+   })
    local pitches = {} -- yesterday's, gathered in scan order
    local cursor = 0
-
-   local function travel_days(from, to, tick)
-      local d = distance(from, to, tick)
-      return (d + u.channel_speed - 1) // u.channel_speed
-   end
 
    local function catch_up()
       while cursor < u.annals:len() do
@@ -348,19 +347,12 @@ local function add_physics(u)
             b.cents = b.cents - p.spent
          elseif e.kind == "cargo.shipped" then
             ledger[p.sender].work = ledger[p.sender].work - p.units
-            freight:schedule(
-               e.tick + travel_days(e.location, p.recipient, e.tick),
-               { id = e.id, kind = "cargo", commodity = p.commodity,
-                  units = p.units, sender = p.sender,
-                  recipient = p.recipient })
+            roads:schedule(e)
          elseif e.kind == "cargo.delivered" then
             ledger[p.recipient].work = ledger[p.recipient].work + p.units
          elseif e.kind == "payment.shipped" then
             ledger[p.payer].cents = ledger[p.payer].cents - p.amount
-            freight:schedule(
-               e.tick + travel_days(e.location, p.payee, e.tick),
-               { id = e.id, kind = "payment", amount = p.amount,
-                  payer = p.payer, payee = p.payee })
+            roads:schedule(e)
          elseif e.kind == "payment.delivered" then
             ledger[p.payee].cents = ledger[p.payee].cents + p.amount
          elseif e.kind == "office.delivered" then
@@ -374,38 +366,11 @@ local function add_physics(u)
       end
    end
 
-   -- The roads, office edition: the same dawn-delivery shape as the
-   -- toy world's (second hand-rolled copy, counted — the rule of
-   -- three says the continent's copy pays for the extraction).
-   u:add_system("roads", function(universe, _, tick)
-      catch_up()
-      local arriving = freight:due(tick)
-      for i = 1, #arriving do
-         local f = arriving[i]
-         if f.kind == "cargo" then
-            universe:emit{
-               kind = "cargo.delivered",
-               location = f.recipient,
-               magnitude = f.units,
-               loudness = "local",
-               payload = { commodity = f.commodity, units = f.units,
-                  sender = f.sender, recipient = f.recipient },
-               causes = { f.id },
-            }
-         else
-            universe:emit{
-               kind = "payment.delivered",
-               location = f.payee,
-               magnitude = f.amount,
-               loudness = "quiet",
-               payload = { amount = f.amount, payer = f.payer,
-                  payee = f.payee },
-               causes = { f.id },
-            }
-         end
-         catch_up()
-      end
-   end)
+   -- The roads (extracted to sonder/roads.lua at card 160, when
+   -- this copy — the second — plus the continent's would-be third
+   -- made it the rule of three's business). The mail arrives at
+   -- dawn; a payslip lands quietly.
+   u:add_system("roads", roads:system(catch_up))
 
    -- The clients: the world outside the office, with a checkbook
    -- and no inner life (v1: environment, not minds — making them
