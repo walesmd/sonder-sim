@@ -22,6 +22,7 @@
 local Rng = require "sonder.rng"
 local Annals = require "sonder.annals"
 local Belief = require "sonder.belief"
+local Travel = require "sonder.travel"
 
 local Universe = {}
 Universe.__index = Universe
@@ -118,7 +119,7 @@ function Universe:add_faction(name, home, decide)
       decide = decide,
       store = Belief.new(name),
       cursor = 0, -- the courier's bookmark into the annals
-      pending = {}, -- arrival tick → in-flight events, in id order
+      pending = Travel.new(), -- this faction's in-flight news
    }
 end
 
@@ -144,24 +145,21 @@ function Universe:step()
    end
    for i = 1, #self.factions do
       local faction = self.factions[i]
-      -- The courier (card 122). An event departs its location when
-      -- emitted and reaches this faction's home after delay() ticks.
-      -- What is due today goes first — in-flight events are older
-      -- than anything the bookmark hasn't seen, so ids stay ordered
-      -- within the tick — then the bookmark advances over everything
-      -- new: what has already arrived is handed over now, the rest
-      -- is scheduled. pending is indexed by arrival tick and only
-      -- ever read at exactly self.tick — no iteration, no pairs(),
-      -- nothing for law 1 to fear. Each believed copy is stamped
-      -- with the tick this faction learned it, so the store keeps a
-      -- private chronology: the order news reached it, not the order
-      -- things happened. That gap is the card.
-      local due = faction.pending[self.tick]
-      if due then
-         faction.pending[self.tick] = nil
-         for j = 1, #due do
-            faction.store:receive(due[j], self.tick)
-         end
+      -- The courier (card 122; calendar extracted card 153). An
+      -- event departs its location when emitted and reaches this
+      -- faction's home after delay() ticks. What is due today goes
+      -- first — in-flight events are older than anything the
+      -- bookmark hasn't seen, so ids stay ordered within the tick —
+      -- then the bookmark advances over everything new: what has
+      -- already arrived is handed over now, the rest goes on the
+      -- calendar (sonder/travel.lua, which carries the determinism
+      -- argument). Each believed copy is stamped with the tick this
+      -- faction learned it, so the store keeps a private
+      -- chronology: the order news reached it, not the order things
+      -- happened. That gap is the card.
+      local due = faction.pending:due(self.tick)
+      for j = 1, #due do
+         faction.store:receive(due[j], self.tick)
       end
       while faction.cursor < self.annals:len() do
          faction.cursor = faction.cursor + 1
@@ -170,12 +168,7 @@ function Universe:step()
          if arrives <= self.tick then
             faction.store:receive(e, self.tick)
          else
-            local bucket = faction.pending[arrives]
-            if not bucket then
-               bucket = {}
-               faction.pending[arrives] = bucket
-            end
-            bucket[#bucket + 1] = e
+            faction.pending:schedule(arrives, e)
          end
       end
       local intents = faction.decide(faction.store,
