@@ -1,5 +1,24 @@
 # Notebook — card 160: two new worlds (the continent and the office)
 
+*(Closed 2026-08-04, session 2. Eight parts: the notebook and the
+why; the charters and ADR 0004; four extractions each proven by an
+unmoved space seal — vocabulary, audit legs, chronicle templates
+and voices, the roads system; toy renamed to space mid-card at
+Mike's call; Bellwether & Co. and Harrow built as evals against
+their charters, each with its own golden seal and its chartered KPI
+precipitating unprompted. Post 0013 shipped both tracks under
+Mike's title-phrase — a universe simulator, whatever that universe
+may be — and the docs sweep promoted the system-of-systems sentence
+into CLAUDE.md's identity paragraph, where this card always wanted
+it. The card's ledger: three worlds, three seals (space
+3475639d8f49678b, office 10fc9a5781a44136, continent
+9be58120c48a121b), 162 specs green, three window bugs converted
+into one principle (act the morning you learn), one wrong theory
+kept next to the right one, one recursive sed confessed, and an
+engine that got smaller with every world it gained. Post tag
+`post/0013` goes on the merge commit. Next: the carriers research,
+against three worlds from birth.)*
+
 Branch: `160-two-worlds`. Card text: two new universes alongside the
 toy space world — (1) a fantasy universe, all civilizations on one
 continent, existing amongst one another; (2) an office universe,

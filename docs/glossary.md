@@ -102,6 +102,17 @@ adds it here, in the same PR.
   is the departure event; its position is a projection; its
   arrival is never a promise. Transfers are net zero — grain
   leaving A arrives at B — where news only ever copies. (post 0012)
+- **world** — a module that builds a universe from a seed, supplying
+  everything the engine refuses to contain: a vocabulary, a cast,
+  systems, a map, sentences, audit legs and conservation identities,
+  and its own golden seal (ADR 0004). The engine demands exactly one
+  thing of every world: universe.genesis, because the engine emits
+  it. Three exist: space (the destination), the continent and the
+  office (evals). (post 0013)
+- **the litmus** — card 160's standing law: what we build must serve
+  all three universes; if it cannot, it is world content, and if it
+  can — like the random number generator — it is a framework-level
+  addition. (post 0013)
 - **road ledger** — the audit's account for what is between places:
   every departure books onto it under its own event id, every
   arrival drains it exactly, and the conservation identities read
