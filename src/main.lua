@@ -20,8 +20,12 @@ package.path = "src/?.lua;" .. package.path
 -- Worlds are content; this file stays a window on whichever one
 -- --world names (card 160). The whitelist lives in parse_args.
 local WORLDS = {
-   space = { build = "worlds.space", audit = "worlds.space_audit" },
-   office = { build = "worlds.office", audit = "worlds.office_audit" },
+   space = { build = "worlds.space", audit = "worlds.space_audit",
+      templates = "worlds.space_templates" },
+   continent = { build = "worlds.continent", audit = "worlds.continent_audit",
+      templates = "worlds.continent_templates" },
+   office = { build = "worlds.office", audit = "worlds.office_audit",
+      templates = "worlds.office_templates" },
 }
 local Chronicle = require "sonder.chronicle"
 local Archive = require "sonder.archive"
@@ -56,7 +60,7 @@ local function parse_args(argv)
          opts.audit = true
          i = i + 1
       elseif flag == "--world" then
-         if value ~= "space" and value ~= "office" then
+         if value ~= "space" and value ~= "office" and value ~= "continent" then
             io.stderr:write(("--world wants a known world, got %q\n")
                :format(tostring(value)))
             os.exit(1)
@@ -165,7 +169,8 @@ local function fold(line)
    fingerprint = fnv.string(fingerprint, line)
 end
 
-local chronicle = Chronicle.new(u.annals)
+local TEMPLATES = require(WORLD.templates)
+local chronicle = Chronicle.new(u.annals, TEMPLATES)
 local function render()
    local lines = chronicle:lines()
    for i = 1, #lines do
@@ -213,7 +218,7 @@ if opts.believes then
       opts.as_of and (" — as of tick %d"):format(opts.as_of) or ""))
    local held = store:chronology(opts.as_of)
    for i = 1, #held do
-      local believed = Chronicle.believed_line(held[i])
+      local believed = Chronicle.believed_line(held[i], TEMPLATES)
       fold(believed)
       print(believed)
    end

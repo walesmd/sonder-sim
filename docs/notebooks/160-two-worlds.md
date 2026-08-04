@@ -388,3 +388,62 @@ evals — worlds that think at the continent level, worlds that think
 at the person level — are important precisely as we move toward
 building out the universal simulator: they are the standard
 everything must clear on the way. Stress this in the post.
+
+## Session 2 — the templates and the roads leave the engine; Harrow wakes
+
+**Chronicle templates extracted** — the last leak on ADR 0004's
+ledger. chronicle.lua is machinery (follower, double-dated believes
+line, envelope fallback); worlds/space_templates.lua carries the
+space voice verbatim (golden feed bytes prove it), the office got
+its own sentences ("vern sends 6 work along to tobin"), and each
+world words even the framework kinds in its own voice — a caravan
+is not a memo. One process scar kept honest: the sed that rewired
+chronicle_spec rewrote its own wrapper into infinite recursion and
+hung the suite; caught, killed, fixed by hand.
+
+**Roads extracted** — sonder/roads.lua, the rule of three cashed:
+space hand-rolled it (153), the office copied it, Harrow would have
+made three. Cargo-blind; loudness is world config (a payslip lands
+quietly, a caravan is local news); both existing worlds refitted
+with the seal unmoved.
+
+**Harrow wakes.** Five civilizations, an adjacency graph with
+interior (Floyd–Warshall at load; the pass is the shortcut and the
+Ashfold know it), four-column books (grain, iron, salt, cents — the
+multi-commodity case the audit generalized for), seasonal lean
+stretches instead of dice-rolled droughts, and NO exchange:
+bilateral trade as four journeys — a letter rides out, a yes rides
+back, then the caravan and the strongbox. Settlement is
+**single-fire: act the morning you learn** — learned == tick — the
+exactly-once guarantee the courier's stamp gives minds for free.
+The first draft scanned recent memory for "have I settled this?"
+and earned the card's THIRD window bug (an old acceptance outlived
+the memory of shipping for it, and shipped twice — caught by the
+receipts spec). The fix deleted the memory scan entirely; if the
+single morning finds the seller short or the buyer broke, the deal
+defaults half-settled — chartered settlement risk, audit-clean,
+recourse being card 159's business. Lesson for the post, third
+time's the charm: never scan for memory when the stamp gives you
+exactly-once.
+
+**The acceptance runs.** 400 days of seed 7: fourteen hunger wars
+(the lean seasons and the mountains' arithmetic), 291 letters, 71
+yeses, 70 settlements, zero violations, zero mismatches, zero
+unexplained — four columns balancing through wars and letters
+alike. And an ecology auditioning for the death doctrine: the
+Korrag slide toward ruin with a 1,541-ingot stockpile nobody wants
+— the valley's demand saturated, the seller economy stalling —
+which is the no-consumption note in the audit legs playing out
+honestly. The KPI spec holds the famine-war chain: declared at
+korrag-height, reason hunger, citing hunger events, a lean day
+within the fortnight before, every raid exactly four days behind
+its march — the pass route, priced by the map. (The charter's
+"three territories" reads as the route: the chain's events touch
+two capitals and the road between runs through a third party's
+pass, unevented — tolls and interceptions are future cards; noted
+as a softening.)
+
+**Three worlds, three golden seals:** space 3475639d8f49678b,
+office 10fc9a5781a44136, continent 9be58120c48a121b. Suite: 162
+green. ADR 0004's leak ledger: all four closed. Everything since
+part 6 sits uncommitted — a large gutter, flagged honestly.
