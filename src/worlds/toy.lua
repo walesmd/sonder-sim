@@ -20,6 +20,7 @@
 -- temperament. No line below schedules one.
 
 local Universe = require "sonder.universe"
+local Travel = require "sonder.travel"
 
 local EXCHANGE = "the-exchange"
 local OPENING_PRICE = 100 -- cents per sack, posted at tick 0
@@ -127,19 +128,28 @@ local function my_founding(beliefs, civ)
 end
 
 -- What the civ believes it holds: the last self-report, plus every
--- believed trade and raid the books haven't absorbed yet. Returns
--- grain, cents, and the id of the report it grew from (the day's
+-- believed road leg the books haven't absorbed yet. Returns grain,
+-- cents, and the id of the report it grew from (the day's
 -- bookkeeping cause).
 --
 -- "Absorbed yet" is judged by the courier's `learned` stamp, never
 -- by event id: news that crossed distance carries an old id, and an
 -- id watermark would drop it forever the moment it finally arrived
--- (the adversarial review caught exactly that — the Khedrun's
--- believed treasury froze at its founding value for sixty days
--- while phantom hunger tripped the war fuse). The tally written on
--- day T absorbed everything learned by day T, by induction: each
--- believed trade or spoils integrates into exactly the first tally
--- decided after it lands. So the filter is learned > basis day.
+-- (card 122's adversarial review caught exactly that). The tally
+-- written on day T absorbed everything learned by day T, by
+-- induction: each believed leg integrates into exactly the first
+-- tally decided after it lands.
+--
+-- Quiet consequence of card 153, worth staring at: every event that
+-- moves *your* books now happens at *your* home — your dispatches
+-- leave your gates, deliveries arrive at them, raids hit them,
+-- your parties return through them — so every one of these arrives
+-- at distance zero, the same morning it happens. A civ's belief
+-- about its own books stops drifting from truth entirely. The
+-- drift card 122 legitimized was a symptom of action at a distance
+-- (trades at the exchange moving faraway books); make matter
+-- honest and self-knowledge becomes exact, while ignorance moves
+-- to where it belongs — what you believe about everyone else.
 local function believed_books(beliefs, civ)
    local grain, cents, since, absorbed
    local tally = my_latest_tally(beliefs, civ)
@@ -151,24 +161,36 @@ local function believed_books(beliefs, civ)
       grain, cents, since = founded.payload.grain, founded.payload.cents, founded.id
       absorbed = founded.tick
    end
-   for _, t in ipairs(beliefs:recent("market.trade", 6)) do
-      if t.learned > absorbed then
-         if t.payload.buyer == civ.name then
-            grain, cents = grain + t.payload.units, cents - t.payload.total
-         elseif t.payload.seller == civ.name then
-            grain, cents = grain - t.payload.units, cents + t.payload.total
-         end
+   for _, c in ipairs(beliefs:recent("cargo.shipped", 6)) do
+      if c.learned > absorbed and c.payload.sender == civ.name then
+         grain = grain - c.payload.units
+      end
+   end
+   for _, c in ipairs(beliefs:recent("cargo.delivered", 6)) do
+      if c.learned > absorbed and c.payload.recipient == civ.name then
+         grain = grain + c.payload.units
+      end
+   end
+   for _, m in ipairs(beliefs:recent("payment.shipped", 6)) do
+      if m.learned > absorbed and m.payload.payer == civ.name then
+         cents = cents - m.payload.amount
+      end
+   end
+   for _, m in ipairs(beliefs:recent("payment.delivered", 6)) do
+      if m.learned > absorbed and m.payload.payee == civ.name then
+         cents = cents + m.payload.amount
       end
    end
    for _, s in ipairs(beliefs:recent("war.spoils", 6)) do
-      if s.learned > absorbed then
-         if s.payload.raider == civ.name then
-            grain = grain + s.payload.seized
-            cents = cents + s.payload.plunder
-         elseif s.payload.target == civ.name then
-            grain = grain - s.payload.seized - s.payload.burned
-            cents = cents - s.payload.plunder
-         end
+      if s.learned > absorbed and s.payload.target == civ.name then
+         grain = grain - s.payload.seized - s.payload.burned
+         cents = cents - s.payload.plunder
+      end
+   end
+   for _, w in ipairs(beliefs:recent("war.returned", 6)) do
+      if w.learned > absorbed and w.payload.raider == civ.name then
+         grain = grain + w.payload.seized
+         cents = cents + w.payload.plunder
       end
    end
    return grain, cents, since
@@ -391,7 +413,13 @@ local function add_physics(u)
    local homes = {} -- location → civ name, learned from foundings
    local seats = {} -- civ name → home location, the reverse map
    local price, price_id -- the posted price and the event that posted it
-   local orders, marches = {}, {} -- in flight or due; pruned once spent
+   -- The calendars (card 153): one Travel per traveling thing. The
+   -- code is shared, the state never is — each drains at its
+   -- owner's turn in the tick.
+   local orders = Travel.new() -- order slips riding to the exchange
+   local marches = Travel.new() -- war parties outbound
+   local parties = Travel.new() -- war parties homebound, laden
+   local freight = Travel.new() -- cargo and payment on the roads
    local cursor = 0
 
    local function catch_up()
@@ -406,44 +434,87 @@ local function add_physics(u)
          elseif e.kind == "civ.tally" then
             local books = ledger[homes[e.location]]
             books.grain = books.grain + p.harvested - p.eaten
-         elseif e.kind == "market.trade" then
-            local buyer, seller = ledger[p.buyer], ledger[p.seller]
-            buyer.grain = buyer.grain + p.units
-            buyer.cents = buyer.cents - p.total
-            seller.grain = seller.grain - p.units
-            seller.cents = seller.cents + p.total
+         elseif e.kind == "cargo.shipped" then
+            -- matter leaves the sender at departure and rides
+            ledger[p.sender].grain = ledger[p.sender].grain - p.units
+            freight:schedule(
+               e.tick + travel(u, e.location, seats[p.recipient], e.tick),
+               { id = e.id, kind = "cargo", commodity = p.commodity,
+                  units = p.units, sender = p.sender,
+                  recipient = p.recipient })
+         elseif e.kind == "cargo.delivered" then
+            ledger[p.recipient].grain = ledger[p.recipient].grain + p.units
+         elseif e.kind == "payment.shipped" then
+            ledger[p.payer].cents = ledger[p.payer].cents - p.amount
+            freight:schedule(
+               e.tick + travel(u, e.location, seats[p.payee], e.tick),
+               { id = e.id, kind = "payment", amount = p.amount,
+                  payer = p.payer, payee = p.payee })
+         elseif e.kind == "payment.delivered" then
+            ledger[p.payee].cents = ledger[p.payee].cents + p.amount
          elseif e.kind == "war.spoils" then
-            local raider, target = ledger[p.raider], ledger[p.target]
-            raider.grain = raider.grain + p.seized
+            -- the target's losses happen where the raid did; the
+            -- seized goods ride home with the party (war.returned
+            -- credits the raider, days from now)
+            local target = ledger[p.target]
             target.grain = target.grain - p.seized - p.burned
-            raider.cents = raider.cents + p.plunder
             target.cents = target.cents - p.plunder
+         elseif e.kind == "war.returned" then
+            local raider = ledger[p.raider]
+            raider.grain = raider.grain + p.seized
+            raider.cents = raider.cents + p.plunder
          elseif e.kind == "market.price" then
             price, price_id = p.price, e.id
          elseif e.kind == "market.order" then
             -- an order slip is on the road before the exchange can
-            -- see it: it arrives, then matches the next morning
-            orders[#orders + 1] = { id = e.id,
-               arrives = e.tick + travel(u, e.location, EXCHANGE, e.tick),
-               civ = homes[e.location], side = p.side,
-               units = p.units, limit = p.limit }
+            -- see it: it arrives, then matches the next morning —
+            -- so it goes on the calendar for the morning after
+            orders:schedule(
+               e.tick + travel(u, e.location, EXCHANGE, e.tick) + 1,
+               { id = e.id, civ = homes[e.location], side = p.side,
+                  units = p.units, limit = p.limit })
          elseif e.kind == "war.march" then
-            marches[#marches + 1] = { id = e.id,
-               arrives = e.tick + travel(u, e.location, seats[p.target], e.tick),
-               raider = p.raider, target = p.target, force = p.force }
+            marches:schedule(
+               e.tick + travel(u, e.location, seats[p.target], e.tick),
+               { id = e.id, raider = p.raider, target = p.target,
+                  force = p.force })
          end
       end
    end
 
-   local function prune(list, tick)
-      local kept = {}
-      for i = 1, #list do
-         if list[i].arrives >= tick - 1 then
-            kept[#kept + 1] = list[i]
+   -- The roads (card 153): freight reaching its destination this
+   -- morning becomes a delivery event. Registered first, so goods
+   -- land before the exchange matches and before any granary can
+   -- be sacked — the mail arrives at dawn.
+   u:add_system("roads", function(universe, _, tick)
+      catch_up()
+      local arriving = freight:due(tick)
+      for i = 1, #arriving do
+         local f = arriving[i]
+         if f.kind == "cargo" then
+            universe:emit{
+               kind = "cargo.delivered",
+               location = seats[f.recipient],
+               magnitude = f.units,
+               loudness = "local",
+               payload = { commodity = f.commodity, units = f.units,
+                  sender = f.sender, recipient = f.recipient },
+               causes = { f.id },
+            }
+         else
+            universe:emit{
+               kind = "payment.delivered",
+               location = seats[f.payee],
+               magnitude = f.amount,
+               loudness = "local",
+               payload = { amount = f.amount, payer = f.payer,
+                  payee = f.payee },
+               causes = { f.id },
+            }
          end
+         catch_up()
       end
-      return kept
-   end
+   end)
 
    -- The exchange. Orders that *arrived* yesterday meet this
    -- morning's market — an order placed three days out spends three
@@ -457,19 +528,17 @@ local function add_physics(u)
    -- price that a reader can watch think.
    u:add_system("exchange", function(universe, _, tick)
       catch_up()
-      orders = prune(orders, tick)
+      local todays = orders:due(tick)
       local bids, offers = {}, {}
       local bid_units, offer_units = 0, 0
-      for i = 1, #orders do
-         local o = orders[i]
-         if o.arrives == tick - 1 then
-            if o.side == "buy" then
-               bids[#bids + 1] = o
-               bid_units = bid_units + o.units
-            else
-               offers[#offers + 1] = o
-               offer_units = offer_units + o.units
-            end
+      for i = 1, #todays do
+         local o = todays[i]
+         if o.side == "buy" then
+            bids[#bids + 1] = o
+            bid_units = bid_units + o.units
+         else
+            offers[#offers + 1] = o
+            offer_units = offer_units + o.units
          end
       end
 
@@ -481,7 +550,13 @@ local function add_physics(u)
             local units = math.min(bid.units, offer.units,
                buyer.cents // at, seller.grain)
             if units > 0 then
-               universe:emit{
+               -- the agreement, then the two road legs it obligates:
+               -- the seller's grain and the buyer's cents both take
+               -- to the road this morning (card 153). Settlement is
+               -- physics executing standing orders — the clamps
+               -- above guarantee neither party ships what it
+               -- doesn't hold.
+               local trade = universe:emit{
                   kind = "market.trade",
                   location = EXCHANGE,
                   magnitude = units,
@@ -489,6 +564,26 @@ local function add_physics(u)
                   payload = { buyer = bid.civ, seller = offer.civ,
                      units = units, price = at, total = units * at },
                   causes = { bid.id, offer.id },
+               }
+               catch_up()
+               universe:emit{
+                  kind = "cargo.shipped",
+                  location = seats[offer.civ],
+                  magnitude = units,
+                  loudness = "local",
+                  payload = { commodity = "grain", units = units,
+                     sender = offer.civ, recipient = bid.civ },
+                  causes = { trade },
+               }
+               catch_up()
+               universe:emit{
+                  kind = "payment.shipped",
+                  location = seats[bid.civ],
+                  magnitude = units * at,
+                  loudness = "local",
+                  payload = { amount = units * at,
+                     payer = bid.civ, payee = offer.civ },
+                  causes = { trade },
                }
                catch_up()
             end
@@ -534,38 +629,61 @@ local function add_physics(u)
    -- ride on beliefs, physics pays out on truth.
    u:add_system("battle", function(universe, _, tick)
       catch_up()
-      marches = prune(marches, tick)
-      for i = 1, #marches do
-         local m = marches[i]
-         if m.arrives == tick then
-            local where = seats[m.target] -- where the grain is
-            local raid = universe:emit{
-               kind = "war.raid",
-               location = where,
-               magnitude = m.force,
-               loudness = "local",
-               payload = { raider = m.raider, target = m.target,
-                  force = m.force },
-               causes = { m.id },
-            }
-            catch_up()
-            local target = ledger[m.target]
-            local seized = math.min(m.force, target.grain)
-            local burned = math.min(m.force // KHEDRUN.torch_divisor,
-               target.grain - seized)
-            local plunder = math.min(m.force * KHEDRUN.plunder_rate,
-               target.cents)
-            universe:emit{
-               kind = "war.spoils",
-               location = where,
-               magnitude = seized + burned,
-               loudness = "local",
-               payload = { raider = m.raider, target = m.target,
-                  seized = seized, plunder = plunder, burned = burned },
-               causes = { raid },
-            }
-            catch_up()
-         end
+      -- Homebound first: parties reaching their own gates this
+      -- morning, laden. Only now do the seized sacks and plunder
+      -- enter the raider's books — the goods rode home with the
+      -- party, and so did the news of them (card 153: no more
+      -- starving beside full granaries).
+      local home = parties:due(tick)
+      for i = 1, #home do
+         local w = home[i]
+         universe:emit{
+            kind = "war.returned",
+            location = w.home,
+            magnitude = w.seized,
+            loudness = "local",
+            payload = { raider = w.raider, target = w.target,
+               seized = w.seized, plunder = w.plunder },
+            causes = { w.spoils },
+         }
+         catch_up()
+      end
+      local arrivals = marches:due(tick)
+      for i = 1, #arrivals do
+         local m = arrivals[i]
+         local where = seats[m.target] -- where the grain is
+         local raid = universe:emit{
+            kind = "war.raid",
+            location = where,
+            magnitude = m.force,
+            loudness = "local",
+            payload = { raider = m.raider, target = m.target,
+               force = m.force },
+            causes = { m.id },
+         }
+         catch_up()
+         local target = ledger[m.target]
+         local seized = math.min(m.force, target.grain)
+         local burned = math.min(m.force // KHEDRUN.torch_divisor,
+            target.grain - seized)
+         local plunder = math.min(m.force * KHEDRUN.plunder_rate,
+            target.cents)
+         local spoils = universe:emit{
+            kind = "war.spoils",
+            location = where,
+            magnitude = seized + burned,
+            loudness = "local",
+            payload = { raider = m.raider, target = m.target,
+               seized = seized, plunder = plunder, burned = burned },
+            causes = { raid },
+         }
+         catch_up()
+         -- and the party turns for home, carrying everything
+         parties:schedule(
+            tick + travel(u, where, seats[m.raider], tick),
+            { spoils = spoils, raider = m.raider, target = m.target,
+               seized = seized, plunder = plunder,
+               home = seats[m.raider] })
       end
    end)
 end

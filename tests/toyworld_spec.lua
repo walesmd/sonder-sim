@@ -14,29 +14,31 @@ local Audit = require "sonder.audit"
 -- audit's own trials (coverage, counterfeits, conservation).
 
 describe("conservation", function()
-   it("every cent is founded, traded, or plundered — never conjured", function()
+   it("every cent is founded, held, or on the road — never conjured", function()
       local u = toy(1893)
       u:run(300)
       local report = Audit.of(u.annals)
       assert.equal(0, #report.violations,
          table.concat(report.violations, "\n"))
-      assert.equal(report.founded.cents, report.held.cents)
+      assert.equal(report.founded.cents,
+         report.held.cents + report.on_road.cents)
    end)
 
-   it("every tally disagrees only by what is still on the road", function()
-      -- The card-122 relaxation, exactly as card 120 positioned it.
-      -- The old line here demanded zero mismatches; now drift is the
-      -- product — a tally written while news rides is honestly
-      -- stale — and the audit holds each mismatch to
-      -- reported + in-flight == audited, to the cent. Violations
-      -- stay zero forever; unexplained mismatches are lies, and
-      -- there are none here.
+   it("every tally agrees again — and this time it's earned", function()
+      -- The arc, for the record: card 120 demanded zero mismatches
+      -- (instant news, a civ can't be misinformed). Card 122 made
+      -- news slow and relaxed exactly that line — drift became the
+      -- product, explained to the cent by what was in flight. Card
+      -- 153 made *matter* slow too, and the drift died honestly:
+      -- every event that moves your books now happens at your own
+      -- gates, at distance zero, so self-knowledge is exact. The
+      -- 122 machinery stays — it certifies the zero, and the liar
+      -- spec proves it still catches books that lie.
       local u = toy(1893)
       u:run(300)
       local report = Audit.of(u.annals,
          { distance = u.distance, channel_speed = u.channel_speed })
-      assert.is_true(#report.mismatches > 0,
-         "slow news should have made honest drift")
+      assert.equal(0, #report.mismatches)
       assert.equal(0, #report.unexplained)
    end)
 
@@ -46,7 +48,8 @@ describe("conservation", function()
          u:run(200)
          local report = Audit.of(u.annals)
          assert.equal(0, #report.violations)
-         assert.equal(report.founded.cents, report.held.cents)
+         assert.equal(report.founded.cents,
+            report.held.cents + report.on_road.cents)
       end
    end)
 end)
@@ -183,6 +186,51 @@ describe("war discipline", function()
             end
          end
       end
+   end)
+end)
+
+describe("the roads", function()
+   it("hungry beside the road: relief can be in transit while bellies are empty", function()
+      -- Card 153's story bar. Replayed from truth in log order, so
+      -- at any hunger event the in-flight set is exactly what was
+      -- on the road that morning. Grain can be riding toward a
+      -- hungry civ two ways: a trade shipment addressed to it, or
+      -- its own war party homebound with seized sacks — the healed
+      -- wrinkle's honest form (the grain and the news of it now
+      -- travel together, but bellies still empty while both ride).
+      -- Only real travel can produce this state of being.
+      local u = toy(1893)
+      u:run(1000)
+      local riding = {} -- departure id → the civ the grain rides toward
+      local hungry_beside = 0
+      for id = 1, u.annals:len() do
+         local e = u.annals:get(id)
+         local p = e.payload
+         if e.kind == "cargo.shipped" then
+            riding[e.id] = p.recipient
+         elseif e.kind == "cargo.delivered" then
+            riding[e.causes[1]] = nil
+         elseif e.kind == "war.spoils" then
+            if p.seized > 0 then
+               riding[e.id] = p.raider
+            end
+         elseif e.kind == "war.returned" then
+            riding[e.causes[1]] = nil
+         elseif e.kind == "grain.hunger" then
+            local name = e.location == "vessar-reaches" and "vessari"
+               or "khedrun"
+            -- pairs() is legal in a spec doing an order-independent
+            -- existence check; nothing here touches an outcome
+            for _, toward in pairs(riding) do
+               if toward == name then
+                  hungry_beside = hungry_beside + 1
+                  break
+               end
+            end
+         end
+      end
+      assert.is_true(hungry_beside > 0,
+         "a thousand days and nobody starved beside their own relief")
    end)
 end)
 
