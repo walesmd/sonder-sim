@@ -100,8 +100,17 @@ end
 -- own desk, so self-knowledge stays exact (card 153's dividend).
 -- ---------------------------------------------------------------
 
+-- Belief windows are sized to the crowd, not the couple: ten
+-- people's events arrive at every desk, and paydays emit nine
+-- payments in one burst. A window of 8 — generous for two
+-- civilizations — silently evicted sef's salary from mara's fold
+-- every single week (found the hard way: 113 phantom mismatches in
+-- 120 days, every one exactly 150¢ — the first payment out the
+-- door). Three mornings' worth of the whole cast is margin.
+local WINDOW = 3 * #CAST
+
 local function my_latest_tally(beliefs, name)
-   local tallies = beliefs:recent("office.tally", 12)
+   local tallies = beliefs:recent("office.tally", WINDOW)
    for i = #tallies, 1, -1 do
       if tallies[i].location == name then
          return tallies[i]
@@ -131,32 +140,32 @@ local function believed_books(beliefs, name)
       work, cents, since = 0, hired.payload.cents, hired.id
       absorbed = hired.tick
    end
-   for _, c in ipairs(beliefs:recent("cargo.shipped", 8)) do
+   for _, c in ipairs(beliefs:recent("cargo.shipped", WINDOW)) do
       if c.learned > absorbed and c.payload.sender == name then
          work = work - c.payload.units
       end
    end
-   for _, c in ipairs(beliefs:recent("cargo.delivered", 8)) do
+   for _, c in ipairs(beliefs:recent("cargo.delivered", WINDOW)) do
       if c.learned > absorbed and c.payload.recipient == name then
          work = work + c.payload.units
       end
    end
-   for _, m in ipairs(beliefs:recent("payment.shipped", 8)) do
+   for _, m in ipairs(beliefs:recent("payment.shipped", WINDOW)) do
       if m.learned > absorbed and m.payload.payer == name then
          cents = cents - m.payload.amount
       end
    end
-   for _, m in ipairs(beliefs:recent("payment.delivered", 8)) do
+   for _, m in ipairs(beliefs:recent("payment.delivered", WINDOW)) do
       if m.learned > absorbed and m.payload.payee == name then
          cents = cents + m.payload.amount
       end
    end
-   for _, d in ipairs(beliefs:recent("office.delivered", 8)) do
+   for _, d in ipairs(beliefs:recent("office.delivered", WINDOW)) do
       if d.learned > absorbed and d.payload.seller == name then
          work = work - d.payload.units
       end
    end
-   for _, r in ipairs(beliefs:recent("office.revenue", 8)) do
+   for _, r in ipairs(beliefs:recent("office.revenue", WINDOW)) do
       if r.learned > absorbed and name == "mara" then
          cents = cents + r.payload.amount
       end

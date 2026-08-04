@@ -5,6 +5,8 @@
 
 local office = require "worlds.office"
 local Seal = require "sonder.seal"
+local Audit = require "sonder.audit"
+local legs = require "worlds.office_audit"
 
 describe("the office", function()
    it("runs deterministically: same seed, same company, seal for seal", function()
@@ -41,6 +43,27 @@ describe("the office", function()
       assert.equal(deals * 660, revenue) -- every deal's money arrived
       assert.is_true(paydays > 0, "nobody ever got paid")
       assert.is_true(lost > 0, "a company that never heard no")
+   end)
+
+   it("the books breathe and still balance: an open system audits clean", function()
+      -- The first world whose economy has mouths: revenue in,
+      -- living and rent out. The audit machinery doesn't know the
+      -- difference — the office's own legs declare the identities,
+      -- and they hold to the cent and the unit. Self-knowledge is
+      -- exact here too (every book-moving event lands at its
+      -- owner's desk), so zero mismatches — certified, not assumed.
+      local u = office(7)
+      u:run(120)
+      local report = Audit.of(u.annals, legs,
+         { distance = u.distance, channel_speed = u.channel_speed })
+      assert.equal(0, #report.violations,
+         table.concat(report.violations, "\n"))
+      assert.equal(0, #report.mismatches)
+      assert.equal(0, #report.unexplained)
+      assert.is_true(report.world.totals.revenue > 0)
+      assert.is_true(report.world.totals.spent > 0)
+      assert.equal(0, next(report.unclassified) and 1 or 0,
+         "the office vocabulary has kinds its own audit cannot book")
    end)
 
    it("the rumor cascade: behavior changes before the office collectively knows", function()

@@ -20,8 +20,8 @@ package.path = "src/?.lua;" .. package.path
 -- Worlds are content; this file stays a window on whichever one
 -- --world names (card 160). The whitelist lives in parse_args.
 local WORLDS = {
-   toy = "worlds.toy",
-   office = "worlds.office",
+   toy = { build = "worlds.toy", audit = "worlds.toy_audit" },
+   office = { build = "worlds.office", audit = "worlds.office_audit" },
 }
 local Chronicle = require "sonder.chronicle"
 local Archive = require "sonder.archive"
@@ -137,7 +137,8 @@ end
 -- market, and wars nobody schedules. All the cast and physics live
 -- in worlds/toy.lua — this file stays a window.
 local opts = parse_args(arg)
-local u = require(WORLDS[opts.world or "toy"])(opts.seed)
+local WORLD = WORLDS[opts.world or "toy"]
+local u = require(WORLD.build)(opts.seed)
 
 local archive
 if opts.db ~= "none" then
@@ -230,23 +231,15 @@ if archive then
 end
 
 -- The double-entry audit (card 120), on request: refold the whole
--- history into books and check the two conservation laws. A viewer
--- like everything else here — and a second copy of chronicle.lua's
--- comma(), which the rule of three says may stay a coincidence.
+-- history into books under this world's legs and check whatever
+-- conservation laws the world declares (card 160). A viewer like
+-- everything else here; the summary line is the world's own,
+-- because the world knows what its books are called.
 if opts.audit then
-   local function comma(n)
-      local s = tostring(n)
-      local grouped = s:reverse():gsub("(%d%d%d)", "%1,"):reverse():gsub("^,", "")
-      return grouped
-   end
-   local report = Audit.of(u.annals,
+   local legs = require(WORLD.audit)
+   local report = Audit.of(u.annals, legs,
       { distance = u.distance, channel_speed = u.channel_speed })
-   print(("audit: %s¢ founded, %s¢ held; %s sacks founded, +%s "
-      .. "harvested, −%s eaten, −%s burned, %s held")
-      :format(comma(report.founded.cents), comma(report.held.cents),
-         comma(report.founded.grain), comma(report.totals.harvested),
-         comma(report.totals.eaten), comma(report.totals.burned),
-         comma(report.held.grain)))
+   print(legs.summary(report))
    for i = 1, #report.violations do
       print("audit violation: " .. report.violations[i])
    end

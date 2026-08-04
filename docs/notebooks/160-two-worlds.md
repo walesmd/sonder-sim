@@ -323,3 +323,47 @@ triggers the extraction, per the rule of three.
 
 Suite: 152 green, toy seal untouched. Uncommitted, awaiting Mike's
 gutter pass under the new rule: code commits only after review.
+
+## Session 1 — the audit's legs leave the engine
+
+The last engine surgery of the card. audit.lua is machinery now:
+the fold, the road ledger, the framework cargo/payment legs, the
+belief-drift certification, the negative sweep (founding order,
+declared column order), and the three findings — while a world's
+legs module supplies what the litmus proved was always content: the
+ordered book columns with their negative phrasings, the
+commodity→column map, which column is money, an effects entry per
+world kind, the conservation identities, and a summary line for the
+host (the world knows what its own books are called — post 0010's
+beloved founded/harvested line lives in toy_audit.summary now,
+verbatim). Legs reach the fold only through a helper library —
+enroll, embark/disembark, ship/drift, flag/mismatch — so the
+discipline stays in one place.
+
+worlds/toy_audit.lua: the toy's legs moved with their exact message
+strings (specs held them to it). worlds/office_audit.lua: the first
+OPEN system declared — money's identity is founded + revenue −
+spent = held + riding; work's is made − delivered = held + riding —
+and the audit machinery neither knew nor cared that this economy
+breathes. main.lua --audit goes world-generic: legs looked up per
+world, summary printed from them.
+
+**The bug the office found, and the wrong theory first:** 113
+mismatches, all mara, all cents, all exactly 150¢ high. First
+theory (the tally flood — ten tallies arriving per morning evicting
+your own from a 12-window) was plausible, got a confident comment,
+and was WRONG: the count didn't move. The real cause: payday emits
+NINE payment.shipped in one burst and the believed-fold window was
+8 — sef's salary, first out the door, was evicted from mara's fold
+every single week. Windows resized to the crowd (3 × cast), the
+false comment replaced with the true story. Lesson kept for the
+post: belief windows are content tuned to a world's event *density*,
+and the office's crowd is denser than the toy's duet — the second
+world's first genuine teaching.
+
+Suite: 153 green. Both worlds audit clean under their own laws; the
+office's zero mismatches are certified, not assumed. ADR 0004's
+leak ledger: vocabulary closed, audit legs closed, main closed.
+Chronicle templates remain (office prose rides toy templates —
+functional, wrong-world wording; extraction when we want office
+sentences, likely with the continent). Uncommitted for the gutter.

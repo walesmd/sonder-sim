@@ -6,6 +6,7 @@
 local toy = require "support.toy"
 local Audit = require "sonder.audit"
 local vocabulary = require "worlds.toy_vocabulary"
+local legs = require "worlds.toy_audit"
 
 -- The world's road, as the audit wants it: the same map and divisor
 -- the courier reads.
@@ -36,13 +37,13 @@ describe("coverage", function()
       end
       table.sort(kinds) -- pairs() order is nobody's friend, even here
       for _, kind in ipairs(kinds) do
-         assert.is_true(Audit.classified(kind),
+         assert.is_true(Audit.classified(legs, kind),
             kind .. " has no ledger classification")
       end
    end)
 
    it("does not pretend to know foreign kinds", function()
-      assert.is_false(Audit.classified("diplomacy.betrayal"))
+      assert.is_false(Audit.classified(legs, "diplomacy.betrayal"))
    end)
 end)
 
@@ -50,7 +51,7 @@ describe("conservation", function()
    it("balances a thousand days of seed 1893", function()
       local u = toy(1893)
       u:run(1000)
-      local report = Audit.of(u.annals, road(u))
+      local report = Audit.of(u.annals, legs, road(u))
       assert_honest(report)
       -- Card 122's drift died at card 153, and honestly: every
       -- event that moves a civ's books now happens at its own
@@ -61,10 +62,10 @@ describe("conservation", function()
       assert.equal(0, #report.mismatches)
       -- and the conservation identities carry their road terms:
       -- some of what exists is between places
-      assert.equal(report.founded.cents,
+      assert.equal(report.world.founded.cents,
          report.held.cents + report.on_road.cents)
-      assert.equal(report.founded.grain + report.totals.harvested
-         - report.totals.eaten - report.totals.burned,
+      assert.equal(report.world.founded.grain + report.world.totals.harvested
+         - report.world.totals.eaten - report.world.totals.burned,
          report.held.grain + report.on_road.grain)
    end)
 
@@ -72,9 +73,9 @@ describe("conservation", function()
       for _, seed in ipairs({ 7, 40412 }) do
          local u = toy(seed)
          u:run(300)
-         local report = Audit.of(u.annals, road(u))
+         local report = Audit.of(u.annals, legs, road(u))
          assert_honest(report)
-         assert.equal(report.founded.cents,
+         assert.equal(report.world.founded.cents,
             report.held.cents + report.on_road.cents)
       end
    end)
@@ -97,7 +98,7 @@ describe("conservation", function()
          end
       end)
       u:run(10)
-      local report = Audit.of(u.annals)
+      local report = Audit.of(u.annals, legs)
       assert.is_true(#report.mismatches > 0)
       assert.is_nil(report.unexplained) -- unchecked is not "none"
    end)
@@ -125,7 +126,7 @@ describe("the counterfeiter", function()
          end
       end)
       u:run(10)
-      return Audit.of(u.annals)
+      return Audit.of(u.annals, legs)
    end
 
    it("catches a trade whose total is not units × price", function()
@@ -160,7 +161,7 @@ describe("the counterfeiter", function()
          end
       end)
       u:run(10)
-      local report = Audit.of(u.annals)
+      local report = Audit.of(u.annals, legs)
       local caught = false
       for _, v in ipairs(report.violations) do
          if v:find("negative treasury", 1, true) then
@@ -197,7 +198,7 @@ describe("the liar", function()
          end
       end)
       u:run(10)
-      local report = Audit.of(u.annals, road(u))
+      local report = Audit.of(u.annals, legs, road(u))
       assert.equal(0, #report.violations)
       assert.is_true(#report.unexplained > 0,
          "a 9,999-sack lie passed as ignorance")
@@ -211,13 +212,13 @@ describe("the report", function()
       -- one history may not disagree.
       local u1 = toy(1893)
       u1:run(200)
-      local a = Audit.of(u1.annals)
+      local a = Audit.of(u1.annals, legs)
       local u2 = toy(1893)
       u2:run(200)
-      local b = Audit.of(u2.annals)
+      local b = Audit.of(u2.annals, legs)
       assert.equal(#a.violations, #b.violations)
       assert.equal(a.held.cents, b.held.cents)
       assert.equal(a.held.grain, b.held.grain)
-      assert.equal(a.totals.burned, b.totals.burned)
+      assert.equal(a.world.totals.burned, b.world.totals.burned)
    end)
 end)

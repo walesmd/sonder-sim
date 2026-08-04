@@ -5,6 +5,7 @@
 local toy = require "support.toy"
 local Chronicle = require "sonder.chronicle"
 local Audit = require "sonder.audit"
+local legs = require "worlds.toy_audit"
 
 -- The independent auditor grew up: what post 0007 kept here as a
 -- spec-local fold is now src/sonder/audit.lua (card 120), and this
@@ -17,10 +18,10 @@ describe("conservation", function()
    it("every cent is founded, held, or on the road — never conjured", function()
       local u = toy(1893)
       u:run(300)
-      local report = Audit.of(u.annals)
+      local report = Audit.of(u.annals, legs)
       assert.equal(0, #report.violations,
          table.concat(report.violations, "\n"))
-      assert.equal(report.founded.cents,
+      assert.equal(report.world.founded.cents,
          report.held.cents + report.on_road.cents)
    end)
 
@@ -36,7 +37,7 @@ describe("conservation", function()
       -- spec proves it still catches books that lie.
       local u = toy(1893)
       u:run(300)
-      local report = Audit.of(u.annals,
+      local report = Audit.of(u.annals, legs,
          { distance = u.distance, channel_speed = u.channel_speed })
       assert.equal(0, #report.mismatches)
       assert.equal(0, #report.unexplained)
@@ -46,9 +47,9 @@ describe("conservation", function()
       for _, seed in ipairs({ 7, 40412 }) do
          local u = toy(seed)
          u:run(200)
-         local report = Audit.of(u.annals)
+         local report = Audit.of(u.annals, legs)
          assert.equal(0, #report.violations)
-         assert.equal(report.founded.cents,
+         assert.equal(report.world.founded.cents,
             report.held.cents + report.on_road.cents)
       end
    end)
