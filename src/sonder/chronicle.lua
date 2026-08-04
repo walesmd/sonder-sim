@@ -76,6 +76,33 @@ templates["war.declared"] = function(e)
       :format(e.payload.aggressor, e.payload.target, e.payload.measure)
 end
 
+templates["cargo.shipped"] = function(e)
+   return ("the %s dispatch %d %s to the %s")
+      :format(e.payload.sender, e.payload.units, e.payload.commodity,
+         e.payload.recipient)
+end
+
+templates["cargo.delivered"] = function(e)
+   return ("%d %s from the %s reach the %s")
+      :format(e.payload.units, e.payload.commodity, e.payload.sender,
+         e.payload.recipient)
+end
+
+templates["payment.shipped"] = function(e)
+   return ("the %s send %d¢ to the %s")
+      :format(e.payload.payer, e.payload.amount, e.payload.payee)
+end
+
+templates["payment.delivered"] = function(e)
+   return ("%d¢ from the %s reach the %s")
+      :format(e.payload.amount, e.payload.payer, e.payload.payee)
+end
+
+templates["war.returned"] = function(e)
+   return ("the %s war party returns home with %d sacks and %d¢")
+      :format(e.payload.raider, e.payload.seized, e.payload.plunder)
+end
+
 templates["war.march"] = function(e)
    return ("a %s war party rides out against the %s (force %d)")
       :format(e.payload.raider, e.payload.target, e.payload.force)

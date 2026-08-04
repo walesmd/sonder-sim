@@ -52,27 +52,51 @@ describe("conservation", function()
       u:run(1000)
       local report = Audit.of(u.annals, road(u))
       assert_honest(report)
-      -- post 0006's promised on-schedule red, resolved the designed
-      -- way: drift exists, because news is slow — and every cent of
-      -- it reconciles against what was still on the road
-      assert.is_true(#report.mismatches > 0)
-      assert.equal(report.founded.cents, report.held.cents)
+      -- Card 122's drift died at card 153, and honestly: every
+      -- event that moves a civ's books now happens at its own
+      -- gates, so self-knowledge is exact again — the drift was a
+      -- symptom of action at a distance, and matter made honest
+      -- cured it. Ignorance lives on in what civs believe about
+      -- each other, which tallies never claimed to know.
+      assert.equal(0, #report.mismatches)
+      -- and the conservation identities carry their road terms:
+      -- some of what exists is between places
+      assert.equal(report.founded.cents,
+         report.held.cents + report.on_road.cents)
       assert.equal(report.founded.grain + report.totals.harvested
          - report.totals.eaten - report.totals.burned,
-         report.held.grain)
+         report.held.grain + report.on_road.grain)
    end)
 
    it("balances other seeds too", function()
       for _, seed in ipairs({ 7, 40412 }) do
          local u = toy(seed)
          u:run(300)
-         assert_honest(Audit.of(u.annals, road(u)))
+         local report = Audit.of(u.annals, road(u))
+         assert_honest(report)
+         assert.equal(report.founded.cents,
+            report.held.cents + report.on_road.cents)
       end
    end)
 
    it("without the road, mismatches go uncertified, not clean", function()
+      -- The toy no longer drifts, so a liar provides the mismatch:
+      -- detection works roadless, certification doesn't.
       local u = toy(1893)
-      u:run(200)
+      u:add_system("liar", function(universe, _, tick)
+         if tick == 5 then
+            universe:emit{
+               kind = "civ.tally",
+               location = "vessar-reaches",
+               magnitude = 9999,
+               loudness = "local",
+               payload = { harvested = 0, eaten = 0,
+                  stock = 9999, cents = 9999 },
+               causes = { 1 },
+            }
+         end
+      end)
+      u:run(10)
       local report = Audit.of(u.annals)
       assert.is_true(#report.mismatches > 0)
       assert.is_nil(report.unexplained) -- unchecked is not "none"
@@ -116,16 +140,34 @@ describe("the counterfeiter", function()
       assert.is_true(caught, "the free-grain trade went unflagged")
    end)
 
-   it("catches a trade that drives a treasury negative", function()
-      local report = forge(7, { buyer = "khedrun", seller = "vessari",
-         units = 1, price = 10000000, total = 10000000 })
+   it("catches a payment that drives a treasury negative", function()
+      -- Since card 153 a trade moves no books — the money moves on
+      -- its road legs — so the impossible purchase is now an
+      -- impossible *dispatch*: a payment.shipped for more cents
+      -- than the payer ever held.
+      local u = toy(7)
+      u:add_system("counterfeiter", function(universe, _, tick)
+         if tick == 5 then
+            universe:emit{
+               kind = "payment.shipped",
+               location = "khedrun-holds",
+               magnitude = 10000000,
+               loudness = "local",
+               payload = { amount = 10000000,
+                  payer = "khedrun", payee = "vessari" },
+               causes = { 1 },
+            }
+         end
+      end)
+      u:run(10)
+      local report = Audit.of(u.annals)
       local caught = false
       for _, v in ipairs(report.violations) do
          if v:find("negative treasury", 1, true) then
             caught = true
          end
       end
-      assert.is_true(caught, "the impossible purchase went unflagged")
+      assert.is_true(caught, "the impossible dispatch went unflagged")
    end)
 end)
 

@@ -145,28 +145,117 @@ local effects = {
    end,
 
    ["market.trade"] = function(s, e)
+      -- Since card 153 the trade is the agreement, not the movement:
+      -- the goods and the payment ride the roads as cargo/payment
+      -- events and the books move on those legs. What's left to
+      -- check here is the arithmetic of the promise itself.
       local p = e.payload
       if p.total ~= p.units * p.price then
          flag(s, e.id, "trade total %d¢ is not %d units × %d¢",
             p.total, p.units, p.price)
       end
-      local buyer, seller = s.books[p.buyer], s.books[p.seller]
-      if not (buyer and seller) then
+      if not (s.books[p.buyer] and s.books[p.seller]) then
          flag(s, e.id, "a trade between parties the audit has never "
             .. "met (%s, %s)", p.buyer, p.seller)
          return
       end
-      buyer.grain = buyer.grain + p.units
-      buyer.cents = buyer.cents - p.total
-      seller.grain = seller.grain - p.units
-      seller.cents = seller.cents + p.total
       s.totals.traded_units = s.totals.traded_units + p.units
       s.totals.traded_cents = s.totals.traded_cents + p.total
-      ship(s, e, p.buyer, p.units, -p.total)
-      ship(s, e, p.seller, -p.units, p.total)
+   end,
+
+   -- The road legs (card 153). A departure debits the sender and
+   -- puts the goods on the road ledger under the departure's own
+   -- event id; the arrival cites that id, drains it exactly, and
+   -- credits the recipient. Net zero per shipment, to the sack and
+   -- the cent — and the audit never checks punctuality, only
+   -- conservation: how long a road takes is physics' business.
+   ["cargo.shipped"] = function(s, e)
+      local p = e.payload
+      local sender = s.books[p.sender]
+      if not (sender and s.books[p.recipient]) then
+         flag(s, e.id, "cargo between parties the audit has never "
+            .. "met (%s, %s)", p.sender, p.recipient)
+         return
+      end
+      if p.commodity ~= "grain" then
+         flag(s, e.id, "cargo in a commodity the audit cannot book (%s)",
+            p.commodity)
+         return
+      end
+      sender.grain = sender.grain - p.units
+      s.roads[e.id] = { grain = p.units, cents = 0 }
+      s.on_road.grain = s.on_road.grain + p.units
+      ship(s, e, p.sender, -p.units, 0)
+   end,
+
+   ["cargo.delivered"] = function(s, e)
+      local p = e.payload
+      local recipient = s.books[p.recipient]
+      if not recipient then
+         flag(s, e.id, "a delivery to %s, whom the audit has never met",
+            p.recipient)
+         return
+      end
+      local road = s.roads[e.causes[1]]
+      if not road then
+         flag(s, e.id, "a delivery citing no departure on the road")
+         return
+      end
+      if p.commodity ~= "grain" or road.grain ~= p.units then
+         flag(s, e.id, "a delivery that does not match its departure: "
+            .. "%d units against %d on the road", p.units, road.grain)
+         return
+      end
+      s.roads[e.causes[1]] = nil
+      s.on_road.grain = s.on_road.grain - p.units
+      recipient.grain = recipient.grain + p.units
+      ship(s, e, p.recipient, p.units, 0)
+   end,
+
+   ["payment.shipped"] = function(s, e)
+      local p = e.payload
+      local payer = s.books[p.payer]
+      if not (payer and s.books[p.payee]) then
+         flag(s, e.id, "payment between parties the audit has never "
+            .. "met (%s, %s)", p.payer, p.payee)
+         return
+      end
+      payer.cents = payer.cents - p.amount
+      s.roads[e.id] = { grain = 0, cents = p.amount }
+      s.on_road.cents = s.on_road.cents + p.amount
+      ship(s, e, p.payer, 0, -p.amount)
+   end,
+
+   ["payment.delivered"] = function(s, e)
+      local p = e.payload
+      local payee = s.books[p.payee]
+      if not payee then
+         flag(s, e.id, "a payment to %s, whom the audit has never met",
+            p.payee)
+         return
+      end
+      local road = s.roads[e.causes[1]]
+      if not road then
+         flag(s, e.id, "a payment delivery citing no departure on the road")
+         return
+      end
+      if road.cents ~= p.amount then
+         flag(s, e.id, "a payment that does not match its departure: "
+            .. "%d¢ against %d¢ on the road", p.amount, road.cents)
+         return
+      end
+      s.roads[e.causes[1]] = nil
+      s.on_road.cents = s.on_road.cents - p.amount
+      payee.cents = payee.cents + p.amount
+      ship(s, e, p.payee, 0, p.amount)
    end,
 
    ["war.spoils"] = function(s, e)
+      -- The verdict and a departure leg in one (card 153): the
+      -- target's losses happen here, where the raid did, but the
+      -- seized goods leave WITH the party — onto the road ledger
+      -- under this event's id, credited to the raider only when
+      -- war.returned cites it.
       local p = e.payload
       local raider, target = s.books[p.raider], s.books[p.target]
       if not (raider and target) then
@@ -174,15 +263,42 @@ local effects = {
             .. "met (%s, %s)", p.raider, p.target)
          return
       end
-      raider.grain = raider.grain + p.seized
-      raider.cents = raider.cents + p.plunder
       target.grain = target.grain - p.seized - p.burned
       target.cents = target.cents - p.plunder
       s.totals.seized = s.totals.seized + p.seized
       s.totals.plunder = s.totals.plunder + p.plunder
       s.totals.burned = s.totals.burned + p.burned
-      ship(s, e, p.raider, p.seized, p.plunder)
+      s.roads[e.id] = { grain = p.seized, cents = p.plunder }
+      s.on_road.grain = s.on_road.grain + p.seized
+      s.on_road.cents = s.on_road.cents + p.plunder
       ship(s, e, p.target, -p.seized - p.burned, -p.plunder)
+   end,
+
+   ["war.returned"] = function(s, e)
+      local p = e.payload
+      local raider = s.books[p.raider]
+      if not raider then
+         flag(s, e.id, "a war party returning to %s, whom the audit "
+            .. "has never met", p.raider)
+         return
+      end
+      local road = s.roads[e.causes[1]]
+      if not road then
+         flag(s, e.id, "a war party returning with no spoils on the road")
+         return
+      end
+      if road.grain ~= p.seized or road.cents ~= p.plunder then
+         flag(s, e.id, "a return that does not match its spoils: "
+            .. "%d sacks and %d¢ against %d and %d on the road",
+            p.seized, p.plunder, road.grain, road.cents)
+         return
+      end
+      s.roads[e.causes[1]] = nil
+      s.on_road.grain = s.on_road.grain - p.seized
+      s.on_road.cents = s.on_road.cents - p.plunder
+      raider.grain = raider.grain + p.seized
+      raider.cents = raider.cents + p.plunder
+      ship(s, e, p.raider, p.seized, p.plunder)
    end,
 }
 
@@ -217,6 +333,12 @@ function Audit.of(annals, road)
       violations = {}, mismatches = {}, unclassified = {},
       road = road, pending = {},
       unexplained = road and {} or nil,
+      -- The road ledger (card 153): matter and money between places,
+      -- one entry per departure event id, drained exactly by the
+      -- arrival that cites it. on_road runs incrementally so the
+      -- conservation identities never iterate a hash.
+      roads = {},
+      on_road = { grain = 0, cents = 0 },
    }
    for id = 1, annals:len() do
       local e = annals:get(id)
@@ -246,22 +368,25 @@ function Audit.of(annals, road)
       held.cents = held.cents + b.cents
    end
    -- The two conservation laws, checked across the whole history.
-   -- Money has no doors at all: every cent held was founded. Matter
-   -- has exactly two, both recorded events: harvests grow it, eating
-   -- and the torch destroy it. Trades and spoils only move things,
-   -- so they appear in neither identity.
-   if held.cents ~= s.founded.cents then
+   -- Money has no doors at all: every cent held or riding was
+   -- founded. Matter has exactly two, both recorded events: harvests
+   -- grow it, eating and the torch destroy it. Movement appears in
+   -- neither identity — but since card 153 some of what exists is
+   -- *between places*, so each identity carries a road term. Net
+   -- zero, with roads.
+   if held.cents + s.on_road.cents ~= s.founded.cents then
       flag(s, annals:len(), "money is not conserved: %d¢ founded, "
-         .. "%d¢ held", s.founded.cents, held.cents)
+         .. "%d¢ held, %d¢ on roads", s.founded.cents, held.cents,
+         s.on_road.cents)
    end
    local grain_expected = s.founded.grain + s.totals.harvested
       - s.totals.eaten - s.totals.burned
-   if held.grain ~= grain_expected then
+   if held.grain + s.on_road.grain ~= grain_expected then
       flag(s, annals:len(), "matter is not conserved: expected %d "
          .. "sacks (%d founded + %d harvested − %d eaten − %d "
-         .. "burned), held %d", grain_expected, s.founded.grain,
-         s.totals.harvested, s.totals.eaten, s.totals.burned,
-         held.grain)
+         .. "burned), held %d with %d on roads", grain_expected,
+         s.founded.grain, s.totals.harvested, s.totals.eaten,
+         s.totals.burned, held.grain, s.on_road.grain)
    end
 
    return {
@@ -275,6 +400,7 @@ function Audit.of(annals, road)
       mismatches = s.mismatches,
       unexplained = s.unexplained, -- nil without a road: unchecked ≠ clean
       unclassified = s.unclassified,
+      on_road = s.on_road, -- matter and money between places, right now
    }
 end
 

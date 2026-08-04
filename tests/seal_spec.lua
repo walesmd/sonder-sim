@@ -40,9 +40,17 @@ local toy = require "support.toy"
 --                      six parties still on the road. Drift became
 --                      the product: 296 mismatches over 300 days,
 --                      every one explained by news still riding
+--   3475639d8f49678b — card 153: nothing teleports. Goods and
+--                      payment ride the roads (cargo and payment
+--                      kinds; the trade is just the agreement now),
+--                      war parties carry their spoils home
+--                      (war.returned), and the drift card 122
+--                      legitimized died honestly — every book-moving
+--                      event now happens at its owner's gates, so
+--                      mismatches are zero again, earned this time
 local GOLDEN_SEED = 1893
 local GOLDEN_TICKS = 500
-local GOLDEN_SEAL = "a3b626e777c0eaff"
+local GOLDEN_SEAL = "3475639d8f49678b"
 
 describe("the golden master", function()
    it("seed 1893, 500 ticks, one exact seal", function()

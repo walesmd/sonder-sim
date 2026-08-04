@@ -70,11 +70,43 @@ return {
             { "limit", "integer" } },
       },
       ["market.trade"] = {
-         doc = "sacks change hands for cents; the only way money or "
-            .. "grain legitimately moves between civilizations",
+         doc = "the agreement: sacks promised for cents at the "
+            .. "exchange. Since card 153 this moves no books — the "
+            .. "goods and the payment ride the roads as cargo and "
+            .. "payment events, and the ledgers move on delivery",
          payload = { { "buyer", "string" }, { "seller", "string" },
             { "units", "integer" }, { "price", "integer" },
             { "total", "integer" } },
+      },
+      ["cargo.shipped"] = {
+         doc = "matter departs one holder for another: commodity "
+            .. "and units leave the sender's stores and take to the "
+            .. "road (card 153). The arrival is physics' verdict, "
+            .. "never this event's promise — a lot can happen in "
+            .. "seven days",
+         payload = { { "commodity", "string" }, { "units", "integer" },
+            { "sender", "string" }, { "recipient", "string" } },
+      },
+      ["cargo.delivered"] = {
+         doc = "matter arrives: the recipient's stores grow by what "
+            .. "actually made it. Cites its cargo.shipped — the "
+            .. "pairing the road ledger balances on",
+         payload = { { "commodity", "string" }, { "units", "integer" },
+            { "sender", "string" }, { "recipient", "string" } },
+      },
+      ["payment.shipped"] = {
+         doc = "money departs payer for payee and takes to the road "
+            .. "(card 153). How long it rides is the mechanism's "
+            .. "business — a hull takes days, a wire takes seconds; "
+            .. "the story reads the same either way",
+         payload = { { "amount", "integer" },
+            { "payer", "string" }, { "payee", "string" } },
+      },
+      ["payment.delivered"] = {
+         doc = "money arrives in the payee's treasury. Cites its "
+            .. "payment.shipped",
+         payload = { { "amount", "integer" },
+            { "payer", "string" }, { "payee", "string" } },
       },
       ["market.price"] = {
          doc = "the exchange reposts grain: naive price adjustment "
@@ -108,13 +140,22 @@ return {
       ["war.spoils"] = {
          doc = "the battle system's verdict on a raid: the sacks and "
             .. "cents carried off, and the sacks burned where they "
-            .. "stood — raiding is how money flows back the other "
-            .. "way, and burning is the one lawful way matter leaves "
+            .. "stood. Burning is the one lawful way matter leaves "
             .. "the world (law 1 permits it because this event "
-            .. "records it)",
+            .. "records it). Since card 153 this is also a departure "
+            .. "leg: the seized goods leave the target here and ride "
+            .. "home with the party, arriving at war.returned",
          payload = { { "raider", "string" }, { "target", "string" },
             { "seized", "integer" }, { "plunder", "integer" },
             { "burned", "integer" } },
+      },
+      ["war.returned"] = {
+         doc = "a war party arrives home with what it carried: the "
+            .. "seized sacks and plunder enter the raider's books "
+            .. "only now (card 153). Cites its war.spoils — an agent "
+            .. "coming home isn't freight, even when carrying some",
+         payload = { { "raider", "string" }, { "target", "string" },
+            { "seized", "integer" }, { "plunder", "integer" } },
       },
       ["war.peace"] = {
          doc = "the aggressor sheathes: grain is cheap enough, or the "
