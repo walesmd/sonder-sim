@@ -17,7 +17,12 @@
 
 package.path = "src/?.lua;" .. package.path
 
-local Toyworld = require "worlds.toy"
+-- Worlds are content; this file stays a window on whichever one
+-- --world names (card 160). The whitelist lives in parse_args.
+local WORLDS = {
+   toy = "worlds.toy",
+   office = "worlds.office",
+}
 local Chronicle = require "sonder.chronicle"
 local Archive = require "sonder.archive"
 local Seal = require "sonder.seal"
@@ -50,6 +55,14 @@ local function parse_args(argv)
       elseif flag == "--audit" then
          opts.audit = true
          i = i + 1
+      elseif flag == "--world" then
+         if value ~= "toy" and value ~= "office" then
+            io.stderr:write(("--world wants a known world, got %q\n")
+               :format(tostring(value)))
+            os.exit(1)
+         end
+         opts.world = value
+         i = i + 2
       elseif flag == "--believes" then
          if type(value) ~= "string" or #value == 0 then
             io.stderr:write("--believes wants a faction name\n")
@@ -124,7 +137,7 @@ end
 -- market, and wars nobody schedules. All the cast and physics live
 -- in worlds/toy.lua — this file stays a window.
 local opts = parse_args(arg)
-local u = Toyworld(opts.seed)
+local u = require(WORLDS[opts.world or "toy"])(opts.seed)
 
 local archive
 if opts.db ~= "none" then

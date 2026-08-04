@@ -275,3 +275,51 @@ edition of the equivalence discipline, and the first entry in ADR
 0004's leak ledger closed. Remaining leaks: audit legs, chronicle
 templates, main.lua's hardwired world — each waits for the world
 build that hits it.
+
+## Session 1 — Bellwether & Co. opens for business
+
+The office world exists and the headline is the card's thesis
+proven: **152 specs green, and the engine was not touched.** Ten
+minds run on the exact machinery that runs two space civilizations;
+the only engine-side edit was main.lua learning `--world office`,
+and main was always the host's window, never the engine.
+
+What got built: `office_vocabulary.lua` — the first vocabulary
+written against ADR 0004 rather than grandfathered (doors declared:
+made and spent ride the tally like harvest and eaten always did;
+revenue in and delivered out are the open system's mouths; the
+framework's cargo/payment kinds are copy-declared, a composition
+helper noted for the rule of three). `office.lua` — the cast from
+the charter (mara, sef, tobin, amity, ivo, prue, and the four
+makers), the org chart as a distance function (LCA hops; off-chart
+places adjacent, so genesis is heard at once), believed books at
+desk scale (self-knowledge exact, card 153's dividend — which is
+what lets minds dispatch their own shipments with no clamping
+middleman), morale as a reading of the belief store (news dims a
+mind when it *arrives*, not when it happened), and two systems:
+roads (the second hand-rolled copy, counted) and clients — the
+world outside with a checkbook and no inner life.
+
+**The chartered KPI fired on the first seed tried.** Seed 7, tick
+14: a client tells ivo no, quietly. Ivo goes silent the next
+morning; prue, two hops away, learns it and sits on full inventory;
+the make-team, four hops out, keeps producing at full rate for days
+before the news dims them — pitching stopped org-wide while half
+the company hadn't heard why. The office_spec replays it from
+truth: seller active before, silent after, the make-team's lag ≥ 3
+hops, and dane's private chronology carrying the loss at exactly
+tick + distance. The believes viewer works on a person with zero
+changes — an employee's newspaper reads like a life.
+
+**Leaks observed, on the ledger:** (1) chronicle templates — office
+shipments render through the TOY's cargo templates ("the dane
+dispatch 6 work to the tobin"): functional, wearing the wrong
+world's prose; extraction when we want office sentences. (2) audit
+legs — office kinds land in report.unclassified; the audit means
+nothing at Bellwether until legs and the open-system identities
+become world-supplied. That extraction is the next chunk. (3) the
+roads system copy count stands at two; the continent's copy
+triggers the extraction, per the rule of three.
+
+Suite: 152 green, toy seal untouched. Uncommitted, awaiting Mike's
+gutter pass under the new rule: code commits only after review.
