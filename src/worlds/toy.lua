@@ -704,7 +704,10 @@ local function found(u, civ)
 end
 
 return function(seed)
-   local u = Universe.new(seed, { distance = distance })
+   local u = Universe.new(seed, {
+      distance = distance,
+      vocabulary = require "worlds.toy_vocabulary",
+   })
    found(u, VESSARI)
    found(u, KHEDRUN)
    u:emit{

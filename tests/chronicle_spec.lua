@@ -3,8 +3,9 @@
 -- no fingerprints on the sim.
 
 local Chronicle = require "sonder.chronicle"
-local vocabulary = require "sonder.vocabulary"
+local vocabulary = require "worlds.toy_vocabulary"
 local Universe = require "sonder.universe"
+local VOCAB = require "support.vocabulary"
 
 -- A hand-built event, bypassing the annals on purpose: the chronicle
 -- renders event tables, wherever they came from — including logs
@@ -30,7 +31,7 @@ end
 -- system, one integer payload. (The full toy world has its own spec;
 -- this fixture stays deliberately tiny.)
 local function toy_universe(seed)
-   local u = Universe.new(seed)
+   local u = Universe.new(seed, { vocabulary = VOCAB })
    local last = 1
    u:add_system("famine", function(universe, stream)
       local n = stream:int(0, 3)

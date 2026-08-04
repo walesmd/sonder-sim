@@ -5,6 +5,7 @@
 -- up here as a different seal.
 
 local Seal = require "sonder.seal"
+local VOCAB = require "support.vocabulary"
 local toy = require "support.toy"
 
 -- The pinned seal of seed 1893 × 500 ticks. If this
@@ -132,7 +133,7 @@ describe("Seal", function()
    it("order matters: a history is a sequence, not a set", function()
       local u = toy(7)
       u:run(2)
-      local forward, backward = Seal.new(), Seal.new()
+      local forward, backward = Seal.new(u.annals.vocabulary), Seal.new(u.annals.vocabulary)
       for id = 1, u.annals:len() do
          forward:fold(u.annals:get(id))
       end
@@ -144,7 +145,7 @@ describe("Seal", function()
 
    it("refuses kinds the vocabulary has never heard of", function()
       assert.has_error(function()
-         Seal.new():fold{
+         Seal.new(VOCAB):fold{
             id = 1, tick = 0, kind = "future.mystery", location = "x",
             magnitude = 0, loudness = "loud", payload = {}, causes = {},
          }

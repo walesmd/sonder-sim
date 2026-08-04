@@ -5,7 +5,7 @@
 
 local toy = require "support.toy"
 local Audit = require "sonder.audit"
-local vocabulary = require "sonder.vocabulary"
+local vocabulary = require "worlds.toy_vocabulary"
 
 -- The world's road, as the audit wants it: the same map and divisor
 -- the courier reads.

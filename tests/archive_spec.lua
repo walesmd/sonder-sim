@@ -4,6 +4,7 @@
 
 local sqlite3 = require "lsqlite3"
 local Universe = require "sonder.universe"
+local VOCAB = require "support.vocabulary"
 local Archive = require "sonder.archive"
 local Seal = require "sonder.seal"
 local toy = require "support.toy"
@@ -90,7 +91,7 @@ describe("Archive", function()
    end)
 
    it("creates the file with provenance at birth", function()
-      local u = Universe.new(7)
+      local u = Universe.new(7, { vocabulary = VOCAB })
       local archive = Archive.create(path, u.annals, provenance(7))
       archive:close()
       local rows = {}
@@ -101,7 +102,7 @@ describe("Archive", function()
       assert.equal("deadbeef", rows.git_commit)
       assert.equal("7", rows.seed)
       assert.equal("{}", rows.config)
-      assert.equal("3", rows.schema_version)
+      assert.equal("1", rows.schema_version) -- the spec world's vocabulary version
       assert.equal("[]", rows.interventions)
       assert.equal(_VERSION, rows.lua_version)
       assert.equal(sqlite3.version(), rows.sqlite_version)
@@ -109,7 +110,7 @@ describe("Archive", function()
    end)
 
    it("demands the host facts it cannot invent", function()
-      local u = Universe.new(7)
+      local u = Universe.new(7, { vocabulary = VOCAB })
       assert.has_error(function()
          Archive.create(path, u.annals, { seed = 7, config = "{}" })
       end)
@@ -123,7 +124,7 @@ describe("Archive", function()
    it("refuses to overwrite an existing file", function()
       local touched = assert(io.open(path, "w"))
       touched:close()
-      local u = Universe.new(7)
+      local u = Universe.new(7, { vocabulary = VOCAB })
       assert.has_error(function()
          Archive.create(path, u.annals, provenance(7))
       end, ("archive: %s already exists; refusing to overwrite history"):format(path))

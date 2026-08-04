@@ -36,9 +36,14 @@ Universe.__index = Universe
 --     125 and beyond) walks through without touching this file.
 --   channel_speed — the divisor that turns distance into delay;
 --     default 1. A parameter, not a constant, on lore's orders.
+--   vocabulary — required (card 160): what can happen in this
+--     world, declared by the world. The engine's only demand is
+--     universe.genesis, because the engine emits it itself.
 function Universe.new(seed, opts)
    assert(math.type(seed) == "integer", "universe: seed must be an integer")
    opts = opts or {}
+   assert(type(opts.vocabulary) == "table",
+      "universe: a world must supply its vocabulary (opts.vocabulary)")
    assert(opts.distance == nil or type(opts.distance) == "function",
       "universe: opts.distance must be a function (from, to, tick) -> days")
    local channel_speed = opts.channel_speed or 1
@@ -48,7 +53,7 @@ function Universe.new(seed, opts)
       seed = seed,
       tick = 0, -- integer sim-time; the only clock the sim has
       rng = Rng.new(seed),
-      annals = Annals.new(),
+      annals = Annals.new(opts.vocabulary),
       distance = opts.distance,
       channel_speed = channel_speed,
       systems = {}, -- array of {name, fn}; order is part of the physics

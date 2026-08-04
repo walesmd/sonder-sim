@@ -2,6 +2,7 @@
 -- beliefs, return intents, and are handed no road to the truth.
 
 local Universe = require "sonder.universe"
+local VOCAB = require "support.vocabulary"
 local toy = require "support.toy"
 
 local function null_decide()
@@ -13,7 +14,7 @@ describe("factions", function()
       -- The capability spec. Everything law 3 means, structurally, is
       -- on this argument list: if the universe isn't in your hands,
       -- no code path reaches it.
-      local u = Universe.new(7)
+      local u = Universe.new(7, { vocabulary = VOCAB })
       local seen
       u:add_faction("spy", "the-void", function(...)
          seen = table.pack(...)
@@ -32,7 +33,7 @@ describe("factions", function()
    end)
 
    it("the pass-through courier delivers everything, including genesis", function()
-      local u = Universe.new(1893)
+      local u = Universe.new(1893, { vocabulary = VOCAB })
       local counted
       u:add_faction("census", "the-void", function(beliefs)
          counted = beliefs:len()
@@ -44,7 +45,7 @@ describe("factions", function()
    end)
 
    it("intents are emitted in order, ticks stamped centrally", function()
-      local u = Universe.new(7)
+      local u = Universe.new(7, { vocabulary = VOCAB })
       u:add_faction("herald", "the-void", function(beliefs, _, tick)
          if tick > 1 then
             return {}
@@ -69,7 +70,7 @@ describe("factions", function()
    end)
 
    it("factions run after systems, in registration order", function()
-      local u = Universe.new(7)
+      local u = Universe.new(7, { vocabulary = VOCAB })
       local order = {}
       u:add_faction("second", "the-void", function()
          order[#order + 1] = "second"
@@ -87,19 +88,19 @@ describe("factions", function()
    end)
 
    it("returning nothing is an error; an empty table is a decision", function()
-      local u = Universe.new(7)
+      local u = Universe.new(7, { vocabulary = VOCAB })
       u:add_faction("mute", "the-void", function() end)
       assert.has_error(function() u:step() end,
          "universe: mute: decide must return an array"
          .. " of intents (perhaps empty), not nil")
-      local v = Universe.new(7)
+      local v = Universe.new(7, { vocabulary = VOCAB })
       v:add_faction("idle", "the-void", null_decide)
       v:step()
       assert.equal(1, v.annals:len()) -- just genesis; idling is legal
    end)
 
    it("names are unique across systems and factions alike", function()
-      local u = Universe.new(7)
+      local u = Universe.new(7, { vocabulary = VOCAB })
       u:add_system("war", function() end)
       assert.has_error(function() u:add_faction("war", "the-void", null_decide) end,
          'universe: the name "war" is already taken')
@@ -108,7 +109,7 @@ describe("factions", function()
    end)
 
    it("bad intents die at the same door as every bad event", function()
-      local u = Universe.new(7)
+      local u = Universe.new(7, { vocabulary = VOCAB })
       u:add_faction("liar", "the-void", function()
          return { { kind = "war.victory", location = "the-void", magnitude = 1,
             loudness = "loud", payload = {}, causes = { 1 } } }

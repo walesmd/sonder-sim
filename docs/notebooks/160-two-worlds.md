@@ -246,3 +246,32 @@ cast (the company as founded, like civilizations at genesis), and
 actors-who-join-and-leave-mid-history is named as a card the office
 world sends back — the first discovered requirement, found before a
 line of the world was written. Questionnaire complete: six for six.
+
+## Session 1 — the first leak fixed: the vocabulary leaves the engine
+
+Charters approved; the extraction ran exactly as the ADR's method
+demands. `src/sonder/vocabulary.lua` became
+`src/worlds/toy_vocabulary.lua` — moved verbatim, v1/v2/v3 history
+comments and all — and the engine's default retired: Annals, Seal,
+and Universe now *require* a vocabulary and validate one universal
+contract, that it declares `universe.genesis`, because the engine
+emits genesis itself. The toy passes its own vocabulary at
+construction like the content it always was.
+
+The engine specs got the honest upgrade instead of a shim:
+`tests/support/vocabulary.lua` is the spec world's own two-kind
+vocabulary — genesis plus one event to emit — which makes the test
+suite quietly the fourth world, and the litmus enforced at every
+`Universe.new` in the repo. The archive provenance spec now records
+schema_version "1" for spec-world universes, proving provenance
+follows the vocabulary it's handed. Coverage walks (audit
+classification, chronicle templates) repointed at the toy's
+vocabulary, where those obligations actually live.
+
+**The proof: 148 green, and the golden seal did not move**
+(3475639d8f49678b) — the toy's history is bit-identical whether its
+vocabulary arrives as an engine default or as world content. Third
+edition of the equivalence discipline, and the first entry in ADR
+0004's leak ledger closed. Remaining leaks: audit legs, chronicle
+templates, main.lua's hardwired world — each waits for the world
+build that hits it.

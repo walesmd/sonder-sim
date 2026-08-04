@@ -2,7 +2,7 @@
 -- don't test behavior; they hold the declaration to its own rules, so
 -- a kind can't sneak in half-declared.
 
-local vocabulary = require "sonder.vocabulary"
+local vocabulary = require "worlds.toy_vocabulary"
 
 describe("vocabulary", function()
    it("carries an integer schema version", function()

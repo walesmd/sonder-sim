@@ -2,6 +2,7 @@
 -- append-only behind it, copies out the window.
 
 local Annals = require "sonder.annals"
+local VOCAB = require "support.vocabulary"
 
 local function genesis(seed)
    return {
@@ -29,7 +30,7 @@ end
 -- A log with genesis in it: the smallest annals a non-genesis event
 -- can legally join.
 local function begun()
-   local a = Annals.new()
+   local a = Annals.new(VOCAB)
    a:append(0, genesis())
    return a
 end
@@ -43,7 +44,7 @@ describe("Annals", function()
    end)
 
    it("stamps id and tick and stores the envelope", function()
-      local a = Annals.new()
+      local a = Annals.new(VOCAB)
       a:append(0, genesis(1893))
       local e = a:get(1)
       assert.equal(1, e.id)
@@ -193,10 +194,10 @@ describe("Annals", function()
          local a = begun()
          assert.has_error(function() a:append(1, genesis()) end)
          -- first: nothing else can open a log (its causes can't resolve)
-         local b = Annals.new()
+         local b = Annals.new(VOCAB)
          assert.has_error(function() b:append(0, hunger(1)) end)
          -- uncaused:
-         local c = Annals.new()
+         local c = Annals.new(VOCAB)
          local spec = genesis()
          spec.causes = { 1 }
          assert.has_error(function() c:append(0, spec) end)
@@ -205,7 +206,7 @@ describe("Annals", function()
 
    it("two identically driven logs are the same log", function()
       local function build()
-         local a = Annals.new()
+         local a = Annals.new(VOCAB)
          a:append(0, genesis(7))
          local last = 1
          for t = 1, 5 do

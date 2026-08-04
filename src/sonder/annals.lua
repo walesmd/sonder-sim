@@ -13,15 +13,21 @@
 -- history that could be edited in place would be append-only by
 -- politeness, and laws get structure.
 
-local default_vocabulary = require "sonder.vocabulary"
-
 local Annals = {}
 Annals.__index = Annals
 
 local GENESIS = "universe.genesis"
 
 function Annals.new(vocabulary)
-   vocabulary = vocabulary or default_vocabulary
+   -- No default (card 160): a vocabulary is something a world
+   -- supplies, and the engine validates against whatever dialect it
+   -- is handed. The one universal requirement is genesis, because
+   -- the engine itself emits it: every universe begins.
+   assert(type(vocabulary) == "table" and type(vocabulary.kinds) == "table"
+      and type(vocabulary.loudnesses) == "table",
+      "annals: a vocabulary is required — worlds declare what can happen")
+   assert(vocabulary.kinds[GENESIS],
+      "annals: every vocabulary must declare universe.genesis")
    local loudnesses = {}
    for i = 1, #vocabulary.loudnesses do
       loudnesses[vocabulary.loudnesses[i]] = true
