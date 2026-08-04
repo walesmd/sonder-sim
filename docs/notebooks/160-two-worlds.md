@@ -60,6 +60,14 @@ simulate a universe, whatever that universe may be. The two new
 worlds are evals we measure all our systems against, to determine
 whether they deliver on that standard.
 
+**The focus clarification (mid-session, kept):** "For the majority
+of this project, we're going to be focused on the Universal Space
+Sim — these two other worlds as an eval will enable us further in
+the future. The end goal is this Universal Space Sim." The space sim
+is the destination; the continent and the office are enabling
+evals, deliberately shallow, never co-equal products. Effort
+re-balances toward the space sim the moment this card lands.
+
 ## The build order (proposed)
 
 1. **The charters** — one page per world, prose before code: cast,
@@ -102,7 +110,29 @@ first cut authors a handful of *role templates* (minds as
 temperament constants, the VESSARI/KHEDRUN pattern) instantiated
 with per-person constants, so thirty people don't mean thirty
 hand-written minds.
-> Mike:
+> Mike: Agreed, individuals — but they should be free to make a
+> coalition that creates a team. And this is also true as we scale
+> up to universal scale, where civilizations could make alliances
+> or enemies.
+
+*Q1 resolution — coalitions are behavior, not structure.* Mike's
+addendum passes his own litmus on the spot: a team in the office
+and an alliance among civilizations are the same concept at two
+scales, which is evidence the concept is framework-shaped — and the
+framework already supports it with no new machinery, because the
+card-122 visibility lesson applies verbatim. A coalition is not a
+state some registry holds; it is events (team.founded,
+alliance.sworn — world vocabulary, not engine) living in members'
+belief stores, plus minds that read those beliefs and act in
+concert. Membership is the behavior of the members. Which buys the
+drama for free: the alliance one side believes is still alive —
+betrayal as belief divergence about the coalition itself — is the
+office world's "same war twice," and at universal scale it is the
+alliance that learns of its own dissolution eight days late.
+Charter requirement, both worlds: the system must be able to host
+coalition stories (formation, defection, the lie that holds a team
+together); v1 minds may be simple, but nothing may structurally
+preclude the coalition that exists only in one member's head.
 
 **Q2 — What is distance in the office?** Physical (floors, desks) or
 social/organizational (the org chart and channels as the map)?
@@ -111,7 +141,17 @@ content, so the org chart IS the map, and "hops" between two people
 run through teams and shared channels. The boldest available test of
 map-as-content — and someday a reorg is the tick parameter finally
 moving a name.
-> Mike:
+> Mike: Agreed, social distance — the org chart is the map.
+
+*Q2 resolution.* The charter owes a concrete hop metric (a distance
+function, not a vibe): same team adjacent, shared manager two hops,
+cross-department through the chart's spine, shared channels as
+shortcuts. Noted for later beats: a reorg is the moving map arriving
+in the office before it arrives in space, and card 157's reception
+capability becomes "who is in the channel." Every mechanic we own —
+courier, loudness, travel calendars, the road ledger for a document
+making the rounds — must run on this map unchanged; that is the
+test.
 
 **Q3 — What are the office's economy and its doors?** The space toy
 is closed (money has no doors). An office earns revenue from outside
@@ -122,7 +162,21 @@ costs out — both recorded events, audit-visible), plus one
 work-product commodity riding the cargo grammar between people and
 out to clients. Deals with other companies are the office's
 "foreign relations."
-> Mike:
+> Mike: Agreed on both — two doors and the work-product commodity.
+
+*Q3 resolution.* The doors follow the torch's precedent: revenue is
+lawful because the deal event records money entering; payroll is
+lawful because the salary event records it leaving. The identity
+becomes world-declared — founded + revenue − paid = held + on-road —
+confirming via the litmus that conservation identities were always
+world content and only the fold machinery is engine. Work product
+rides the existing cargo grammar on the social map (a report making
+the rounds is cargo.shipped, and that is not a metaphor); deals
+with external companies are the office's foreign relations,
+conducted by whoever sits closest to them on the social map.
+Chartered simplification: external companies are environment in
+v1 — weather with a checkbook — and making them believable actors
+is a named, declined future card.
 
 **Q4 — The continent's cast and geography?** *Recommendation:* four
 to six civilizations (drawn fresh, eval-note practice from day one —
@@ -130,7 +184,24 @@ not ported from the space shelf), geography as an adjacency graph of
 bordering regions (contiguity is the stress: shared borders,
 chokepoints, no exchange in the sky), and two or three commodities
 so the cargo grammar's commodity field finally earns its keep.
-> Mike:
+> Mike: Agreed on all three — fresh cast, adjacency graph, and no
+> exchange.
+
+*Q4 resolution.* Four to six civilizations, authored fresh under
+the eval-note practice from day one (never ported from the space
+shelf — each kingdom an example the system must host, not a
+dictation). Geography as an adjacency graph of named regions:
+distance is hops through territory, the map gains interior
+(landlocked civs, passes that make near capitals far), and
+distance(a, b) violates naive expectations for the first time —
+which the seam was built for and has never had to carry. Two or
+three commodities with differential needs (the mountain civ has
+iron and no grain) so trade has structure. And the chartered
+omission: NO exchange — the continent trades bilaterally, neighbor
+to neighbor, exercising card 154's future and proving the market
+machinery was content all along. Anything bilateral trade needs
+that we don't have is a leak found honestly: a card, not scope
+creep.
 
 **Q5 — What is each world's "war nobody planned"?** Every world
 needs one emergent story class as its KPI — the space toy's is the
@@ -140,7 +211,19 @@ scheduled, precipitating from beliefs); the continent's is the
 unplanned *border war or famine trade crisis* (contiguity makes
 neighbors, neighbors make friction). Each charter names its own and
 the acceptance run must produce it unprompted.
-> Mike:
+> Mike: Agreed on both.
+
+*Q5 resolution.* The office's KPI story: the unplanned rumor
+cascade — something true happens quietly, its news propagates the
+social map unevenly, and the org's collective behavior visibly
+changes before the org collectively knows why. The continent's: the
+unplanned border war or famine crisis — a bad harvest propagating
+through bilateral trade into a war no charter scheduled, the whole
+chain legible in cause links across three or more civs' territories.
+Both executable as annals-replay specs in the established style.
+For post 0013: "a war nobody planned" was never about war — it is
+the standard that a universe's drama must be emergent from beliefs
+and physics, and each universe names its own genre of it.
 
 **Q6 — Scope guard: what do the worlds NOT get in v1?**
 *Recommendation:* no new engine features designed FOR them — v1
@@ -149,4 +232,17 @@ travel, audit) plus the leak-fixes their construction forces. Any
 mechanic a world wants that doesn't exist becomes a card, not scope
 creep. The worlds are evals of the engine we have, not wishlists for
 the engine we don't.
-> Mike:
+> Mike: I agree that worlds are built with the engine we have. If
+> the engine cannot build one of those worlds and sustain it, then
+> that is a card that we need to bring back into the system. Again,
+> we're not building a game; we're building a system of systems.
+> These are all of the systems that this project needs to support.
+
+*Q6 resolution.* "Build AND SUSTAIN" is the sharpened bar: a world
+that can be constructed but collapses without hand-holding is also
+a gap, and gaps become cards brought back into the system. The
+hiring tension resolves under this rule: v1 offices have a fixed
+cast (the company as founded, like civilizations at genesis), and
+actors-who-join-and-leave-mid-history is named as a card the office
+world sends back — the first discovered requirement, found before a
+line of the world was written. Questionnaire complete: six for six.
