@@ -3,7 +3,12 @@
 Sonder is a universe simulator you read: many simulated civilizations with
 distinct proclivities trading, scheming, allying, and warring across a
 procedurally grown galaxy, observed by a player who is something between a
-god and a subscriber. It is an educational project first — every mechanic
+god and a subscriber. We are not building a game: we are building a system
+of systems, and games and observability are the outcomes (card 160). The
+universal space sim is the destination; two deliberately shallow eval
+universes — a fantasy continent and an office — stand guard on the way,
+and anything we build must serve all three or be filed as one world's
+content. It is an educational project first — every mechanic
 ships with a written lesson — and a decades-horizon labor of love with no
 1.0, no roadmap, and no destination. A CS concept is introduced only when
 the work in front of us requires it; nothing gets taught in the abstract.
@@ -200,7 +205,7 @@ the road (reported + in-flight = audited to the cent; explained
 mismatches are the product, unexplained are lies, violations stay
 zero), and `--believes NAME [--as-of T]` renders any faction's
 private chronology double-dated — three fingerprints, one seal
-(card 122, post 0011 *News at Ship Speed*); and nothing teleports —
+(card 122, post 0011 *News at Ship Speed*); nothing teleports —
 the travel scheduler extracted (sonder/travel.lua, one calendar per
 owner, adopted by the courier with a bit-identical seal proof),
 goods and payment riding the roads as paired departure/arrival
@@ -209,13 +214,31 @@ agreement now), the audit keeping a road ledger with conservation
 reading founded = held + on-road, and the drift card 122
 legitimized dying honestly — every book-moving event happens at its
 owner's gates, so self-knowledge is exact and mismatches are zero,
-earned (card 153, post 0012 *Nothing Teleports*). Next up:
+earned (card 153, post 0012 *Nothing Teleports*); and the engine
+became a framework in fact — the toy world renamed to space (its
+real name: the destination), the world interface written down (ADR
+0004: a world supplies its vocabulary, cast, systems, map,
+sentences, audit legs and identities, and its own golden seal; the
+engine demands only universe.genesis), four leaks extracted with
+the space seal as regression anchor (vocabulary, audit legs,
+chronicle templates, and the roads system — rule of three, cashed),
+and two eval universes built against their charters: Bellwether &
+Co. (ten person-tier minds, the org chart as the map, an open
+economy, the rumor cascade firing unprompted) and Harrow (five
+civilizations, adjacency-graph interior, four-column books, no
+exchange — bilateral trade as four journeys with single-fire
+settlement: act the morning you learn). Three worlds, three golden
+seals, 162 specs, one engine that got smaller with every world it
+gained (card 160, post 0013 *Whatever That Universe May Be*).
+Next up:
 
-- the courier's successors, cards 150–159: carriers that can be
-  somebody, degradation, interpretation, exchanges in the plural,
-  counterfeiting as content, reception-side loudness (plus the
-  loudness stamp re-judgment punted there), in-flight actors, and
-  money grown up
+- the carriers research card: what carries things and how fast,
+  designed against hulls, caravans, and email in the same breath —
+  then the courier's successors, cards 150–159 (carriers that can
+  be somebody, degradation, interpretation, exchanges in the
+  plural, counterfeiting as content, reception-side loudness plus
+  the stamp re-judgment punted there, in-flight actors, and money
+  grown up)
 - the road to thirty species, one lore card at a time (cards 133–146,
   each entry arriving with its eval note)
 

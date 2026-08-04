@@ -100,11 +100,19 @@ home, the audit keeps a goods-in-transit account — and the belief
 drift of the previous card died honestly, because everything that
 moves a nation's books now happens at its own gates — post 0012,
 [*Nothing Teleports*](docs/posts/0012-nothing-teleports/complete.md)
-(tag `post/0012`). Ahead: the rest of the courier's successors
-(carriers that can be somebody, degradation, interpretation,
-exchanges in the plural — cards 150–159), and the lore shelf's road
-to thirty species. Watching now means watching from very nearly the
-beginning, which is rather the point.
+(tag `post/0012`). And the engine is a framework in fact: the toy
+world took its real name — space, the destination — and two
+deliberately shallow eval universes now stand guard beside it, an
+office where distance is the org chart and a continent where trade
+travels by letter, all three running on one engine that got smaller
+with every world it gained. Anything built here must serve all
+three, or it's one world's content — post 0013,
+[*Whatever That Universe May Be*](docs/posts/0013-whatever-that-universe-may-be/complete.md)
+(tag `post/0013`). Ahead: the carriers research (hulls, caravans,
+and email in the same breath), the courier's successors (cards
+150–159), and the lore shelf's road to thirty species. Watching now
+means watching from very nearly the beginning, which is rather the
+point.
 
 ## Building
 

@@ -4,9 +4,10 @@
 
 local sqlite3 = require "lsqlite3"
 local Universe = require "sonder.universe"
+local VOCAB = require "support.vocabulary"
 local Archive = require "sonder.archive"
 local Seal = require "sonder.seal"
-local toy = require "support.toy"
+local space = require "support.space"
 
 -- A fresh path in the OS temp dir that no file occupies yet.
 -- os.tmpname() pre-creates the file and Archive.create refuses paths
@@ -90,7 +91,7 @@ describe("Archive", function()
    end)
 
    it("creates the file with provenance at birth", function()
-      local u = Universe.new(7)
+      local u = Universe.new(7, { vocabulary = VOCAB })
       local archive = Archive.create(path, u.annals, provenance(7))
       archive:close()
       local rows = {}
@@ -101,7 +102,7 @@ describe("Archive", function()
       assert.equal("deadbeef", rows.git_commit)
       assert.equal("7", rows.seed)
       assert.equal("{}", rows.config)
-      assert.equal("3", rows.schema_version)
+      assert.equal("1", rows.schema_version) -- the spec world's vocabulary version
       assert.equal("[]", rows.interventions)
       assert.equal(_VERSION, rows.lua_version)
       assert.equal(sqlite3.version(), rows.sqlite_version)
@@ -109,7 +110,7 @@ describe("Archive", function()
    end)
 
    it("demands the host facts it cannot invent", function()
-      local u = Universe.new(7)
+      local u = Universe.new(7, { vocabulary = VOCAB })
       assert.has_error(function()
          Archive.create(path, u.annals, { seed = 7, config = "{}" })
       end)
@@ -123,14 +124,14 @@ describe("Archive", function()
    it("refuses to overwrite an existing file", function()
       local touched = assert(io.open(path, "w"))
       touched:close()
-      local u = Universe.new(7)
+      local u = Universe.new(7, { vocabulary = VOCAB })
       assert.has_error(function()
          Archive.create(path, u.annals, provenance(7))
       end, ("archive: %s already exists; refusing to overwrite history"):format(path))
    end)
 
    it("sync copies exactly the new suffix, and says how much", function()
-      local u = toy(1893)
+      local u = space(1893)
       local archive = Archive.create(path, u.annals, provenance(1893))
       assert.equal(4, archive:sync()) -- genesis, two foundings, the price
       assert.equal(0, archive:sync()) -- nothing new
@@ -141,7 +142,7 @@ describe("Archive", function()
    end)
 
    it("archives the same history the memory holds", function()
-      local u = toy(1893)
+      local u = space(1893)
       local archive = Archive.create(path, u.annals, provenance(1893))
       u:run(5)
       archive:close() -- close syncs
@@ -160,7 +161,7 @@ describe("Archive", function()
    end)
 
    it("writes payloads as canonical JSON SQL can reach into", function()
-      local u = toy(1893)
+      local u = space(1893)
       local archive = Archive.create(path, u.annals, provenance(1893))
       u:run(1)
       archive:close()
@@ -173,7 +174,7 @@ describe("Archive", function()
    end)
 
    it("the file itself refuses UPDATE and DELETE", function()
-      local u = toy(1893)
+      local u = space(1893)
       local archive = Archive.create(path, u.annals, provenance(1893))
       u:run(2)
       archive:close()
@@ -189,7 +190,7 @@ describe("Archive", function()
    it("same seed, same database, logically byte for byte", function()
       local other = fresh_path()
       for _, p in ipairs({ path, other }) do
-         local u = toy(1893)
+         local u = space(1893)
          local archive = Archive.create(p, u.annals, provenance(1893))
          u:run(10)
          archive:close()
@@ -199,7 +200,7 @@ describe("Archive", function()
    end)
 
    it("a closed archive is spent", function()
-      local u = toy(1893)
+      local u = space(1893)
       local archive = Archive.create(path, u.annals, provenance(1893))
       archive:close()
       assert.has_error(function() archive:sync() end, "archive: already closed")
@@ -207,7 +208,7 @@ describe("Archive", function()
    end)
 
    it("checkpoints every N ticks, each recomputable from the log", function()
-      local u = toy(1893)
+      local u = space(1893)
       local archive = Archive.create(path, u.annals, provenance(1893),
          { checkpoint_every = 2 })
       u:run(5)
@@ -228,14 +229,14 @@ describe("Archive", function()
       -- Checkpoints derive from the log alone; how often the follower
       -- happens to look must not change what it writes down.
       local eager, lazy = fresh_path(), fresh_path()
-      local u = toy(1893)
+      local u = space(1893)
       local a = Archive.create(eager, u.annals, provenance(1893), { checkpoint_every = 2 })
       for _ = 1, 5 do
          u:step()
          a:sync() -- looks every tick
       end
       a:close()
-      local v = toy(1893)
+      local v = space(1893)
       local b = Archive.create(lazy, v.annals, provenance(1893), { checkpoint_every = 2 })
       v:run(5)
       b:close() -- looks exactly once
@@ -245,7 +246,7 @@ describe("Archive", function()
    end)
 
    it("every file ends sealed, even one that never ran", function()
-      local u = toy(1893)
+      local u = space(1893)
       local archive = Archive.create(path, u.annals, provenance(1893))
       archive:close()
       local hash, events = seal_through(u.annals, 0)
@@ -254,7 +255,7 @@ describe("Archive", function()
    end)
 
    it("checkpoints refuse UPDATE and DELETE like everything else", function()
-      local u = toy(1893)
+      local u = space(1893)
       local archive = Archive.create(path, u.annals, provenance(1893))
       u:run(2)
       archive:close()

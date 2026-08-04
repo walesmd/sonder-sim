@@ -3,8 +3,12 @@
 -- no fingerprints on the sim.
 
 local Chronicle = require "sonder.chronicle"
-local vocabulary = require "sonder.vocabulary"
+local TEMPLATES = require "worlds.space_templates"
+local function line(e) return Chronicle.line(e, TEMPLATES) end
+local function believed(held) return Chronicle.believed_line(held, TEMPLATES) end
+local vocabulary = require "worlds.space_vocabulary"
 local Universe = require "sonder.universe"
+local VOCAB = require "support.vocabulary"
 
 -- A hand-built event, bypassing the annals on purpose: the chronicle
 -- renders event tables, wherever they came from — including logs
@@ -27,10 +31,10 @@ local function event(overrides)
 end
 
 -- A minimal emitting universe for cursor and law-4 specs: one chained
--- system, one integer payload. (The full toy world has its own spec;
+-- system, one integer payload. (The full space world has its own spec;
 -- this fixture stays deliberately tiny.)
-local function toy_universe(seed)
-   local u = Universe.new(seed)
+local function spec_universe(seed)
+   local u = Universe.new(seed, { vocabulary = VOCAB })
    local last = 1
    u:add_system("famine", function(universe, stream)
       local n = stream:int(0, 3)
@@ -49,20 +53,20 @@ end
 describe("templates", function()
    it("cover every kind in this repo's vocabulary", function()
       for kind in pairs(vocabulary.kinds) do
-         assert.equal("function", type(Chronicle._templates[kind]),
+         assert.equal("function", type(TEMPLATES[kind]),
             "no chronicle sentence for " .. kind)
       end
    end)
 
    it("render genesis", function()
       assert.equal("tick    0 · the-void · a universe begins (seed 1893)",
-         Chronicle.line(event()))
+         line(event()))
    end)
 
    it("render a founding, thousands separated", function()
       assert.equal("tick    0 · vessar-reaches · the vessari enter history"
          .. " with 160 sacks of grain and 10,000¢",
-         Chronicle.line(event{ kind = "civ.founded",
+         line(event{ kind = "civ.founded",
             location = "vessar-reaches", magnitude = 160,
             payload = { name = "vessari", grain = 160, cents = 10000 } }))
    end)
@@ -70,7 +74,7 @@ describe("templates", function()
    it("render the day's books", function()
       assert.equal("tick   40 · khedrun-holds · the day's books: 96 sacks"
          .. " in the granary (+7, −10), 1,390¢ in the treasury",
-         Chronicle.line(event{ kind = "civ.tally", tick = 40,
+         line(event{ kind = "civ.tally", tick = 40,
             location = "khedrun-holds", magnitude = 96,
             payload = { harvested = 7, eaten = 10, stock = 96,
                cents = 1390 } }))
@@ -79,23 +83,23 @@ describe("templates", function()
    it("render hunger, singular and plural", function()
       assert.equal("tick    9 · khedrun-holds · hunger — the granaries"
          .. " came up 2 sacks short",
-         Chronicle.line(event{ kind = "grain.hunger", tick = 9,
+         line(event{ kind = "grain.hunger", tick = 9,
             location = "khedrun-holds", magnitude = 2,
             payload = { shortfall = 2 } }))
       assert.equal("tick    9 · khedrun-holds · hunger — the granaries"
          .. " came up 1 sack short",
-         Chronicle.line(event{ kind = "grain.hunger", tick = 9,
+         line(event{ kind = "grain.hunger", tick = 9,
             location = "khedrun-holds", magnitude = 1,
             payload = { shortfall = 1 } }))
    end)
 
    it("render both sides of an order", function()
       assert.equal("tick    2 · khedrun-holds · a bid for 12 sacks at up to 105¢",
-         Chronicle.line(event{ kind = "market.order", tick = 2,
+         line(event{ kind = "market.order", tick = 2,
             location = "khedrun-holds", magnitude = 12,
             payload = { side = "buy", units = 12, limit = 105 } }))
       assert.equal("tick    2 · vessar-reaches · 15 sacks on offer at 98¢ or better",
-         Chronicle.line(event{ kind = "market.order", tick = 2,
+         line(event{ kind = "market.order", tick = 2,
             location = "vessar-reaches", magnitude = 15,
             payload = { side = "sell", units = 15, limit = 98 } }))
    end)
@@ -103,7 +107,7 @@ describe("templates", function()
    it("render a trade", function()
       assert.equal("tick    3 · the-exchange · 12 sacks pass from the"
          .. " vessari to the khedrun at 101¢ (1,212¢ paid)",
-         Chronicle.line(event{ kind = "market.trade", tick = 3,
+         line(event{ kind = "market.trade", tick = 3,
             location = "the-exchange", magnitude = 12,
             payload = { buyer = "khedrun", seller = "vessari",
                units = 12, price = 101, total = 1212 } }))
@@ -111,11 +115,11 @@ describe("templates", function()
 
    it("render the price, including the quiet day", function()
       assert.equal("tick    3 · the-exchange · grain settles at 103¢ (+2)",
-         Chronicle.line(event{ kind = "market.price", tick = 3,
+         line(event{ kind = "market.price", tick = 3,
             location = "the-exchange", magnitude = 2,
             payload = { price = 103, delta = 2 } }))
       assert.equal("tick    0 · the-exchange · grain holds at 100¢",
-         Chronicle.line(event{ kind = "market.price",
+         line(event{ kind = "market.price",
             location = "the-exchange",
             payload = { price = 100, delta = 0 } }))
    end)
@@ -123,13 +127,13 @@ describe("templates", function()
    it("render both flavors of declaration", function()
       assert.equal("tick   86 · khedrun-holds · the khedrun declare war on"
          .. " the vessari — grain at 151¢ was the last insult",
-         Chronicle.line(event{ kind = "war.declared", tick = 86,
+         line(event{ kind = "war.declared", tick = 86,
             location = "khedrun-holds", magnitude = 151,
             payload = { aggressor = "khedrun", target = "vessari",
                reason = "price", measure = 151 } }))
       assert.equal("tick   86 · khedrun-holds · the khedrun declare war on"
          .. " the vessari — 4 hungry days were the last insult",
-         Chronicle.line(event{ kind = "war.declared", tick = 86,
+         line(event{ kind = "war.declared", tick = 86,
             location = "khedrun-holds", magnitude = 4,
             payload = { aggressor = "khedrun", target = "vessari",
                reason = "hunger", measure = 4 } }))
@@ -147,7 +151,7 @@ describe("templates", function()
       assert.equal("tick   94 ← tick   86 · khedrun-holds · the khedrun"
          .. " declare war on the vessari — grain at 151¢ was the last"
          .. " insult",
-         Chronicle.believed_line(held))
+         believed(held))
    end)
 
    it("believed lines survive kinds younger than this viewer", function()
@@ -158,13 +162,13 @@ describe("templates", function()
       }
       assert.equal("tick   30 ← tick   12 · the-sky  · omen.comet,"
          .. " magnitude 7, loud — portent=doom",
-         Chronicle.believed_line(held))
+         believed(held))
    end)
 
    it("render a march riding out", function()
       assert.equal("tick   86 · khedrun-holds · a khedrun war party rides"
          .. " out against the vessari (force 8)",
-         Chronicle.line(event{ kind = "war.march", tick = 86,
+         line(event{ kind = "war.march", tick = 86,
             location = "khedrun-holds", magnitude = 8,
             payload = { raider = "khedrun", target = "vessari",
                force = 8 } }))
@@ -173,7 +177,7 @@ describe("templates", function()
    it("render a raid arriving", function()
       assert.equal("tick   87 · vessar-reaches · a khedrun war party falls"
          .. " on the vessari granaries (force 8)",
-         Chronicle.line(event{ kind = "war.raid", tick = 87,
+         line(event{ kind = "war.raid", tick = 87,
             location = "vessar-reaches", magnitude = 8,
             payload = { raider = "khedrun", target = "vessari",
                force = 8 } }))
@@ -182,19 +186,19 @@ describe("templates", function()
    it("render spoils: laden, unburned, and bare", function()
       assert.equal("tick   88 · vessar-reaches · the khedrun raiders carry"
          .. " off 8 sacks and 400¢ from the vessari and put 4 to the torch",
-         Chronicle.line(event{ kind = "war.spoils", tick = 88,
+         line(event{ kind = "war.spoils", tick = 88,
             location = "vessar-reaches", magnitude = 12,
             payload = { raider = "khedrun", target = "vessari",
                seized = 8, plunder = 400, burned = 4 } }))
       assert.equal("tick   88 · vessar-reaches · the khedrun raiders carry"
          .. " off 8 sacks and 400¢ from the vessari",
-         Chronicle.line(event{ kind = "war.spoils", tick = 88,
+         line(event{ kind = "war.spoils", tick = 88,
             location = "vessar-reaches", magnitude = 8,
             payload = { raider = "khedrun", target = "vessari",
                seized = 8, plunder = 400, burned = 0 } }))
       assert.equal("tick   88 · vessar-reaches · the khedrun raiders find"
          .. " the vessari stores bare",
-         Chronicle.line(event{ kind = "war.spoils", tick = 88,
+         line(event{ kind = "war.spoils", tick = 88,
             location = "vessar-reaches", magnitude = 0,
             payload = { raider = "khedrun", target = "vessari",
                seized = 0, plunder = 0, burned = 0 } }))
@@ -203,7 +207,7 @@ describe("templates", function()
    it("render peace", function()
       assert.equal("tick   96 · khedrun-holds · the khedrun sheathe —"
          .. " grain at 79¢ buys more than blood",
-         Chronicle.line(event{ kind = "war.peace", tick = 96,
+         line(event{ kind = "war.peace", tick = 96,
             location = "khedrun-holds", magnitude = 79,
             payload = { name = "khedrun", price = 79 } }))
    end)
@@ -222,20 +226,20 @@ describe("the unknown-kind fallback", function()
       assert.equal(
          "tick  512 · sector:7 · diplomacy.betrayal, magnitude 8, quiet"
          .. " — traitor=house-veyl, victim=house-omast",
-         Chronicle.line(e))
+         line(e))
    end)
 
    it("survives an empty payload", function()
       local e = event{ kind = "void.hum", tick = 1, magnitude = 2,
          loudness = "loud", payload = {} }
       assert.equal("tick    1 · the-void · void.hum, magnitude 2, loud",
-         Chronicle.line(e))
+         line(e))
    end)
 end)
 
 describe("the cursor", function()
    it("returns only what it hasn't yet rendered", function()
-      local u = toy_universe(1893)
+      local u = spec_universe(1893)
       local c = Chronicle.new(u.annals)
       assert.equal(1, #c:lines()) -- genesis
       assert.same({}, c:lines())
@@ -245,7 +249,7 @@ describe("the cursor", function()
    end)
 
    it("a fresh chronicle replays the whole log to the same lines", function()
-      local u = toy_universe(1893)
+      local u = spec_universe(1893)
       local live = Chronicle.new(u.annals)
       local seen = {}
       for _ = 1, 5 do
@@ -258,12 +262,12 @@ describe("the cursor", function()
 end)
 
 describe("the golden feed", function()
-   it("the toy world's first days read the same on every machine", function()
+   it("the space world's first days read the same on every machine", function()
       -- Hardcoded from a real run of the real world. If this fails,
       -- either rendering changed (update the lines, note it in the
       -- post's changelog) or determinism broke (stop everything).
-      local toy = require "support.toy"
-      local u = toy(1893)
+      local space = require "support.space"
+      local u = space(1893)
       u:run(2)
       -- Re-cut for card 122 (news at ship speed): the old feed's
       -- first days held offers, bids, and a tick-2 trade — born
@@ -282,7 +286,7 @@ describe("the golden feed", function()
          "tick    1 · khedrun-holds · the day's books: 78 sacks in the granary (+8, −10), 14,000¢ in the treasury",
          "tick    2 · vessar-reaches · the day's books: 169 sacks in the granary (+12, −8), 10,000¢ in the treasury",
          "tick    2 · khedrun-holds · the day's books: 75 sacks in the granary (+7, −10), 14,000¢ in the treasury",
-      }, Chronicle.new(u.annals):lines())
+      }, Chronicle.new(u.annals, TEMPLATES):lines())
    end)
 end)
 
@@ -291,7 +295,7 @@ describe("law 4, executable", function()
       -- With projection this passes by construction — that is the
       -- point of projection. The spec pins it so a future
       -- "optimization" can't unpin it.
-      local watched, bare = toy_universe(99), toy_universe(99)
+      local watched, bare = spec_universe(99), spec_universe(99)
       local c = Chronicle.new(watched.annals)
       for _ = 1, 20 do
          watched:step()

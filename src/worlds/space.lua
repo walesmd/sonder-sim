@@ -1,4 +1,4 @@
--- src/worlds/toy.lua — two civilizations, one commodity, one
+-- src/worlds/space.lua — two civilizations, one commodity, one
 -- market. The Vessari price things; the Khedrun cost them out.
 --
 -- This is content, not engine: the first world the machinery hosts,
@@ -21,6 +21,7 @@
 
 local Universe = require "sonder.universe"
 local Travel = require "sonder.travel"
+local Roads = require "sonder.roads"
 
 local EXCHANGE = "the-exchange"
 local OPENING_PRICE = 100 -- cents per sack, posted at tick 0
@@ -419,7 +420,9 @@ local function add_physics(u)
    local orders = Travel.new() -- order slips riding to the exchange
    local marches = Travel.new() -- war parties outbound
    local parties = Travel.new() -- war parties homebound, laden
-   local freight = Travel.new() -- cargo and payment on the roads
+   local roads = Roads.new(u, { -- cargo and payment on the roads
+      resolve = function(name) return seats[name] end,
+   })
    local cursor = 0
 
    local function catch_up()
@@ -437,19 +440,12 @@ local function add_physics(u)
          elseif e.kind == "cargo.shipped" then
             -- matter leaves the sender at departure and rides
             ledger[p.sender].grain = ledger[p.sender].grain - p.units
-            freight:schedule(
-               e.tick + travel(u, e.location, seats[p.recipient], e.tick),
-               { id = e.id, kind = "cargo", commodity = p.commodity,
-                  units = p.units, sender = p.sender,
-                  recipient = p.recipient })
+            roads:schedule(e)
          elseif e.kind == "cargo.delivered" then
             ledger[p.recipient].grain = ledger[p.recipient].grain + p.units
          elseif e.kind == "payment.shipped" then
             ledger[p.payer].cents = ledger[p.payer].cents - p.amount
-            freight:schedule(
-               e.tick + travel(u, e.location, seats[p.payee], e.tick),
-               { id = e.id, kind = "payment", amount = p.amount,
-                  payer = p.payer, payee = p.payee })
+            roads:schedule(e)
          elseif e.kind == "payment.delivered" then
             ledger[p.payee].cents = ledger[p.payee].cents + p.amount
          elseif e.kind == "war.spoils" then
@@ -482,39 +478,11 @@ local function add_physics(u)
       end
    end
 
-   -- The roads (card 153): freight reaching its destination this
-   -- morning becomes a delivery event. Registered first, so goods
-   -- land before the exchange matches and before any granary can
-   -- be sacked — the mail arrives at dawn.
-   u:add_system("roads", function(universe, _, tick)
-      catch_up()
-      local arriving = freight:due(tick)
-      for i = 1, #arriving do
-         local f = arriving[i]
-         if f.kind == "cargo" then
-            universe:emit{
-               kind = "cargo.delivered",
-               location = seats[f.recipient],
-               magnitude = f.units,
-               loudness = "local",
-               payload = { commodity = f.commodity, units = f.units,
-                  sender = f.sender, recipient = f.recipient },
-               causes = { f.id },
-            }
-         else
-            universe:emit{
-               kind = "payment.delivered",
-               location = seats[f.payee],
-               magnitude = f.amount,
-               loudness = "local",
-               payload = { amount = f.amount, payer = f.payer,
-                  payee = f.payee },
-               causes = { f.id },
-            }
-         end
-         catch_up()
-      end
-   end)
+   -- The roads (card 153; extracted to sonder/roads.lua at card 160,
+   -- when the third world made it the rule of three's business).
+   -- Registered first, so goods land before the exchange matches and
+   -- before any granary can be sacked — the mail arrives at dawn.
+   u:add_system("roads", roads:system(catch_up))
 
    -- The exchange. Orders that *arrived* yesterday meet this
    -- morning's market — an order placed three days out spends three
@@ -704,7 +672,10 @@ local function found(u, civ)
 end
 
 return function(seed)
-   local u = Universe.new(seed, { distance = distance })
+   local u = Universe.new(seed, {
+      distance = distance,
+      vocabulary = require "worlds.space_vocabulary",
+   })
    found(u, VESSARI)
    found(u, KHEDRUN)
    u:emit{

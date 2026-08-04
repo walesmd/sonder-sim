@@ -1,13 +1,21 @@
--- src/sonder/vocabulary.lua — what can happen, declared.
+-- src/worlds/space_vocabulary.lua — what can happen in the space
+-- world, declared. Content, not engine (card 160): a vocabulary is
+-- something a world *supplies* — the engine's schema machinery
+-- (envelope, validation, byteform) serves any vocabulary, and lived
+-- in src/sonder pretending this kind list was engine until the
+-- world-interface ADR (0004) called the bluff. Moved verbatim, seal
+-- unmoved: same kinds, same bytes, same history.
 --
 -- The event vocabulary is a public API: the versioned list of every
--- kind of thing that can occur in a universe, and the exact shape of
--- what each kind carries. The annals validates against it, strictly —
--- a malformed event written today is corrupted history forever.
--- Nothing here says how an event should be *displayed*; that belongs
--- to viewers (see chronicle.lua). Kinds are append-mostly: pre-0.1 we
--- churn freely, after that additions are cheap and removals owe a
--- documented migration.
+-- kind of thing that can occur in this universe, and the exact shape
+-- of what each kind carries. The annals validates against it,
+-- strictly — a malformed event written today is corrupted history
+-- forever. Nothing here says how an event should be *displayed*;
+-- that belongs to viewers (see chronicle.lua). Kinds are
+-- append-mostly: additions are cheap and removals owe a documented
+-- migration. One kind is the engine's own and every world's
+-- vocabulary must declare it: universe.genesis, because every
+-- universe begins.
 
 return {
    -- Bumped when the envelope or an existing kind's payload changes

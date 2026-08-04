@@ -17,7 +17,16 @@
 
 package.path = "src/?.lua;" .. package.path
 
-local Toyworld = require "worlds.toy"
+-- Worlds are content; this file stays a window on whichever one
+-- --world names (card 160). The whitelist lives in parse_args.
+local WORLDS = {
+   space = { build = "worlds.space", audit = "worlds.space_audit",
+      templates = "worlds.space_templates" },
+   continent = { build = "worlds.continent", audit = "worlds.continent_audit",
+      templates = "worlds.continent_templates" },
+   office = { build = "worlds.office", audit = "worlds.office_audit",
+      templates = "worlds.office_templates" },
+}
 local Chronicle = require "sonder.chronicle"
 local Archive = require "sonder.archive"
 local Seal = require "sonder.seal"
@@ -50,6 +59,14 @@ local function parse_args(argv)
       elseif flag == "--audit" then
          opts.audit = true
          i = i + 1
+      elseif flag == "--world" then
+         if value ~= "space" and value ~= "office" and value ~= "continent" then
+            io.stderr:write(("--world wants a known world, got %q\n")
+               :format(tostring(value)))
+            os.exit(1)
+         end
+         opts.world = value
+         i = i + 2
       elseif flag == "--believes" then
          if type(value) ~= "string" or #value == 0 then
             io.stderr:write("--believes wants a faction name\n")
@@ -120,11 +137,13 @@ local function default_db_path(seed)
    return path
 end
 
--- The toy world (card 118): the Vessari and the Khedrun, one grain
--- market, and wars nobody schedules. All the cast and physics live
--- in worlds/toy.lua — this file stays a window.
+-- The default is the space world (card 118, renamed at card 160):
+-- the Vessari and the Khedrun, one grain market, and wars nobody
+-- schedules — the project's destination and the engine's regression
+-- anchor. The office is the eval next door.
 local opts = parse_args(arg)
-local u = Toyworld(opts.seed)
+local WORLD = WORLDS[opts.world or "space"]
+local u = require(WORLD.build)(opts.seed)
 
 local archive
 if opts.db ~= "none" then
@@ -150,7 +169,8 @@ local function fold(line)
    fingerprint = fnv.string(fingerprint, line)
 end
 
-local chronicle = Chronicle.new(u.annals)
+local TEMPLATES = require(WORLD.templates)
+local chronicle = Chronicle.new(u.annals, TEMPLATES)
 local function render()
    local lines = chronicle:lines()
    for i = 1, #lines do
@@ -198,7 +218,7 @@ if opts.believes then
       opts.as_of and (" — as of tick %d"):format(opts.as_of) or ""))
    local held = store:chronology(opts.as_of)
    for i = 1, #held do
-      local believed = Chronicle.believed_line(held[i])
+      local believed = Chronicle.believed_line(held[i], TEMPLATES)
       fold(believed)
       print(believed)
    end
@@ -217,23 +237,15 @@ if archive then
 end
 
 -- The double-entry audit (card 120), on request: refold the whole
--- history into books and check the two conservation laws. A viewer
--- like everything else here — and a second copy of chronicle.lua's
--- comma(), which the rule of three says may stay a coincidence.
+-- history into books under this world's legs and check whatever
+-- conservation laws the world declares (card 160). A viewer like
+-- everything else here; the summary line is the world's own,
+-- because the world knows what its books are called.
 if opts.audit then
-   local function comma(n)
-      local s = tostring(n)
-      local grouped = s:reverse():gsub("(%d%d%d)", "%1,"):reverse():gsub("^,", "")
-      return grouped
-   end
-   local report = Audit.of(u.annals,
+   local legs = require(WORLD.audit)
+   local report = Audit.of(u.annals, legs,
       { distance = u.distance, channel_speed = u.channel_speed })
-   print(("audit: %s¢ founded, %s¢ held; %s sacks founded, +%s "
-      .. "harvested, −%s eaten, −%s burned, %s held")
-      :format(comma(report.founded.cents), comma(report.held.cents),
-         comma(report.founded.grain), comma(report.totals.harvested),
-         comma(report.totals.eaten), comma(report.totals.burned),
-         comma(report.held.grain)))
+   print(legs.summary(report))
    for i = 1, #report.violations do
       print("audit violation: " .. report.violations[i])
    end

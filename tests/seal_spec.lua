@@ -5,7 +5,8 @@
 -- up here as a different seal.
 
 local Seal = require "sonder.seal"
-local toy = require "support.toy"
+local VOCAB = require "support.vocabulary"
+local space = require "support.space"
 
 -- The pinned seal of seed 1893 × 500 ticks. If this
 -- fails and you didn't mean to change history, you changed history.
@@ -54,13 +55,13 @@ local GOLDEN_SEAL = "3475639d8f49678b"
 
 describe("the golden master", function()
    it("seed 1893, 500 ticks, one exact seal", function()
-      local u = toy(GOLDEN_SEED)
+      local u = space(GOLDEN_SEED)
       u:run(GOLDEN_TICKS)
       assert.equal(GOLDEN_SEAL, Seal.of(u.annals):hex())
    end)
 
    it("passes twice in a row: a fresh universe, same seed, same seal", function()
-      local u = toy(GOLDEN_SEED)
+      local u = space(GOLDEN_SEED)
       u:run(GOLDEN_TICKS)
       assert.equal(GOLDEN_SEAL, Seal.of(u.annals):hex())
    end)
@@ -69,7 +70,7 @@ describe("the golden master", function()
       -- The gremlin: same seed, same world, plus one extra draw
       -- stolen from the Vessari's own stream at tick 250. One number
       -- nobody even looked at — and every harvest after it shifts.
-      local u = toy(GOLDEN_SEED)
+      local u = space(GOLDEN_SEED)
       u:add_system("gremlin", function(universe, _, tick)
          if tick == 250 then
             universe.rng:stream("vessari"):int(0, 4)
@@ -89,7 +90,7 @@ describe("the golden master", function()
       -- days, so the theft at 250 stays invisible until 252. A
       -- perturbation is only observable when it changes an *event* —
       -- the seal detects divergence, not tampering.
-      local clean, bent = toy(GOLDEN_SEED), toy(GOLDEN_SEED)
+      local clean, bent = space(GOLDEN_SEED), space(GOLDEN_SEED)
       bent:add_system("gremlin", function(universe, _, tick)
          if tick == 250 then
             universe.rng:stream("vessari"):int(0, 4)
@@ -106,13 +107,13 @@ end)
 
 describe("Seal", function()
    it("is a projection: recomputing agrees with itself", function()
-      local u = toy(7)
+      local u = space(7)
       u:run(10)
       assert.equal(Seal.of(u.annals):hex(), Seal.of(u.annals):hex())
    end)
 
    it("incremental folding agrees with all-at-once", function()
-      local u = toy(7)
+      local u = space(7)
       local rolling = Seal.new(u.annals.vocabulary)
       local folded = 0
       local function catch_up()
@@ -130,9 +131,9 @@ describe("Seal", function()
    end)
 
    it("order matters: a history is a sequence, not a set", function()
-      local u = toy(7)
+      local u = space(7)
       u:run(2)
-      local forward, backward = Seal.new(), Seal.new()
+      local forward, backward = Seal.new(u.annals.vocabulary), Seal.new(u.annals.vocabulary)
       for id = 1, u.annals:len() do
          forward:fold(u.annals:get(id))
       end
@@ -144,7 +145,7 @@ describe("Seal", function()
 
    it("refuses kinds the vocabulary has never heard of", function()
       assert.has_error(function()
-         Seal.new():fold{
+         Seal.new(VOCAB):fold{
             id = 1, tick = 0, kind = "future.mystery", location = "x",
             magnitude = 0, loudness = "loud", payload = {}, causes = {},
          }

@@ -19,15 +19,17 @@
 
 local byteform = require "sonder.byteform"
 local fnv = require "sonder.fnv"
-local default_vocabulary = require "sonder.vocabulary"
 
 local Seal = {}
 Seal.__index = Seal
 
 function Seal.new(vocabulary)
+   assert(type(vocabulary) == "table" and vocabulary.kinds,
+      "seal: a vocabulary is required — canonical bytes need the "
+      .. "world's dialect (card 160: worlds supply vocabularies)")
    return setmetatable({
       hash = fnv.offset,
-      vocabulary = vocabulary or default_vocabulary,
+      vocabulary = vocabulary,
    }, Seal)
 end
 

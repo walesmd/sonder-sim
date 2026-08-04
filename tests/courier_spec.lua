@@ -5,6 +5,7 @@
 -- pass-through courier, bit for bit.
 
 local Universe = require "sonder.universe"
+local VOCAB = require "support.vocabulary"
 
 -- A beacon: a system that emits one legal event (grain.hunger — the
 -- vocabulary doesn't care that nobody is hungry) from a chosen place
@@ -40,7 +41,7 @@ end
 
 describe("the courier", function()
    it("delivers across distance: three days away is three days late", function()
-      local u = Universe.new(7, {
+      local u = Universe.new(7, { vocabulary = VOCAB,
          distance = function(from, to)
             if from == to then return 0 end
             return 3
@@ -56,7 +57,7 @@ describe("the courier", function()
 
    it("channel speed divides the days, rounded up in integers", function()
       -- distance 5 at speed 2: ceil(5/2) = 3 ticks, no floats involved
-      local u = Universe.new(7, {
+      local u = Universe.new(7, { vocabulary = VOCAB,
          distance = function(from, to)
             if from == to then return 0 end
             return 5
@@ -71,7 +72,7 @@ describe("the courier", function()
    end)
 
    it("stamps the believed copy: tick is when it happened, learned is when the news landed", function()
-      local u = Universe.new(7, {
+      local u = Universe.new(7, { vocabulary = VOCAB,
          distance = function(from, to)
             if from == to then return 0 end
             return 3
@@ -86,7 +87,7 @@ describe("the courier", function()
    end)
 
    it("keeps id order when far news and fresh news land the same tick", function()
-      local u = Universe.new(7, {
+      local u = Universe.new(7, { vocabulary = VOCAB,
          distance = function(from, to, _)
             if from == "beacon-isle" and to == "far-shore" then return 3 end
             return 0
@@ -104,6 +105,8 @@ describe("the courier", function()
 
    it("at distance zero it is the pass-through courier, bit for bit", function()
       local function world(opts)
+         opts = opts or {}
+         opts.vocabulary = VOCAB
          local u = Universe.new(1893, opts)
          beacon(u, "beacon", 2, "beacon-isle")
          local _, store = listener(u, "here")
@@ -121,7 +124,7 @@ describe("the courier", function()
       -- speed 2 is ceil(1/2) = 1 tick, never 0 — a fast channel
       -- doesn't make far places adjacent
       local function arrival(d, speed)
-         local u = Universe.new(7, {
+         local u = Universe.new(7, { vocabulary = VOCAB,
             distance = function(from, to)
                if from == to then return 0 end
                return d
@@ -147,7 +150,7 @@ describe("the courier", function()
       -- scans the event one tick after it happened — the lookup must
       -- still be dated to the departure.
       local asked = {}
-      local u = Universe.new(7, {
+      local u = Universe.new(7, { vocabulary = VOCAB,
          distance = function(from, to, tick)
             if from == "far-isle" and to == "watch-post" then
                asked[#asked + 1] = tick
@@ -179,7 +182,7 @@ describe("the courier", function()
       -- tick later; at distance zero its computed arrival is already
       -- past, and the honest stamp is when the courier actually
       -- handed it over.
-      local u = Universe.new(7)
+      local u = Universe.new(7, { vocabulary = VOCAB })
       local _, store = listener(u, "here")
       u:add_faction("actor", "here", function(_, _, tick)
          if tick ~= 2 then return {} end
@@ -194,7 +197,7 @@ describe("the courier", function()
    end)
 
    it("delivers one event to different homes at different ticks", function()
-      local u = Universe.new(7, {
+      local u = Universe.new(7, { vocabulary = VOCAB,
          distance = function(from, to)
             if from == to then return 0 end
             if to == "near-shore" then return 2 end
@@ -224,7 +227,7 @@ describe("the courier", function()
       -- Event A happens first, far away; event B happens later,
       -- nearby. B arrives before A, so the store's arrival order
       -- inverts id order — which is the store working, not failing.
-      local u = Universe.new(7, {
+      local u = Universe.new(7, { vocabulary = VOCAB,
          distance = function(from, to, _)
             if from == "far-isle" and to == "here" then return 5 end
             return 0
@@ -243,7 +246,7 @@ describe("the courier", function()
 
    it("insists distances are non-negative integers", function()
       local function world(d)
-         local u = Universe.new(7, { distance = function() return d end })
+         local u = Universe.new(7, { vocabulary = VOCAB, distance = function() return d end })
          beacon(u, "beacon", 1, "beacon-isle")
          listener(u, "far-shore")
          u:run(1)
@@ -253,12 +256,12 @@ describe("the courier", function()
    end)
 
    it("insists on a lawful channel speed", function()
-      assert.has_error(function() Universe.new(7, { channel_speed = 0 }) end)
-      assert.has_error(function() Universe.new(7, { channel_speed = 1.5 }) end)
+      assert.has_error(function() Universe.new(7, { vocabulary = VOCAB, channel_speed = 0 }) end)
+      assert.has_error(function() Universe.new(7, { vocabulary = VOCAB, channel_speed = 1.5 }) end)
    end)
 
    it("insists a faction lives somewhere", function()
-      local u = Universe.new(7)
+      local u = Universe.new(7, { vocabulary = VOCAB })
       assert.has_error(function() u:add_faction("drifter", nil, function() return {} end) end)
       assert.has_error(function() u:add_faction("drifter", "", function() return {} end) end)
    end)

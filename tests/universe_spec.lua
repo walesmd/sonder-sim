@@ -1,10 +1,11 @@
 -- tests/universe_spec.lua — the heartbeat's contract.
 
 local Universe = require "sonder.universe"
+local VOCAB = require "support.vocabulary"
 
 describe("Universe", function()
    it("starts at tick 0 and counts by one", function()
-      local u = Universe.new(1)
+      local u = Universe.new(1, { vocabulary = VOCAB })
       assert.equal(0, u.tick)
       u:step()
       assert.equal(1, u.tick)
@@ -17,7 +18,7 @@ describe("Universe", function()
    end)
 
    it("runs systems in registration order, every tick", function()
-      local u = Universe.new(1)
+      local u = Universe.new(1, { vocabulary = VOCAB })
       local calls = {}
       u:add_system("market", function() calls[#calls + 1] = "market" end)
       u:add_system("war", function() calls[#calls + 1] = "war" end)
@@ -26,7 +27,7 @@ describe("Universe", function()
    end)
 
    it("hands each system its own named stream and the tick", function()
-      local u = Universe.new(1)
+      local u = Universe.new(1, { vocabulary = VOCAB })
       local got_stream, got_tick
       u:add_system("market", function(universe, stream, tick)
          assert.equal(u, universe)
@@ -38,7 +39,7 @@ describe("Universe", function()
    end)
 
    it("begins with genesis: event 1, tick 0, the seed on record", function()
-      local u = Universe.new(1893)
+      local u = Universe.new(1893, { vocabulary = VOCAB })
       assert.equal(1, u.annals:len())
       local e = u.annals:get(1)
       assert.equal("universe.genesis", e.kind)
@@ -48,7 +49,7 @@ describe("Universe", function()
    end)
 
    it("emit stamps the current tick and returns the id", function()
-      local u = Universe.new(1)
+      local u = Universe.new(1, { vocabulary = VOCAB })
       local id
       u:add_system("market", function(universe)
          id = universe:emit{
@@ -67,7 +68,7 @@ describe("Universe", function()
 
    it("same seed → the same universe, draw for draw", function()
       local function trace(seed, ticks)
-         local u = Universe.new(seed)
+         local u = Universe.new(seed, { vocabulary = VOCAB })
          local draws = {}
          u:add_system("market", function(_, stream)
             draws[#draws + 1] = stream:int(-3, 3)

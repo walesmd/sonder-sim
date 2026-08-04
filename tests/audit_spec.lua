@@ -1,11 +1,12 @@
 -- tests/audit_spec.lua — the double-entry audit held to its own
 -- standard: it must classify every kind the vocabulary can utter,
--- balance every universe the toy world can produce, and catch the
+-- balance every universe the space world can produce, and catch the
 -- counterfeits the annals has no grounds to refuse.
 
-local toy = require "support.toy"
+local space = require "support.space"
 local Audit = require "sonder.audit"
-local vocabulary = require "sonder.vocabulary"
+local vocabulary = require "worlds.space_vocabulary"
+local legs = require "worlds.space_audit"
 
 -- The world's road, as the audit wants it: the same map and divisor
 -- the courier reads.
@@ -36,21 +37,21 @@ describe("coverage", function()
       end
       table.sort(kinds) -- pairs() order is nobody's friend, even here
       for _, kind in ipairs(kinds) do
-         assert.is_true(Audit.classified(kind),
+         assert.is_true(Audit.classified(legs, kind),
             kind .. " has no ledger classification")
       end
    end)
 
    it("does not pretend to know foreign kinds", function()
-      assert.is_false(Audit.classified("diplomacy.betrayal"))
+      assert.is_false(Audit.classified(legs, "diplomacy.betrayal"))
    end)
 end)
 
 describe("conservation", function()
    it("balances a thousand days of seed 1893", function()
-      local u = toy(1893)
+      local u = space(1893)
       u:run(1000)
-      local report = Audit.of(u.annals, road(u))
+      local report = Audit.of(u.annals, legs, road(u))
       assert_honest(report)
       -- Card 122's drift died at card 153, and honestly: every
       -- event that moves a civ's books now happens at its own
@@ -61,28 +62,28 @@ describe("conservation", function()
       assert.equal(0, #report.mismatches)
       -- and the conservation identities carry their road terms:
       -- some of what exists is between places
-      assert.equal(report.founded.cents,
+      assert.equal(report.world.founded.cents,
          report.held.cents + report.on_road.cents)
-      assert.equal(report.founded.grain + report.totals.harvested
-         - report.totals.eaten - report.totals.burned,
+      assert.equal(report.world.founded.grain + report.world.totals.harvested
+         - report.world.totals.eaten - report.world.totals.burned,
          report.held.grain + report.on_road.grain)
    end)
 
    it("balances other seeds too", function()
       for _, seed in ipairs({ 7, 40412 }) do
-         local u = toy(seed)
+         local u = space(seed)
          u:run(300)
-         local report = Audit.of(u.annals, road(u))
+         local report = Audit.of(u.annals, legs, road(u))
          assert_honest(report)
-         assert.equal(report.founded.cents,
+         assert.equal(report.world.founded.cents,
             report.held.cents + report.on_road.cents)
       end
    end)
 
    it("without the road, mismatches go uncertified, not clean", function()
-      -- The toy no longer drifts, so a liar provides the mismatch:
+      -- The space world no longer drifts, so a liar provides the mismatch:
       -- detection works roadless, certification doesn't.
-      local u = toy(1893)
+      local u = space(1893)
       u:add_system("liar", function(universe, _, tick)
          if tick == 5 then
             universe:emit{
@@ -97,7 +98,7 @@ describe("conservation", function()
          end
       end)
       u:run(10)
-      local report = Audit.of(u.annals)
+      local report = Audit.of(u.annals, legs)
       assert.is_true(#report.mismatches > 0)
       assert.is_nil(report.unexplained) -- unchecked is not "none"
    end)
@@ -111,7 +112,7 @@ describe("the counterfeiter", function()
    -- demands the audit name it.
 
    local function forge(seed, payload)
-      local u = toy(seed)
+      local u = space(seed)
       u:add_system("counterfeiter", function(universe, _, tick)
          if tick == 5 then
             universe:emit{
@@ -125,7 +126,7 @@ describe("the counterfeiter", function()
          end
       end)
       u:run(10)
-      return Audit.of(u.annals)
+      return Audit.of(u.annals, legs)
    end
 
    it("catches a trade whose total is not units × price", function()
@@ -145,7 +146,7 @@ describe("the counterfeiter", function()
       -- its road legs — so the impossible purchase is now an
       -- impossible *dispatch*: a payment.shipped for more cents
       -- than the payer ever held.
-      local u = toy(7)
+      local u = space(7)
       u:add_system("counterfeiter", function(universe, _, tick)
          if tick == 5 then
             universe:emit{
@@ -160,7 +161,7 @@ describe("the counterfeiter", function()
          end
       end)
       u:run(10)
-      local report = Audit.of(u.annals)
+      local report = Audit.of(u.annals, legs)
       local caught = false
       for _, v in ipairs(report.violations) do
          if v:find("negative treasury", 1, true) then
@@ -179,7 +180,7 @@ describe("the liar", function()
    -- arithmetic), explained mismatches (ignorance, the product), and
    -- unexplained mismatches (somebody's books are lying).
    it("catches a forged tally the road cannot explain", function()
-      local u = toy(7)
+      local u = space(7)
       u:add_system("liar", function(universe, _, tick)
          if tick == 5 then
             universe:emit{
@@ -197,7 +198,7 @@ describe("the liar", function()
          end
       end)
       u:run(10)
-      local report = Audit.of(u.annals, road(u))
+      local report = Audit.of(u.annals, legs, road(u))
       assert.equal(0, #report.violations)
       assert.is_true(#report.unexplained > 0,
          "a 9,999-sack lie passed as ignorance")
@@ -209,15 +210,15 @@ describe("the report", function()
       -- Determinism of the report itself: same log, same report,
       -- field for field — the audit is a projection, so two folds of
       -- one history may not disagree.
-      local u1 = toy(1893)
+      local u1 = space(1893)
       u1:run(200)
-      local a = Audit.of(u1.annals)
-      local u2 = toy(1893)
+      local a = Audit.of(u1.annals, legs)
+      local u2 = space(1893)
       u2:run(200)
-      local b = Audit.of(u2.annals)
+      local b = Audit.of(u2.annals, legs)
       assert.equal(#a.violations, #b.violations)
       assert.equal(a.held.cents, b.held.cents)
       assert.equal(a.held.grain, b.held.grain)
-      assert.equal(a.totals.burned, b.totals.burned)
+      assert.equal(a.world.totals.burned, b.world.totals.burned)
    end)
 end)
