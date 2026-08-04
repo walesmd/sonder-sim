@@ -96,6 +96,22 @@ adds it here, in the same PR.
   (learned ← happened). Same templates as the chronicle — what
   differs is never the words, only the dates and the order.
   (post 0011)
+- **shipment** — matter or money between places: a departure event
+  (the actor's act, at the origin) paired with an arrival event
+  (physics' verdict, at the destination) by cause id. Its identity
+  is the departure event; its position is a projection; its
+  arrival is never a promise. Transfers are net zero — grain
+  leaving A arrives at B — where news only ever copies. (post 0012)
+- **road ledger** — the audit's account for what is between places:
+  every departure books onto it under its own event id, every
+  arrival drains it exactly, and the conservation identities read
+  founded = held + on-road, to the sack and the cent. Real
+  accounting calls it goods in transit. Punctuality is never
+  audited — only conservation. (post 0012)
+- **travel calendar** — the shared scheduler (one per owner:
+  courier, battlefield, exchange, roads) that holds every traveling
+  thing until its arrival tick. Cargo-blind: what an arrival means
+  belongs to the owner. (post 0012)
 - **intent** — an event spec a faction's decide() returns; the
   universe emits it through the same strict validation as
   everything else. Factions don't write history, they petition it.

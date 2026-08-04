@@ -200,12 +200,22 @@ the road (reported + in-flight = audited to the cent; explained
 mismatches are the product, unexplained are lies, violations stay
 zero), and `--believes NAME [--as-of T]` renders any faction's
 private chronology double-dated — three fingerprints, one seal
-(card 122, post 0011 *News at Ship Speed*). Next up:
+(card 122, post 0011 *News at Ship Speed*); and nothing teleports —
+the travel scheduler extracted (sonder/travel.lua, one calendar per
+owner, adopted by the courier with a bit-identical seal proof),
+goods and payment riding the roads as paired departure/arrival
+kinds (cargo.*, payment.*, war.returned; the trade is just the
+agreement now), the audit keeping a road ledger with conservation
+reading founded = held + on-road, and the drift card 122
+legitimized dying honestly — every book-moving event happens at its
+owner's gates, so self-knowledge is exact and mismatches are zero,
+earned (card 153, post 0012 *Nothing Teleports*). Next up:
 
-- the courier's successors, seeded by card 122 as cards 150–158:
-  carriers that can be somebody, degradation, interpretation, goods
-  that stop teleporting, exchanges in the plural, counterfeiting as
-  content, reception-side loudness, and in-flight actors
+- the courier's successors, cards 150–159: carriers that can be
+  somebody, degradation, interpretation, exchanges in the plural,
+  counterfeiting as content, reception-side loudness (plus the
+  loudness stamp re-judgment punted there), in-flight actors, and
+  money grown up
 - the road to thirty species, one lore card at a time (cards 133–146,
   each entry arriving with its eval note)
 

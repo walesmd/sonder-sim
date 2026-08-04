@@ -1,5 +1,17 @@
 # Notebook — card 153: travel as a system (goods don't teleport)
 
+*(Closed 2026-08-03, session 1 — a single-session card, design to
+post. The official re-cut landed (seal 3475639d8f49678b, ledger
+entry in seal_spec), post 0012 shipped in both tracks with the
+merchant's sixteen-day ledger as the front door and the drift's
+death as the spine, and the docs sweep updated the glossary
+(shipment, road ledger, travel calendar), README, and CLAUDE.md.
+148 specs green, zero failures. The does-this-need-a-visual
+question was asked: yes — the settlement flow diagram is in
+complete.md. Post tag `post/0012` goes on the merge commit. One
+punt on the record: the price-war bet is settled (lost), and the
+hunger-cycle ecology stands per the no-nostalgia ruling.)*
+
 Branch: `153-travel`. Card text: "Goods don't instantly travel from
 one point of the universe to the other — but 122 fakes it: the
 exchange keeps settling trades instantly, because that card is only

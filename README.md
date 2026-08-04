@@ -93,11 +93,18 @@ exactly the news still in flight — and `--believes` renders any
 faction's private newspaper, double-dated, at any tick. Three
 fingerprints, one seal — post 0011,
 [*News at Ship Speed*](docs/posts/0011-news-at-ship-speed/complete.md)
-(tag `post/0011`). Ahead: the courier's successors (carriers that
-can be somebody, degradation, goods that stop teleporting — cards
-150–158), and the lore shelf's road to thirty species. Watching now
-means watching from very nearly the beginning, which is rather the
-point.
+(tag `post/0011`). And nothing teleports anymore: goods and payment
+physically ride the roads (a shared travel scheduler, born with a
+bit-identical equivalence proof), war parties carry their spoils
+home, the audit keeps a goods-in-transit account — and the belief
+drift of the previous card died honestly, because everything that
+moves a nation's books now happens at its own gates — post 0012,
+[*Nothing Teleports*](docs/posts/0012-nothing-teleports/complete.md)
+(tag `post/0012`). Ahead: the rest of the courier's successors
+(carriers that can be somebody, degradation, interpretation,
+exchanges in the plural — cards 150–159), and the lore shelf's road
+to thirty species. Watching now means watching from very nearly the
+beginning, which is rather the point.
 
 ## Building
 
