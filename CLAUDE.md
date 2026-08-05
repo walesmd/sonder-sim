@@ -72,8 +72,10 @@ are jointly owned and published.
   code and some of the project's most consequential decisions); the
   post obligation stands either way. Post shape, in order: excerpt
   showing the new thing in the wild (a chronicle excerpt when there's
-  code; the artifact itself when there isn't) → the design → the CS
-  underneath → what we got wrong.
+  code; the artifact itself when there isn't) → why now (why this
+  card, in this moment — what debt or door opened, what's queued
+  behind it; added at post 0014 after twelve posts shipped without
+  it) → the design → the CS underneath → what we got wrong.
 - A post is a directory with two public tracks (ADR 0003, card 147):
   `docs/posts/NNNN-slug/complete.md` — the canonical collegiate essay —
   and `simple.md` — a plain-language companion, ~950 words, at most one
@@ -229,16 +231,27 @@ civilizations, adjacency-graph interior, four-column books, no
 exchange — bilateral trade as four journeys with single-fire
 settlement: act the morning you learn). Three worlds, three golden
 seals, 162 specs, one engine that got smaller with every world it
-gained (card 160, post 0013 *Whatever That Universe May Be*).
+gained (card 160, post 0013 *Whatever That Universe May Be*); and
+the carrier taxonomy, designed on paper for all three worlds at
+once — movement as a system (five columns: speed, coverage, failure
+profile with a declared threat surface, cost, owner), net-zero
+versus copyable payloads, addressed and radiated as the only
+delivery shapes with rumor demoted to behavior (one plus
+shipments), the witness rule (an event's news exists only in the
+minds that caught it; the annals still hears every tree), carriage
+as trade with custody and manifests, per-world migration off the
+field row, and a build map assigning cards 150–159 their pieces —
+zero code, on purpose (card 161, ADR 0005, post 0014 *The Witness
+Rule*).
 Next up:
 
-- the carriers research card: what carries things and how fast,
-  designed against hulls, caravans, and email in the same breath —
-  then the courier's successors, cards 150–159 (carriers that can
-  be somebody, degradation, interpretation, exchanges in the
-  plural, counterfeiting as content, reception-side loudness plus
-  the stamp re-judgment punted there, in-flight actors, and money
-  grown up)
+- the courier's successors, cards 150–159, each with its piece of
+  the carrier taxonomy assigned by ADR 0005's build map — card 150
+  first (the mechanism row schema in the engine, proven by three
+  unmoving seals), then degradation, interpretation, exchanges in
+  the plural, counterfeiting as content, reception-side loudness
+  plus the stamp re-judgment punted there, in-flight actors, and
+  money grown up
 - the road to thirty species, one lore card at a time (cards 133–146,
   each entry arriving with its eval note)
 

@@ -128,6 +128,46 @@ adds it here, in the same PR.
   everything else. Factions don't write history, they petition it.
   (post 0006)
 
+## Carriage (designed at post 0014; built by cards 150–159)
+
+- **mechanism** — one way of moving anything across distance: a row
+  in the carrier taxonomy — speed, coverage (which destinations,
+  named how, available *when*), a failure profile with a declared
+  threat surface, cost, and owner. Rows are state (events can change
+  every cell; mechanisms are born, improve, and die), mechanisms are
+  data never code, and no fallback row covers the world. (post 0014)
+- **net-zero / copyable** — the two payload disciplines, and the
+  only split the taxonomy makes: conserved cargo (grain that leaves
+  the granary is gone from it; the road ledger watches) versus
+  reproducible cargo (telling costs the teller nothing; belief
+  semantics watch). One taxonomy carries both. (post 0014)
+- **addressed / radiated** — the two delivery shapes: to a name the
+  world's map can price (and an address can sail), or into a
+  neighborhood of the map, whatever that map means by nearness.
+  Relay is deliberately not a shape — a rumor is one *plus*
+  shipments. (post 0014)
+- **retelling** — a fresh emission composed from the teller's
+  beliefs and agenda, cause-linked to the news that prompted it; how
+  information travels beyond its witnesses without freight.
+  (post 0014)
+- **the witness rule** — an event's news exists only in the minds
+  that caught it: natural media are how witnesses witness,
+  everything after the catch is somebody carrying, and no witness
+  means no news, forever. Law 2 untouched — the annals still records
+  every tree that falls. (post 0014)
+- **custody** — whose hands a payload sits in while carried; what
+  the road ledger's on-road column names when the carrier is
+  somebody. (post 0014)
+- **manifest** — what a carrier knows it hauls: total knowledge for
+  net-zero cargo, but for copyable cargo the manifest stops at the
+  envelope — reading the contents is a behavior, never a schema
+  default. (post 0014)
+- **the field row** — the licensed placeholder, named at last:
+  today's courier re-read as a natural medium with infinite range,
+  no owner, no failure, no cost. Doctrinally retired by the witness
+  rule; each world retires it in code on its own schedule.
+  (posts 0011, 0014)
+
 ## The universe file
 
 - **universe file** (`universe.db`) — the SQLite database a run
@@ -189,9 +229,11 @@ adds it here, in the same PR.
   the *expressibility* eval (authored story leads; the engine must
   host it); a world is the *emergence* eval (temperaments lead;
   history must precipitate). (post 0007)
-- **the toy world** (`src/worlds/toy.lua`) — the first world: two
-  civilizations, one commodity, one market, wars nobody plans. Also
-  the shared spec fixture, via `tests/support/toy.lua`. (post 0007)
+- **the space world** (`src/worlds/space.lua`) — the first world,
+  born as "the toy world" and renamed at card 160 to its real name,
+  the destination: two civilizations, one commodity, one market,
+  wars nobody plans. Also the shared spec fixture, via
+  `tests/support/space.lua`. (posts 0007, 0013)
 - **the Vessari** — the toy world's mercantile half: they price
   things — surplus sellers with a reserve, an undercut, and a floor
   below which they simply wait. (post 0007; lore:
