@@ -108,9 +108,17 @@ travels by letter, all three running on one engine that got smaller
 with every world it gained. Anything built here must serve all
 three, or it's one world's content — post 0013,
 [*Whatever That Universe May Be*](docs/posts/0013-whatever-that-universe-may-be/complete.md)
-(tag `post/0013`). Ahead: the carriers research (hulls, caravans,
-and email in the same breath), the courier's successors (cards
-150–159), and the lore shelf's road to thirty species. Watching now
+(tag `post/0013`). And the field model's replacement is designed —
+on paper, for all three worlds at once: everything that moves rides
+a mechanism (one row: speed, coverage, failure profile, cost,
+owner), cargo splits into net-zero and copyable, a rumor is one
+*plus* shipments, and an event's news exists only in the minds that
+caught it — the witness rule. Zero code, one ADR, and a build map
+handing each piece to the card that builds it — post 0014,
+[*The Witness Rule*](docs/posts/0014-the-witness-rule/complete.md)
+(tag `post/0014`). Ahead: card 150 builds the carrier rows the
+taxonomy designed, the courier's other successors follow (cards
+151–159), and the lore shelf's road to thirty species. Watching now
 means watching from very nearly the beginning, which is rather the
 point.
 
