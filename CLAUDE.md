@@ -242,16 +242,25 @@ minds that caught it; the annals still hears every tree), carriage
 as trade with custody and manifests, per-world migration off the
 field row, and a build map assigning cards 150–159 their pieces —
 zero code, on purpose (card 161, ADR 0005, post 0014 *The Witness
-Rule*).
+Rule*); and the carriage — mechanism rows in the engine
+(sonder/carriage.lua: radiated and addressed shapes, strict
+validation, earliest arrival wins, nil is the witness rule), the
+field row declared as data in space and the office (rung 1), and
+Harrow piloting rung 2 with earshot and letters — where the golden
+seal famously did not move, because no Harrow mind ever read the
+field's over-delivery: history stood still while belief stores
+shrank to what was witnessed or carried (card 150, post 0015 *The
+Seal That Didn't Move*).
 Next up:
 
-- the courier's successors, cards 150–159, each with its piece of
-  the carrier taxonomy assigned by ADR 0005's build map — card 150
-  first (the mechanism row schema in the engine, proven by three
-  unmoving seals), then degradation, interpretation, exchanges in
-  the plural, counterfeiting as content, reception-side loudness
-  plus the stamp re-judgment punted there, in-flight actors, and
-  money grown up
+- the courier's remaining successors, cards 151–159, each with its
+  piece of the carrier taxonomy assigned by ADR 0005's build map —
+  degradation (now a property of a mechanism that exists),
+  interpretation, exchanges in the plural, counterfeiting as
+  content, reception-side loudness plus the stamp re-judgment
+  punted there, in-flight actors, and money grown up; the space
+  world's own rung-2 migration awaits a card that must answer for
+  the Fleet
 - the road to thirty species, one lore card at a time (cards 133–146,
   each entry arriving with its eval note)
 

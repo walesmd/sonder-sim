@@ -246,3 +246,34 @@ range today, the licensed simplification 157 retires; when
 detection floors land, the shellsea's ice becomes a boundary in
 the medium and the under-ice civilization never sees the star die,
 exactly the story the world library demands stay tellable.
+
+## Session 2, continued — the post and the sweep
+
+Mike: commit and move to the next task. Part 1 committed
+(`f9b4f3b`); the next task in the rhythm is the post.
+
+Post plan: **post 0015, *The Seal That Didn't Move*** — the pilot's
+surprise is the story. Front door: the tethri's believes view,
+real output from seed 7 (what's *missing* is the excerpt's point).
+Why-now: the build map's sequencing, the field as two-card-old
+debt. CS underneath: the two shapes as unicast and scoped broadcast
+(range as TTL; the field as flooding), and **characterization
+testing** (Feathers 2004) — the golden seal as a characterization
+test whose surprise was the finding. The does-this-need-a-visual
+question was asked and answered yes: one Mermaid map of Harrow
+showing how far a declaration of war carries (earshot 2 from
+korrag-height; the valley at 4 learns from the raid itself).
+What-we-got-wrong: the predicted re-cut that never happened
+(reasoned from the mechanism instead of the consumers); "the first
+event nobody learned about" overclaimed (per-faction ignorance,
+not oblivion — on Harrow every event happens at somebody's home);
+the stray lint directive.
+
+Docs sweep: glossary (courier entry de-staled — it hardcoded the
+field arithmetic; mechanism and field-row entries gained their
+built-at-150 status), README status through post 0015, CLAUDE.md
+status and next-up (150 done; 151–159 remain; space's rung 2 noted
+as its own future card), ADR 0004's world-interface list amended
+with mechanisms (marked as the card-150 amendment). Engine version
+left at 0.1.0 — flagged in the PR as an open question for Mike
+rather than bumped unilaterally.

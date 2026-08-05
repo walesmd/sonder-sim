@@ -116,10 +116,20 @@ owner), cargo splits into net-zero and copyable, a rumor is one
 caught it — the witness rule. Zero code, one ADR, and a build map
 handing each piece to the card that builds it — post 0014,
 [*The Witness Rule*](docs/posts/0014-the-witness-rule/complete.md)
-(tag `post/0014`). Ahead: card 150 builds the carrier rows the
-taxonomy designed, the courier's other successors follow (cards
-151–159), and the lore shelf's road to thirty species. Watching now
-means watching from very nearly the beginning, which is rather the
+(tag `post/0014`). And the rows are real: news rides declared
+mechanisms now (`sonder/carriage.lua`) — the field survives only as
+a row two worlds admit to, while Harrow pilots its retirement with
+earshot and letters. The pilot's surprise: the golden seal did not
+move, because no Harrow mind had ever read what the field
+over-delivered — history stood still while every civilization's
+knowledge shrank to what was witnessed or carried. The valley no
+longer hears the mountains declare war; the raid arrives
+unannounced — post 0015,
+[*The Seal That Didn't Move*](docs/posts/0015-the-seal-that-didnt-move/complete.md)
+(tag `post/0015`). Ahead: the courier's remaining successors (cards
+151–159 — degradation now has a mechanism to be a property of), and
+the lore shelf's road to thirty species. Watching now means
+watching from very nearly the beginning, which is rather the
 point.
 
 ## Building

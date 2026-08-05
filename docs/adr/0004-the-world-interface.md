@@ -35,6 +35,10 @@ contains:
 - **a map** — distance(from, to, tick) → days, whatever distance
   means there (void between stars, hops through bordering
   territory, hops through an org chart);
+- **its mechanisms** — the carriage rows saying what carries news
+  here and how fast (amended at card 150, per ADR 0005: row schema
+  is engine, row instances are world content; a world that declares
+  nothing gets the field row at channel speed);
 - **chronicle templates** — the world's own sentences (the
   follower machinery is engine; the prose is world);
 - **audit legs and conservation identities** — what each kind does

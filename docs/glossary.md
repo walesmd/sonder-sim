@@ -81,10 +81,12 @@ adds it here, in the same PR.
   a push-based memory of the events that have reached it. Ignorance
   is free — no events received, no rows. (post 0006)
 - **courier** — the machinery that delivers events into belief
-  stores, at the pace of distance: every event reaches every
-  faction ceil(distance ÷ channel speed) ticks after it happens,
-  stamped with the tick it arrived. Degradation and interpretation
-  will arrive through the same door. (post 0006; post 0011)
+  stores, on the mechanism rows the world declares (the carriage,
+  card 150): arrival is the earliest reaching row's answer, each
+  believed copy stamped with the tick it landed — and when no row
+  reaches a faction, the event is never delivered (the witness
+  rule). Degradation and interpretation will arrive through the
+  same door. (posts 0006, 0011, 0015)
 - **channel speed** — the divisor that turns distance into delay.
   A parameter, not a constant; today it is 1 everywhere. (post 0011)
 - **learned** — the arrival stamp on a believed copy: the tick the
@@ -128,14 +130,17 @@ adds it here, in the same PR.
   everything else. Factions don't write history, they petition it.
   (post 0006)
 
-## Carriage (designed at post 0014; built by cards 150–159)
+## Carriage (designed at post 0014; landing since card 150)
 
 - **mechanism** — one way of moving anything across distance: a row
   in the carrier taxonomy — speed, coverage (which destinations,
   named how, available *when*), a failure profile with a declared
   threat surface, cost, and owner. Rows are state (events can change
   every cell; mechanisms are born, improve, and die), mechanisms are
-  data never code, and no fallback row covers the world. (post 0014)
+  data never code, and no fallback row covers the world. In the
+  engine since card 150: `sonder/carriage.lua`, consuming speed and
+  coverage; the remaining columns arrive with their owning cards.
+  (posts 0014, 0015)
 - **net-zero / copyable** — the two payload disciplines, and the
   only split the taxonomy makes: conserved cargo (grain that leaves
   the granary is gone from it; the road ledger watches) versus
@@ -163,10 +168,12 @@ adds it here, in the same PR.
   envelope — reading the contents is a behavior, never a schema
   default. (post 0014)
 - **the field row** — the licensed placeholder, named at last:
-  today's courier re-read as a natural medium with infinite range,
+  the old courier re-read as a natural medium with infinite range,
   no owner, no failure, no cost. Doctrinally retired by the witness
-  rule; each world retires it in code on its own schedule.
-  (posts 0011, 0014)
+  rule; each world retires it in code on its own schedule — since
+  card 150 it is data the world declares (`Carriage.field`), still
+  standing in space and the office, retired on Harrow for earshot
+  and letters. (posts 0011, 0014, 0015)
 
 ## The universe file
 
