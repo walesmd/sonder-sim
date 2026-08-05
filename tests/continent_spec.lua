@@ -150,4 +150,85 @@ describe("the continent", function()
             "no sentence for " .. kind)
       end
    end)
+
+   -- Card 150's pilot: the field is retired on Harrow. Earshot and
+   -- letters carry everything the minds ever read — which is why the
+   -- golden seal above did not move — and everything else now
+   -- reaches no one, because nothing carries it. The witness rule,
+   -- observable.
+
+   local function store_of(u, name)
+      for i = 1, #u.factions do
+         if u.factions[i].name == name then
+            return u.factions[i].store
+         end
+      end
+   end
+
+   it("the witness rule, lived: the steppe never hears the mountains' hunger", function()
+      local u = continent(7)
+      u:run(400)
+      local hungers = 0
+      for id = 1, u.annals:len() do
+         local e = u.annals:get(id)
+         if e.kind == "continent.hunger"
+            and e.location == "korrag-height" then
+            hungers = hungers + 1
+         end
+      end
+      assert.is_true(hungers > 0, "the mountains never even went hungry")
+      -- the mountains know their own hunger; the steppe, three days
+      -- of territory away, has no rows about it — not late: never
+      local korrag = store_of(u, "korrag"):recall("continent.hunger")
+      assert.is_true(#korrag > 0)
+      local tethri = store_of(u, "tethri"):recall("continent.hunger")
+      for i = 1, #tethri do
+         assert.is_not.equal("korrag-height", tethri[i].location,
+            "hunger crossed the steppe with no carrier")
+      end
+   end)
+
+   it("letters reach their addressee at road pace, and nobody else", function()
+      local u = continent(7)
+      u:run(150)
+      -- the mountains receive the valley's grain offers four days
+      -- after they were written: around the passes, priced honestly
+      local korrag = store_of(u, "korrag"):recall("continent.offer")
+      local from_valley = 0
+      for i = 1, #korrag do
+         local o = korrag[i]
+         if o.payload.seller == "valebright" then
+            from_valley = from_valley + 1
+            assert.equal("korrag", o.payload.buyer)
+            assert.equal(4, o.learned - o.tick,
+               "a letter that did not take the road")
+         end
+      end
+      assert.is_true(from_valley > 0, "the valley never wrote")
+      -- the Selm — everyone's neighbor by water — no longer read
+      -- everyone's mail: no offer between two other civilizations
+      -- ever lands in their store
+      local selm = store_of(u, "selm"):recall("continent.offer")
+      for i = 1, #selm do
+         local p = selm[i].payload
+         assert.is_true(p.buyer == "selm" or p.seller == "selm",
+            "a letter between strangers landed on the Selm's table")
+      end
+   end)
+
+   it("earshot ends where the range says: foundings carry one pass, not two", function()
+      local u = continent(7)
+      u:run(5)
+      -- from selm-water: the valley (2 days) and the steppe (2) are
+      -- in earshot of a loud founding; the mountains (3) and the
+      -- gate (4) are not, and no later tick changes that
+      local heard = {}
+      local founded = store_of(u, "selm"):recall("continent.founded")
+      for i = 1, #founded do
+         heard[founded[i].payload.name] = true
+      end
+      assert.is_true(heard.selm and heard.valebright and heard.tethri)
+      assert.is_nil(heard.korrag)
+      assert.is_nil(heard.ashfold)
+   end)
 end)
