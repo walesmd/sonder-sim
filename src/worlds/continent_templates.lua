@@ -37,6 +37,12 @@ templates["continent.accept"] = function(e)
       :format(p.buyer, p.seller, p.units, p.commodity, p.total)
 end
 
+templates["continent.letter-lost"] = function(e)
+   local p = e.payload
+   return ("somewhere on the road from %s to %s, a letter is lost")
+      :format(p.from, p.to)
+end
+
 templates["war.declared"] = function(e)
    local p = e.payload
    return ("the %s declare war on the %s — %d hungry days were the last insult")

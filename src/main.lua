@@ -37,12 +37,13 @@ local fnv = require "sonder.fnv"
 -- convention (card 150): the version tracks the universe, not the
 -- code. Minor bumps when a golden seal moves — the same seed now
 -- produces a different history, and provenance must say so; a seal
--- re-cut must never ship without one. Patch bumps when the engine
--- changes but every seal stands (this one: the carriage landed and
--- nothing archived went stale). Docs, worlds, and specs bump
--- nothing. Precise identification is the git commit in provenance;
--- this number only names determinism epochs.
-local ENGINE_VERSION = "0.1.1"
+-- re-cut must never ship without one (this one: card 151, the
+-- roads can lose a letter — the project's first deliberate history
+-- fork). Patch bumps when the engine changes but every seal
+-- stands. Docs, worlds, and specs bump nothing. Precise
+-- identification is the git commit in provenance; this number only
+-- names determinism epochs.
+local ENGINE_VERSION = "0.2.0"
 
 local function parse_args(argv)
    local opts = { seed = 1893, ticks = 10 }

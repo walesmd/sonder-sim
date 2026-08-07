@@ -22,9 +22,17 @@ describe("the continent", function()
       --   9be58120c48a121b — first cut (card 160): five civilizations,
       --                      bilateral letters, single-fire settlement
       --                      (act the morning you learn)
+      --   c6dc5ef5b428aa85 — re-cut (card 151): the roads can lose a
+      --                      letter — one encounter per fifty
+      --                      rider-days, drawn on rng.courier at
+      --                      departure, landing on its true day. The
+      --                      project's first deliberate history
+      --                      fork; engine 0.2.0 under the card-150
+      --                      convention (a seal re-cut never ships
+      --                      without a minor bump)
       local u = continent(7)
       u:run(200)
-      assert.equal("9be58120c48a121b", Seal.of(u.annals):hex())
+      assert.equal("c6dc5ef5b428aa85", Seal.of(u.annals):hex())
    end)
 
    it("trade settles by letter: offers ride, acceptances ride back, goods and money follow", function()
@@ -214,6 +222,77 @@ describe("the continent", function()
          assert.is_true(p.buyer == "selm" or p.seller == "selm",
             "a letter between strangers landed on the Selm's table")
       end
+   end)
+
+   -- Card 151: the roads can lose a letter. The fate is drawn at
+   -- departure on the courier's own stream; the loss lands on its
+   -- true day, on the road, reason-free, witnessed by no one.
+
+   it("the roads take letters, on their true day, citing what they carried", function()
+      local u = continent(7)
+      u:run(400)
+      local losses = 0
+      for id = 1, u.annals:len() do
+         local e = u.annals:get(id)
+         if e.kind == "continent.letter-lost" then
+            losses = losses + 1
+            assert.equal("the-roads", e.location)
+            local carried = u.annals:get(e.causes[1])
+            assert.is_true(carried.kind == "continent.offer"
+               or carried.kind == "continent.accept",
+               "a loss that carried nothing")
+            -- strictly after departure (the annals does not stamp
+            -- a death before it happens), within the road's days
+            local road = u.distance(carried.location,
+               e.payload.to, carried.tick)
+            assert.is_true(e.tick > carried.tick,
+               "a loss stamped before the rider set out")
+            assert.is_true(e.tick - carried.tick <= road,
+               "a rider lost after they would have arrived")
+         end
+      end
+      assert.is_true(losses > 0, "four hundred days and safe roads")
+   end)
+
+   it("a lost letter is witnessed by no one: the first oblivion in production", function()
+      local u = continent(7)
+      u:run(400)
+      for i = 1, #u.factions do
+         assert.equal(0,
+            #u.factions[i].store:recall("continent.letter-lost"),
+            u.factions[i].name .. " somehow heard a rider die alone")
+      end
+   end)
+
+   it("a lost acceptance half-settles: paid, never shipped, chartered risk", function()
+      -- The buyer acts on their own yes at their own gates; the
+      -- seller never learns it. Payment rides to a seller who never
+      -- ships — a strongbox arriving for no reason the seller
+      -- knows. Settlement risk the charter blessed; recourse is
+      -- card 159's business. The audit stays clean throughout (the
+      -- four-columns spec above runs the same 400 days).
+      local u = continent(7)
+      u:run(400)
+      local accept_ids, shipped, paid = {}, {}, {}
+      for id = 1, u.annals:len() do
+         local e = u.annals:get(id)
+         if e.kind == "continent.accept" then
+            accept_ids[#accept_ids + 1] = e.id
+         elseif e.kind == "cargo.shipped" then
+            shipped[e.causes[1]] = true
+         elseif e.kind == "payment.shipped" then
+            paid[e.causes[1]] = true
+         end
+      end
+      local half = 0
+      for i = 1, #accept_ids do
+         local id = accept_ids[i]
+         if paid[id] and not shipped[id] then
+            half = half + 1
+         end
+      end
+      assert.is_true(half > 0,
+         "no trade ever half-settled — the roads are too kind")
    end)
 
    it("earshot ends where the range says: foundings carry one pass, not two", function()

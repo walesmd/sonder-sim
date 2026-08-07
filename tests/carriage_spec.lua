@@ -109,6 +109,31 @@ describe("carriage rows", function()
          Carriage.new({ { name = "x", shape = "addressed", speed = 1 } }, d)
       end)
    end)
+
+   it("insists on lawful encounter profiles", function()
+      local d = function() return 0 end
+      local function letters(encounters)
+         return { { name = "letters", shape = "addressed", speed = 1,
+            to = { ["spec.letter"] = "to" }, encounters = encounters } }
+      end
+      -- a lawful profile passes
+      Carriage.new(letters{ per_day = 50, lost = "spec.letter-lost",
+         where = "spec-roads" }, d)
+      -- riders must have at least a coin-flip's chance
+      assert.has_error(function()
+         Carriage.new(letters{ per_day = 1, lost = "x", where = "y" }, d)
+      end)
+      -- the world must provide the words and the place
+      assert.has_error(function()
+         Carriage.new(letters{ per_day = 50 }, d)
+      end)
+      -- and radiated rows take no encounters, today
+      assert.has_error(function()
+         Carriage.new({ { name = "shout", shape = "radiated", speed = 1,
+            range = "everywhere",
+            encounters = { per_day = 50, lost = "x", where = "y" } } }, d)
+      end)
+   end)
 end)
 
 describe("the courier on declared rows", function()
@@ -188,5 +213,100 @@ describe("the courier on declared rows", function()
       declared:run(6)
       assumed:run(6)
       assert.same(b():chronology(), a():chronology())
+   end)
+
+   -- Card 151: the roads can lose what they carry. A dangerous
+   -- little universe: one writer, one reader, three days of road,
+   -- and a coin-flip encounter every day of it.
+   local LOSSY_VOCAB = {
+      schema_version = 1,
+      loudnesses = { "loud", "local", "quiet" },
+      kinds = {
+         ["universe.genesis"] = {
+            doc = "a universe begins",
+            payload = { { "seed", "integer" } },
+         },
+         ["spec.letter"] = {
+            doc = "a letter with a named recipient",
+            payload = { { "to", "string" }, { "n", "integer" } },
+         },
+         ["spec.letter-lost"] = {
+            doc = "the road took one",
+            payload = { { "from", "string" }, { "to", "string" } },
+         },
+      },
+   }
+   local function lossy_universe(seed)
+      local u = Universe.new(seed, {
+         vocabulary = LOSSY_VOCAB,
+         distance = function(from, to)
+            if from == to or from == "the-void" or to == "the-void" then
+               return 0
+            end
+            if from == "spec-roads" or to == "spec-roads" then
+               return 10 -- beyond every ear
+            end
+            return 3
+         end,
+         mechanisms = {
+            { name = "earshot", shape = "radiated", speed = 1,
+               range = { loud = 1, ["local"] = 0, quiet = 0 } },
+            { name = "letters", shape = "addressed", speed = 1,
+               to = { ["spec.letter"] = "to" },
+               encounters = { per_day = 2, lost = "spec.letter-lost",
+                  where = "spec-roads" } },
+         },
+      })
+      u:add_system("writer", function(universe, _, tick)
+         if tick <= 20 then
+            universe:emit{
+               kind = "spec.letter", location = "write-desk",
+               magnitude = 1, loudness = "quiet",
+               payload = { to = "reader", n = tick }, causes = { 1 },
+            }
+         end
+      end)
+      return u
+   end
+
+   it("loses letters on their true day, and nobody ever witnesses it", function()
+      local u = lossy_universe(11)
+      local store = listener(u, "reader", "read-desk")
+      u:run(30)
+      local losses, letters = 0, 0
+      for id = 1, u.annals:len() do
+         local e = u.annals:get(id)
+         if e.kind == "spec.letter" then
+            letters = letters + 1
+         elseif e.kind == "spec.letter-lost" then
+            losses = losses + 1
+            assert.equal("spec-roads", e.location)
+            local carried = u.annals:get(e.causes[1])
+            assert.is_true(e.tick > carried.tick,
+               "a loss stamped before departure")
+            assert.is_true(e.tick - carried.tick <= 3,
+               "a rider lost after arrival day")
+         end
+      end
+      assert.is_true(letters == 20, "the writer stopped writing")
+      assert.is_true(losses > 0, "coin-flip roads lost nothing")
+      -- delivered + lost = sent: no letter is both, none is neither
+      local received = #store():recall("spec.letter")
+      assert.equal(letters, received + losses)
+      -- and the reader never learns the roads eat mail
+      assert.equal(0, #store():recall("spec.letter-lost"))
+   end)
+
+   it("rolls the dice on the courier's own stream: same seed, same fates", function()
+      local a, b = lossy_universe(11), lossy_universe(11)
+      listener(a, "reader", "read-desk")
+      listener(b, "reader", "read-desk")
+      a:run(30)
+      b:run(30)
+      assert.equal(a.annals:len(), b.annals:len())
+      for id = 1, a.annals:len() do
+         assert.equal(a.annals:get(id).kind, b.annals:get(id).kind)
+         assert.equal(a.annals:get(id).tick, b.annals:get(id).tick)
+      end
    end)
 end)

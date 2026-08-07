@@ -74,6 +74,29 @@ local function validate_row(i, row)
    else
       error(where .. ': shape must be "radiated" or "addressed"')
    end
+   -- The encounter profile (card 151): the road doesn't kill
+   -- riders; what they meet on it does, and exposure scales with
+   -- the days spent exposed — one chance-in-per_day draw per day
+   -- of travel, on the courier's own stream. Today's sole outcome
+   -- is loss, recorded as the world-named event kind (the world
+   -- provides the words; the engine provides the dice), located at
+   -- the world-named `where`. Deliberately reason-free: the
+   -- universe does not fake knowledge it lacks — causes arrive
+   -- with the encounter engine (card 165), which will generate
+   -- them as facts, never as flavor. Addressed rows only, for now:
+   -- per-listener wear on radiated rows is blur, and blur waits
+   -- for its first consumer.
+   if row.encounters ~= nil then
+      assert(row.shape == "addressed",
+         where .. ": encounters ride addressed rows only, today")
+      local enc = row.encounters
+      assert(type(enc) == "table"
+            and math.type(enc.per_day) == "integer" and enc.per_day >= 2
+            and type(enc.lost) == "string" and #enc.lost > 0
+            and type(enc.where) == "string" and #enc.where > 0,
+         where .. ": encounters needs { per_day = N >= 2, "
+         .. "lost = event kind, where = location }")
+   end
 end
 
 -- rows: the world's declared mechanisms, in declaration order.
@@ -101,8 +124,14 @@ function Carriage.field(speed)
 end
 
 -- When does event e reach the faction called name, at home?
--- Returns the arrival tick, or nil — and nil is a complete answer:
--- nothing carried it, so for this faction it never happened.
+-- Returns the arrival tick and the row that carries it, or nil —
+-- and nil is a complete answer: nothing carried it, so for this
+-- faction it never happened. The returned row is where the caller
+-- finds the encounter profile; when several rows reach, the
+-- earliest carries (ties to declaration order), and its fate is
+-- the delivery's fate — surviving-alternative semantics wait for
+-- the first world that declares a kind both radiated and
+-- addressed.
 function Carriage:arrival(e, name, home)
    local d = 0
    if self.distance then
@@ -111,7 +140,7 @@ function Carriage:arrival(e, name, home)
          ("carriage: distance(%q, %q) must be a non-negative integer")
          :format(e.location, home))
    end
-   local best
+   local best, carrier
    for i = 1, #self.rows do
       local row = self.rows[i]
       local reaches
@@ -125,10 +154,11 @@ function Carriage:arrival(e, name, home)
          local arrives = e.tick + (d + row.speed - 1) // row.speed
          if best == nil or arrives < best then
             best = arrives
+            carrier = row
          end
       end
    end
-   return best
+   return best, carrier
 end
 
 return Carriage

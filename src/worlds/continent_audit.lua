@@ -22,6 +22,9 @@ return {
       ["continent.hunger"] = false,
       ["continent.offer"] = false,
       ["continent.accept"] = false,
+      -- a lost letter moves no books: the offer it carried was
+      -- never a holding, and the audit checks arithmetic, not luck
+      ["continent.letter-lost"] = false,
       ["war.declared"] = false,
       ["war.march"] = false,
       ["war.raid"] = false,

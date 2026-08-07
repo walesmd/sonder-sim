@@ -15,7 +15,9 @@
 return {
    -- v1: Harrow founded (card 160). Four book columns: grain, iron,
    -- salt, cents.
-   schema_version = 1,
+   -- v2: the roads can lose a letter (card 151) — one kind added,
+   -- append-mostly as the discipline demands.
+   schema_version = 2,
 
    loudnesses = { "loud", "local", "quiet" },
 
@@ -55,6 +57,14 @@ return {
          payload = { { "seller", "string" }, { "buyer", "string" },
             { "commodity", "string" }, { "units", "integer" },
             { "price", "integer" }, { "total", "integer" } },
+      },
+      ["continent.letter-lost"] = {
+         doc = "a letter the roads took: the rider never arrives, "
+            .. "and nobody alive learns why — or that it happened "
+            .. "at all. Deliberately reason-free (card 151): causes "
+            .. "arrive when the encounter engine (card 165) can "
+            .. "generate them as facts",
+         payload = { { "from", "string" }, { "to", "string" } },
       },
       ["continent.accept"] = {
          doc = "the buyer says yes, citing the offer; the payment "

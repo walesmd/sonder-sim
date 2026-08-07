@@ -85,8 +85,10 @@ adds it here, in the same PR.
   card 150): arrival is the earliest reaching row's answer, each
   believed copy stamped with the tick it landed — and when no row
   reaches a faction, the event is never delivered (the witness
-  rule). Degradation and interpretation will arrive through the
-  same door. (posts 0006, 0011, 0015)
+  rule). Since card 151 the courier also rolls the roads' dice, on
+  its own reserved stream: rows with an encounter profile can lose
+  what they carry. Interpretation will arrive through the same
+  door. (posts 0006, 0011, 0015, 0016)
 - **channel speed** — the divisor that turns distance into delay.
   A parameter, not a constant; today it is 1 everywhere. (post 0011)
 - **learned** — the arrival stamp on a believed copy: the tick the
@@ -160,6 +162,14 @@ adds it here, in the same PR.
   everything after the catch is somebody carrying, and no witness
   means no news, forever. Law 2 untouched — the annals still records
   every tree that falls. (post 0014)
+- **encounter profile** — what a mechanism's travelers meet on the
+  way: one chance-in-N drawn per day of exposure on `rng.courier`,
+  so longer roads are riskier purely by being longer. Today's sole
+  outcome is loss — the letter that never arrives, recorded on its
+  true day, reason-free (the universe does not fake knowledge it
+  lacks; causes await the encounter engine, card 165), witnessed by
+  no one. The generalization of ADR 0005's failure-profile column,
+  renamed by Mike's ruling: encounters are not all bad. (post 0016)
 - **custody** — whose hands a payload sits in while carried; what
   the road ledger's on-road column names when the carrier is
   somebody. (post 0014)

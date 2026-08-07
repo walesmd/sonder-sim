@@ -126,11 +126,20 @@ knowledge shrank to what was witnessed or carried. The valley no
 longer hears the mountains declare war; the raid arrives
 unannounced — post 0015,
 [*The Seal That Didn't Move*](docs/posts/0015-the-seal-that-didnt-move/complete.md)
-(tag `post/0015`). Ahead: the courier's remaining successors (cards
-151–159 — degradation now has a mechanism to be a property of), and
-the lore shelf's road to thirty species. Watching now means
-watching from very nearly the beginning, which is rather the
-point.
+(tag `post/0015`). And the roads are not safe: Harrow's letters
+carry an encounter profile — one chance per fifty rider-days,
+drawn on the courier's own stream — and a lost letter dies on its
+true day, on the road, reason-free and witnessed by no one; the
+world's first half-settled trade (paid, never shipped) is the Two
+Generals' Problem living in a fantasy continent, and the golden
+seal re-cut deliberately for the first time, taking the engine to
+0.2.0 — post 0016,
+[*The Roads Are Not Safe*](docs/posts/0016-the-roads-are-not-safe/complete.md)
+(tag `post/0016`). Ahead: the courier's remaining successors
+(cards 152–159), the encounter engine that will give losses their
+reasons (card 165), and the lore shelf's road to thirty species.
+Watching now means watching from very nearly the beginning, which
+is rather the point.
 
 ## Building
 

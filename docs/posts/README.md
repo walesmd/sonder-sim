@@ -37,6 +37,7 @@ can explain an algorithm better than a paragraph, the post carries one
 | [0013](0013-whatever-that-universe-may-be/complete.md) | Whatever That Universe May Be | `post/0013` |
 | [0014](0014-the-witness-rule/complete.md) | The Witness Rule | `post/0014` |
 | [0015](0015-the-seal-that-didnt-move/complete.md) | The Seal That Didn't Move | `post/0015` |
+| [0016](0016-the-roads-are-not-safe/complete.md) | The Roads Are Not Safe | `post/0016` |
 
 Tags pushed before card 147 point at the old single-file layout
 (`docs/posts/NNNN-slug.md`); posts are era artifacts, and the tags
