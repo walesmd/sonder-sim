@@ -277,3 +277,37 @@ as its own future card), ADR 0004's world-interface list amended
 with mechanisms (marked as the card-150 amendment). Engine version
 left at 0.1.0 — flagged in the PR as an open question for Mike
 rather than bumped unilaterally.
+
+## Session 3 (2026-08-07) — the version question, answered
+
+Mike asked what kind of bump this card deserves, given 1.0.0 is far
+away (and not a destination the charter believes in), the third
+number traditionally means bug fixes, and — honestly — "I don't
+think we care that much." His instinct: 0.1.1.
+
+The convention that stuck, argued from the project's own physics
+rather than semver's: **the version tracks the universe, not the
+code.** Semver's axes signal compatibility to downstream consumers;
+Sonder's only consumers are universe files, whose one question is
+"does this engine still replay my history bit for bit?" So:
+
+- **Minor bumps when a golden seal moves** — the same seed now
+  produces a different history; the re-cut ledger and the version
+  history become the same document. The one mandatory rule: a seal
+  re-cut must never ship without a bump, or two engines that
+  disagree about history share a version string in provenance.
+- **Patch bumps when the engine changes but every seal stands.**
+- **Nothing bumps** for docs, worlds, and specs. Precise
+  identification is the git commit in provenance, always.
+
+No minor-number rationing: below 1.0 the minor is unbounded and
+promise-free (OpenSSL lived in 0.9.x for a decade). Ration by
+meaning, not by fear of 1.0.
+
+Card 150 is therefore **0.1.1** — the biggest engine change since
+the cut, and every seal stood; the patch bump says what the post
+says: nothing archived went stale. Applied: ENGINE_VERSION in
+main.lua (with the convention recorded beside the constant), the
+rockspec renamed to sonder-0.1.1-1 with its version field updated,
+and tools/setup.sh's reference. The first card that genuinely
+forks history earns 0.2.0.
