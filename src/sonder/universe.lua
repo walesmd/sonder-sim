@@ -70,7 +70,13 @@ function Universe.new(seed, opts)
       systems = {}, -- array of {name, fn}; order is part of the physics
       factions = {}, -- array of {name, home, decide, store, cursor, pending}
       names = {}, -- every actor name ever claimed, systems and factions
+      losses = Travel.new(), -- letters the roads have already taken,
+      -- awaiting the day the loss actually lands (card 151)
    }, Universe)
+   -- The courier draws its own dice now (card 151) and owns the
+   -- stream name outright: no world actor may claim "courier",
+   -- because sharing a stream couples draws — law 1's oldest rule.
+   u.names["courier"] = true
    -- In the beginning there was an event, because there is nothing
    -- else for there to be (law 2). Every cause chain in this universe
    -- terminates here, at id 1. Magnitude 0 reads odd on the largest
@@ -141,6 +147,24 @@ end
 
 function Universe:step()
    self.tick = self.tick + 1
+   -- Dawn: losses whose day has come become events (card 151). The
+   -- fate was sealed at departure; the annals stamps the day the
+   -- rider actually dies — quiet, on the road, reason-free (the
+   -- universe does not fake knowledge it lacks; card 165 will
+   -- generate causes as facts). Located wherever the row said, a
+   -- place worlds map far from every home: witnessed by no one.
+   local lost = self.losses:due(self.tick)
+   for i = 1, #lost do
+      local l = lost[i]
+      self:emit{
+         kind = l.kind,
+         location = l.where,
+         magnitude = 1,
+         loudness = "quiet",
+         payload = { from = l.from, to = l.to },
+         causes = { l.cause },
+      }
+   end
    for i = 1, #self.systems do
       local system = self.systems[i]
       system.fn(self, self.rng:stream(system.name), self.tick)
@@ -168,12 +192,34 @@ function Universe:step()
       -- declared, earliest arrival winning. nil is the witness rule
       -- (ADR 0005) — nothing carried it, so for this faction it
       -- never happened; the cursor moves on and no row ever forms.
+      -- Rows with an encounter profile (card 151) roll the dice at
+      -- departure, one chance per day of exposure, on the courier's
+      -- own stream: the fate is sealed when the rider sets out,
+      -- exactly as the delay always was, but the loss *lands* on
+      -- the day it happens (never before the next dawn — a fate
+      -- sealed mid-scan still needs a dawn to be discovered by).
       while faction.cursor < self.annals:len() do
          faction.cursor = faction.cursor + 1
          local e = self.annals:get(faction.cursor)
-         local arrives = self.carriage:arrival(e, faction.name, faction.home)
+         local arrives, row =
+            self.carriage:arrival(e, faction.name, faction.home)
+         if arrives ~= nil and row.encounters ~= nil then
+            local enc = row.encounters
+            local dice = self.rng:stream("courier")
+            for day = 1, arrives - e.tick do
+               if dice:int(1, enc.per_day) == 1 then
+                  self.losses:schedule(
+                     math.max(e.tick + day, self.tick + 1),
+                     { kind = enc.lost, where = enc.where,
+                        from = e.location, to = faction.home,
+                        cause = e.id })
+                  arrives = nil
+                  break
+               end
+            end
+         end
          if arrives == nil then
-            -- unwitnessed and uncarried: never delivered
+            -- unwitnessed, uncarried, or lost: never delivered
          elseif arrives <= self.tick then
             faction.store:receive(e, self.tick)
          else

@@ -64,10 +64,23 @@ do
    end
 end
 
+-- Beyond every road: unmapped places are far from everyone, not
+-- near (card 151). The old fallback said "unmapped: adjacent" —
+-- harmless under the field, a witness-rule leak under earshot: any
+-- event at an unnamed place would have been heard by all five
+-- civilizations at once. Now only the-void is adjacent (genesis
+-- reaches everyone: creation was loud), and everywhere else
+-- unmapped — the-roads, where riders die — is out of every ear's
+-- reach.
+local FAR = 30
+
 local function distance(from, to, _)
+   if from == to or from == "the-void" or to == "the-void" then
+      return 0
+   end
    local row = DIST[from]
    if not (row and row[to]) then
-      return 0 -- the void and anywhere unmapped: adjacent
+      return FAR
    end
    return row[to]
 end
@@ -581,7 +594,17 @@ return function(seed)
             range = { loud = 2, ["local"] = 0, quiet = 0 } },
          { name = "letters", shape = "addressed", speed = 1,
             to = { ["continent.offer"] = "buyer",
-               ["continent.accept"] = "seller" } },
+               ["continent.accept"] = "seller" },
+            -- Card 151: the passes are not safe. One encounter per
+            -- fifty rider-days — a four-day road loses about one
+            -- letter in thirteen — and the only outcome the
+            -- universe can yet name is loss, recorded on the road,
+            -- witnessed by no one. The rate is an honest
+            -- placeholder: its real inputs (technology, hardiness,
+            -- who else rides the pass) arrive with the encounter
+            -- engine, card 165.
+            encounters = { per_day = 50,
+               lost = "continent.letter-lost", where = "the-roads" } },
       },
       vocabulary = require "worlds.continent_vocabulary",
    })
