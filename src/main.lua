@@ -33,8 +33,16 @@ local Seal = require "sonder.seal"
 local Audit = require "sonder.audit"
 local fnv = require "sonder.fnv"
 
--- Matches sonder-0.1.0-1.rockspec; got real at v0.1 (card 119).
-local ENGINE_VERSION = "0.1.0"
+-- Matches the rockspec; got real at v0.1 (card 119). The numbering
+-- convention (card 150): the version tracks the universe, not the
+-- code. Minor bumps when a golden seal moves — the same seed now
+-- produces a different history, and provenance must say so; a seal
+-- re-cut must never ship without one. Patch bumps when the engine
+-- changes but every seal stands (this one: the carriage landed and
+-- nothing archived went stale). Docs, worlds, and specs bump
+-- nothing. Precise identification is the git commit in provenance;
+-- this number only names determinism epochs.
+local ENGINE_VERSION = "0.1.1"
 
 local function parse_args(argv)
    local opts = { seed = 1893, ticks = 10 }

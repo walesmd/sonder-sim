@@ -560,6 +560,29 @@ end
 return function(seed)
    local u = Universe.new(seed, {
       distance = distance,
+      -- Rung 2 of ADR 0005's ladder (card 150): Harrow is the pilot,
+      -- and the field is retired here. Two rows replace it. Earshot
+      -- is the continent's natural medium — a loud act carries two
+      -- days over the passes (a declaration of war is heard next
+      -- door); local and quiet acts stay at their own gates, which
+      -- makes self-knowledge exact with no further machinery. The
+      -- letters row is the charter's "trade travels by letter" made
+      -- literal: an offer rides to its named buyer, an acceptance
+      -- back to its named seller, at road pace, and reaches nobody
+      -- else — the Selm no longer read everyone's mail for free.
+      -- Everything else the field used to deliver — another civ's
+      -- tallies, a distant raid, a stranger's founding — now reaches
+      -- no one, because nothing carries it: the witness rule, lived.
+      -- The seal does not move: no mind here ever read what the
+      -- field over-delivered, so history is bit-identical and only
+      -- the belief stores grow honestly ignorant.
+      mechanisms = {
+         { name = "earshot", shape = "radiated", speed = 1,
+            range = { loud = 2, ["local"] = 0, quiet = 0 } },
+         { name = "letters", shape = "addressed", speed = 1,
+            to = { ["continent.offer"] = "buyer",
+               ["continent.accept"] = "seller" } },
+      },
       vocabulary = require "worlds.continent_vocabulary",
    })
    for i = 1, #CAST do

@@ -20,6 +20,7 @@
 local Universe = require "sonder.universe"
 local Travel = require "sonder.travel"
 local Roads = require "sonder.roads"
+local Carriage = require "sonder.carriage"
 
 -- The cast. Salaries are weekly; cents are starting savings;
 -- temperament constants are per-role, the Vessari/Khedrun pattern
@@ -442,6 +443,13 @@ end
 return function(seed)
    local u = Universe.new(seed, {
       distance = distance,
+      -- Rung 1 of ADR 0005's ladder (card 150): the office still
+      -- runs on the field — everything eventually reaches everyone
+      -- at org-chart pace — declared now as a row instead of
+      -- assumed. Rung 2 waits for this world's own migration card:
+      -- an office's earshot (the room, the thread, the cc line) is
+      -- a design conversation, not a default.
+      mechanisms = { Carriage.field(1) },
       vocabulary = require "worlds.office_vocabulary",
    })
    for i = 1, #CAST do

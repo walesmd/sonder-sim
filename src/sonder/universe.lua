@@ -11,18 +11,22 @@
 -- directly. Factions are the governed side of law 3: their decision
 -- code is handed a belief store, a stream, and the tick — never the
 -- universe — and *returns* intents for the universe to emit. The
--- courier lives here too (card 122): news crosses distance, so an
--- event reaches each faction ceil(distance ÷ channel speed) ticks
--- after it happens, and every store becomes a private chronology.
--- The pass-through era (v0.1, everyone briefly omniscient) ended
--- exactly as promised: without any decide() noticing. A universe
--- built without a distance function still gets that era — nil
--- distance means everywhere is adjacent and news is instant.
+-- courier lives here too (card 122): news crosses distance on the
+-- mechanisms the world declares (card 150, sonder/carriage.lua) —
+-- the field row by default, a radiated medium with infinite range
+-- at channel speed, which is the old ceil(distance ÷ channel_speed)
+-- arithmetic as one honest row of data. A world past rung 1 of
+-- ADR 0005's ladder declares real rows instead, and the witness
+-- rule applies: an event no row carries to a faction is never
+-- delivered to it. The pass-through era (v0.1, everyone briefly
+-- omniscient) remains the degenerate case: nil distance means
+-- everywhere is adjacent and news is instant.
 
 local Rng = require "sonder.rng"
 local Annals = require "sonder.annals"
 local Belief = require "sonder.belief"
 local Travel = require "sonder.travel"
+local Carriage = require "sonder.carriage"
 
 local Universe = {}
 Universe.__index = Universe
@@ -36,6 +40,10 @@ Universe.__index = Universe
 --     125 and beyond) walks through without touching this file.
 --   channel_speed — the divisor that turns distance into delay;
 --     default 1. A parameter, not a constant, on lore's orders.
+--   mechanisms — the world's carriage rows (card 150; ADR 0005):
+--     what carries news here, and how fast. Optional; a world that
+--     declares nothing gets the field row at channel speed — the
+--     pass-through era as one honest row of data.
 --   vocabulary — required (card 160): what can happen in this
 --     world, declared by the world. The engine's only demand is
 --     universe.genesis, because the engine emits it itself.
@@ -56,6 +64,9 @@ function Universe.new(seed, opts)
       annals = Annals.new(opts.vocabulary),
       distance = opts.distance,
       channel_speed = channel_speed,
+      carriage = Carriage.new(
+         opts.mechanisms or { Carriage.field(channel_speed) },
+         opts.distance),
       systems = {}, -- array of {name, fn}; order is part of the physics
       factions = {}, -- array of {name, home, decide, store, cursor, pending}
       names = {}, -- every actor name ever claimed, systems and factions
@@ -128,20 +139,6 @@ function Universe:add_faction(name, home, decide)
    }
 end
 
--- How long news takes: distance at the event's departure, divided by
--- the channel speed, rounded up — in integer arithmetic, because a
--- delay decides outcomes and law 1 tolerates no floats near one.
-local function delay(self, e, faction)
-   if not self.distance then
-      return 0
-   end
-   local d = self.distance(e.location, faction.home, e.tick)
-   assert(math.type(d) == "integer" and d >= 0,
-      ("universe: distance(%q, %q) must be a non-negative integer")
-      :format(e.location, faction.home))
-   return (d + self.channel_speed - 1) // self.channel_speed
-end
-
 function Universe:step()
    self.tick = self.tick + 1
    for i = 1, #self.systems do
@@ -166,11 +163,18 @@ function Universe:step()
       for j = 1, #due do
          faction.store:receive(due[j], self.tick)
       end
+      -- Which mechanism carries each event, and when it lands, is
+      -- the carriage's answer (card 150): the rows this world
+      -- declared, earliest arrival winning. nil is the witness rule
+      -- (ADR 0005) — nothing carried it, so for this faction it
+      -- never happened; the cursor moves on and no row ever forms.
       while faction.cursor < self.annals:len() do
          faction.cursor = faction.cursor + 1
          local e = self.annals:get(faction.cursor)
-         local arrives = e.tick + delay(self, e, faction)
-         if arrives <= self.tick then
+         local arrives = self.carriage:arrival(e, faction.name, faction.home)
+         if arrives == nil then
+            -- unwitnessed and uncarried: never delivered
+         elseif arrives <= self.tick then
             faction.store:receive(e, self.tick)
          else
             faction.pending:schedule(arrives, e)

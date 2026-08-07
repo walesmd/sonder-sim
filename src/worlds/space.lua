@@ -22,6 +22,7 @@
 local Universe = require "sonder.universe"
 local Travel = require "sonder.travel"
 local Roads = require "sonder.roads"
+local Carriage = require "sonder.carriage"
 
 local EXCHANGE = "the-exchange"
 local OPENING_PRICE = 100 -- cents per sack, posted at tick 0
@@ -674,6 +675,14 @@ end
 return function(seed)
    local u = Universe.new(seed, {
       distance = distance,
+      -- Rung 1 of ADR 0005's ladder (card 150): this world still
+      -- runs on the field — news radiating everywhere at channel
+      -- speed — but the field is now a row this world declares,
+      -- not arithmetic the engine assumes. Rung 2 (real mechanisms,
+      -- the witness rule enforced) waits for the space world's own
+      -- migration card: the destination moves carefully, and the
+      -- Fleet deserves better than a hasty landing.
+      mechanisms = { Carriage.field(1) },
       vocabulary = require "worlds.space_vocabulary",
    })
    found(u, VESSARI)
