@@ -250,17 +250,29 @@ Harrow piloting rung 2 with earshot and letters — where the golden
 seal famously did not move, because no Harrow mind ever read the
 field's over-delivery: history stood still while belief stores
 shrank to what was witnessed or carried (card 150, post 0015 *The
-Seal That Didn't Move*).
+Seal That Didn't Move*); and the roads are not safe — Harrow's
+letters carry an encounter profile (one chance per fifty
+rider-days on the courier's own reserved stream, exposure not
+fate), losses land on their true day at the-roads, reason-free
+(the universe does not fake knowledge it lacks — causes await the
+encounter engine, card 165) and witnessed by no one, the
+half-settled trade (paid, never shipped) lives as chartered
+settlement risk, the warned-of audit relaxation did not bite
+(loss changes behavior, never book accuracy), and the golden
+continent seal re-cut deliberately for the first time — engine
+0.2.0, the version convention's first minor bump (card 151, post
+0016 *The Roads Are Not Safe*).
 Next up:
 
-- the courier's remaining successors, cards 151–159, each with its
+- the courier's remaining successors, cards 152–159, each with its
   piece of the carrier taxonomy assigned by ADR 0005's build map —
-  degradation (now a property of a mechanism that exists),
   interpretation, exchanges in the plural, counterfeiting as
   content, reception-side loudness plus the stamp re-judgment
-  punted there, in-flight actors, and money grown up; the space
-  world's own rung-2 migration awaits a card that must answer for
-  the Fleet
+  punted there, in-flight actors, and money grown up; the
+  encounter engine research card (165) that gives losses their
+  reasons; the space world's own rung-2 migration awaits a card
+  that must answer for the Fleet (163) and teach the audit's
+  in-flight explainer the carriage
 - the road to thirty species, one lore card at a time (cards 133–146,
   each entry arriving with its eval note)
 
