@@ -82,3 +82,18 @@ anything; negotiation mechanics richer than standing intents (a
 card if the world proves it needs one); migration and borders that
 move (the map stands still until the moving map arrives for every
 world at once).
+
+## Current state (living; the sections above are the card-160 founding)
+
+Harrow is the **rung-2 pilot** of the carrier taxonomy (ADR 0005):
+the field is retired here. News travels on two declared rows —
+*earshot* (loud carries two days; local and quiet stay home) and
+*letters* (offers to their buyer, acceptances to their seller) —
+and since card 151 the letters carry an encounter profile: one
+chance per fifty rider-days, sole outcome loss, recorded
+reason-free at `the-roads`, witnessed by no one. The headline
+consequence is the half-settled trade — paid, never shipped —
+which the charter's settlement-risk clause blessed in advance.
+Golden seal `c6dc5ef5b428aa85` (seed 7 × 200; re-cut at card 151,
+the project's first deliberate history fork, engine 0.2.0). The
+famine-war KPI still precipitates unprompted.

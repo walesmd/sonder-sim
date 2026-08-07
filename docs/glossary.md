@@ -89,8 +89,11 @@ adds it here, in the same PR.
   its own reserved stream: rows with an encounter profile can lose
   what they carry. Interpretation will arrive through the same
   door. (posts 0006, 0011, 0015, 0016)
-- **channel speed** — the divisor that turns distance into delay.
-  A parameter, not a constant; today it is 1 everywhere. (post 0011)
+- **channel speed** — the divisor that turned distance into delay
+  in the field era. Since card 150, each mechanism row carries its
+  own speed; this parameter survives as the *default field row's*
+  speed and as a legacy field the roads and audit still read (a
+  card-166 review finding). (posts 0011, 0015)
 - **learned** — the arrival stamp on a believed copy: the tick the
   news actually reached its owner. The event is a photograph; this
   is the date written on the back. The left-hand date on every
@@ -108,11 +111,15 @@ adds it here, in the same PR.
   leaving A arrives at B — where news only ever copies. (post 0012)
 - **world** — a module that builds a universe from a seed, supplying
   everything the engine refuses to contain: a vocabulary, a cast,
-  systems, a map, sentences, audit legs and conservation identities,
-  and its own golden seal (ADR 0004). The engine demands exactly one
-  thing of every world: universe.genesis, because the engine emits
-  it. Three exist: space (the destination), the continent and the
-  office (evals). (post 0013)
+  systems, a map, mechanisms, sentences, audit legs and conservation
+  identities, and its own golden seal (ADR 0004, amended card 150).
+  The engine demands exactly one thing of every world:
+  universe.genesis, because the engine emits it. Three exist: space
+  (the destination), the continent and the office (evals). Worlds
+  are content — the engine/content line is a directory boundary —
+  and each is an *emergence* eval (temperaments lead; history must
+  precipitate) where the lore shelf is the *expressibility* eval.
+  (posts 0007, 0013)
 - **the litmus** — card 160's standing law: what we build must serve
   all three universes; if it cannot, it is world content, and if it
   can — like the random number generator — it is a framework-level
@@ -195,9 +202,13 @@ adds it here, in the same PR.
   over the annals, one transaction per tick, never a live reference.
   (post 0004)
 - **provenance** — the table of origins every universe file carries
-  from birth: engine version, git commit, seed, config, schema
-  version, intervention log. A log found on a beach can testify
-  about where it came from. (post 0004)
+  from birth — eight rows today: engine version, git commit, seed,
+  config, vocabulary schema version, intervention log, plus the Lua
+  and SQLite versions that wrote it. A log found on a beach can
+  testify about where it came from. (Owed and on the record: a
+  `world` row, per ADR 0004 — today two worlds' files with one seed
+  are confusable.) Full reference:
+  [`universe-file.md`](universe-file.md). (posts 0004; card 166)
 - **byteform** (`byteform.lua`) — the one byte representation every
   event has: envelope fields in fixed order, payload fields in
   declaration order, total escaping. The archive stores these bytes;
@@ -220,32 +231,39 @@ adds it here, in the same PR.
 - **golden master** — a spec pinning exact output (the seal of seed
   1893 × 500 ticks) so any accidental change to history fails the
   build. (post 0005)
-- **re-cut ledger** — the comment block in `seal_spec.lua` recording
-  every golden constant this project has pinned, and why each one
-  moved. Constants are re-cut deliberately, loudly, never casually.
-  (posts 0005, 0006)
+- **re-cut ledger** — the comment block beside each world's golden
+  constant recording every value it has ever held, and why each one
+  moved: space's in `seal_spec.lua`, the continent's in
+  `continent_spec.lua` (holding the first deliberate re-cut, card
+  151), the office's in `office_spec.lua`. Constants are re-cut
+  deliberately, loudly, never casually — and since card 150, never
+  without a minor version bump. (posts 0005, 0006, 0016)
+- **determinism epoch** — what the engine's minor version names
+  (card 150's convention): the version tracks the universe, not the
+  code. Minor bumps when a golden seal moves; patch bumps when the
+  engine changes but every seal stands; docs, worlds, and specs
+  bump nothing. Precise identification is always the git commit in
+  provenance. (posts 0015, 0016)
 - **gremlin** — the saboteur in the perturbation spec: one extra
   draw stolen from another actor's stream, proving one stolen random
   number forks a universe. (post 0005)
 - **audit** — the double-entry projection (`src/sonder/audit.lua`):
   the whole annals refolded into per-civ books, checked against two
   conservation laws — money has no doors; matter has two, both
-  recorded. Violations (impossible arithmetic) are zero forever;
-  mismatches (self-reports drifting from the fold) are bugs until
-  card 122 makes them the product. Born as a spec-local fold in
-  post 0007. (posts 0007, 0010)
+  recorded. Violations (impossible arithmetic) are zero forever.
+  Mismatches (self-reports drifting from the fold) were legitimized
+  by card 122 — explained by news still on the road — then died
+  honestly at card 153, when every book-moving event moved to its
+  owner's gates: zero, earned. Card 151 confirmed loss doesn't
+  revive them (a lost letter changes behavior, never books). Born
+  as a spec-local fold in post 0007. (posts 0007, 0010, 0011, 0012,
+  0016)
 - **doctor** — `tools/doctor.lua`: verifies the properties
   determinism leans on (integer subtype, wrapping overflow, pinned
   toolchain) rather than just that programs exist.
 
 ## Worlds and their people
 
-- **world** — content the engine hosts: temperaments compiled to
-  constants and decide functions, living in `src/worlds/` (the
-  engine/content line is a directory boundary). The lore shelf is
-  the *expressibility* eval (authored story leads; the engine must
-  host it); a world is the *emergence* eval (temperaments lead;
-  history must precipitate). (post 0007)
 - **the space world** (`src/worlds/space.lua`) — the first world,
   born as "the toy world" and renamed at card 160 to its real name,
   the destination: two civilizations, one commodity, one market,

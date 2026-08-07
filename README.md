@@ -37,7 +37,17 @@ once, in [`docs/glossary.md`](docs/glossary.md).
 
 ## Status
 
-**v0.1 — the walking skeleton, complete.** Cut at card 119, with
+**Engine 0.2.0.** Three worlds — space (the destination), a
+fantasy continent, an office — run on one engine, each guarded by
+a golden seal; news rides declared mechanisms, roads can lose
+letters, and the version's minor digit moves only when history
+itself forks (the determinism-epoch convention, card 150). The
+system as it stands is mapped in
+[`docs/architecture.md`](docs/architecture.md); the full
+documentation index is [`docs/README.md`](docs/README.md).
+
+**The story so far, in order.** v0.1 — the walking skeleton — was
+cut at card 119, with
 post 0000 ([*First Tick*](docs/posts/0000-first-tick/complete.md),
 tag `post/0000`) re-cut from aspiration to fact as its front door.
 The pieces, in the order they arrived: A deterministic tick loop
@@ -135,11 +145,20 @@ Generals' Problem living in a fantasy continent, and the golden
 seal re-cut deliberately for the first time, taking the engine to
 0.2.0 — post 0016,
 [*The Roads Are Not Safe*](docs/posts/0016-the-roads-are-not-safe/complete.md)
-(tag `post/0016`). Ahead: the courier's remaining successors
-(cards 152–159), the encounter engine that will give losses their
-reasons (card 165), and the lore shelf's road to thirty species.
-Watching now means watching from very nearly the beginning, which
-is rather the point.
+(tag `post/0016`). And the project took a beat: a comprehensive
+review with two hats — thirty findings identified and ranked for
+Mike's verdicts (none applied; identify first, decide second), and
+the documentation of the *system* built at last: a living
+reference shelf ([architecture](docs/architecture.md), the
+[universe file](docs/universe-file.md), the [API](docs/api.md),
+[verification](docs/verification.md)) beside the pinned posts —
+post 0017,
+[*Success Debt*](docs/posts/0017-success-debt/complete.md)
+(tag `post/0017`). Ahead: Mike's picks from the findings, the
+courier's remaining successors (cards 152–159), the encounter
+engine that will give losses their reasons (card 165), and the
+lore shelf's road to thirty species. Watching now means watching
+from very nearly the beginning, which is rather the point.
 
 ## Building
 
@@ -161,11 +180,20 @@ How and why the pin is enforced this way is `docs/adr/0002`.
 ## Running
 
 ```sh
-./lua src/main.lua --seed 1893 --ticks 10           # a universe, narrated
-./lua src/main.lua --seed 1893 --ticks 10 --why 21  # why did event 21 happen?
-./lua src/main.lua --seed 1893 --ticks 1000 --audit # do the books balance?
-./lua_modules/bin/busted                            # the spec suite
+./lua src/main.lua --seed 1893 --ticks 10             # a universe, narrated
+./lua src/main.lua --seed 1893 --ticks 10 --why 21    # why did event 21 happen?
+./lua src/main.lua --seed 1893 --ticks 1000 --audit   # do the books balance?
+./lua src/main.lua --world continent --seed 7 --ticks 200   # Harrow instead
+./lua src/main.lua --world office --seed 7 --ticks 120      # Bellwether & Co.
+./lua src/main.lua --world continent --seed 7 --ticks 60 \
+   --believes tethri --as-of 30   # one mind's private newspaper, at a past tick
+./lua_modules/bin/busted                              # the spec suite
 ```
+
+`--world` picks the universe (`space` is the default); `--believes
+NAME` renders the feed as one faction received it, double-dated
+(learned ← happened), and `--as-of T` rewinds that mind to what it
+knew *then*.
 
 Same seed, same feed, on every machine — that is the whole promise so
 far. `--why` walks an event's cause links back to genesis, because

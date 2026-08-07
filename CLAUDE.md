@@ -100,9 +100,15 @@ are jointly owned and published.
 - The docs sweep, before every pull request: update the README (status,
   install steps), add any newly coined reader-facing terms to
   `docs/glossary.md`, confirm the post's `simple.md` exists and agrees
-  with `complete.md`, confirm the does-this-need-a-visual question was
-  asked, and fix any other documentation the change makes stale, in the
-  same PR. Post tags are immutable once pushed, so
+  with `complete.md` (and carries a diagram when `complete.md` does,
+  or records why not — the simple track lost its visuals for ten
+  posts before card 166 noticed), confirm the does-this-need-a-visual
+  question was asked, update the living reference pages the change
+  touches (`docs/architecture.md`, `docs/api.md`,
+  `docs/universe-file.md`, `docs/verification.md`, `docs/README.md` —
+  staleness there is a bug, unlike posts, which are era artifacts),
+  add the new post to `docs/posts/README.md`'s index, and fix any
+  other documentation the change makes stale, in the same PR. Post tags are immutable once pushed, so
   documentation that misses the PR stays wrong at that tag forever
   (learned the hard way after card 113).
 - Branch names always start with the Fizzy card number, then a short
@@ -261,7 +267,13 @@ settlement risk, the warned-of audit relaxation did not bite
 (loss changes behavior, never book accuracy), and the golden
 continent seal re-cut deliberately for the first time — engine
 0.2.0, the version convention's first minor bump (card 151, post
-0016 *The Roads Are Not Safe*).
+0016 *The Roads Are Not Safe*); and the beat — a comprehensive
+two-hat review (thirty findings, ranked in notebook 166, none
+applied: identify first, Mike decides), plus the living reference
+shelf built beside the pinned posts (docs/architecture.md,
+docs/universe-file.md, docs/api.md, docs/verification.md,
+docs/README.md — staleness there is a bug, and the docs sweep now
+names them) (card 166, post 0017 *Success Debt*).
 Next up:
 
 - the courier's remaining successors, cards 152–159, each with its
