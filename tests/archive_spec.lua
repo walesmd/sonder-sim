@@ -24,6 +24,7 @@ local function provenance(seed)
       git_commit = "deadbeef",
       seed = seed,
       config = "{}",
+      world = "spec",
    }
 end
 
@@ -106,7 +107,20 @@ describe("Archive", function()
       assert.equal("[]", rows.interventions)
       assert.equal(_VERSION, rows.lua_version)
       assert.equal(sqlite3.version(), rows.sqlite_version)
+      -- which world wrote this file (card 167; ADR 0004's oldest
+      -- unpaid requirement) — three worlds' archives must never be
+      -- confusable, and before this row two of them were
+      assert.equal("spec", rows.world)
       assert.same({ { 2 } }, query(path, "PRAGMA user_version"))
+   end)
+
+   it("refuses a file that cannot say which world wrote it", function()
+      local u = Universe.new(7, { vocabulary = VOCAB })
+      assert.has_error(function()
+         local p = provenance(7)
+         p.world = nil
+         Archive.create(path, u.annals, p)
+      end)
    end)
 
    it("demands the host facts it cannot invent", function()

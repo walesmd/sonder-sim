@@ -56,7 +56,7 @@ itself*, enforced by the database engine, not by politeness.
 `provenance` is deliberately unguarded (it is a label, not
 history).
 
-## Provenance — the eight rows
+## Provenance — the nine rows
 
 Written once, at file creation, in sorted key order (byte-stable
 output is a habit here):
@@ -71,13 +71,13 @@ output is a habit here):
 | `schema_version` | the world's vocabulary version, as decimal text | archive |
 | `seed` | the seed, as decimal text | caller (required) |
 | `sqlite_version` | SQLite's version | archive |
+| `world` | which world wrote this file (e.g. `continent`) — card 167, paying ADR 0004's requirement that three worlds' archives never be confusable | caller (required) |
 
-Two honest caveats, both on the record as review findings (card
-166): there is **no `world` row yet**, although ADR 0004 requires
-one — today a Harrow file and a space file with the same seed are
-distinguishable only by their event kinds — and `schema_version`
-is per-world, so the same number means different vocabularies in
-different worlds' files. Both await the provenance card.
+One reading note: `schema_version` is the **world's** vocabulary
+version, meaningful only beside the `world` row (space's v3 and
+the continent's v2 are different vocabularies, not one vocabulary
+at two ages). A world's version *is* its vocabulary's version —
+one world, one vocabulary, one number.
 
 ## Write behavior
 

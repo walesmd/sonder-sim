@@ -288,8 +288,17 @@ applied: identify first, Mike decides), plus the living reference
 shelf built beside the pinned posts (docs/architecture.md,
 docs/universe-file.md, docs/api.md, docs/verification.md,
 docs/README.md — staleness there is a bug, and the docs sweep now
-names them) (card 166, post 0017 *Success Debt*).
+names them) (card 166, post 0017 *Success Debt*); and the world row —
+provenance grew to nine rows, ADR 0004's oldest unpaid requirement
+paid, a world's version ruled to be its vocabulary's version,
+engine 0.2.1 (card 167, post 0018 *The File That Knows Its Name*).
 Next up:
+
+- the card-166 findings menu (cards 168–172): the courier
+  extraction (before 152 cuts through the heartbeat), the
+  believed-books cluster (the big one), road-day arithmetic and
+  channel_speed's retirement, the vocabulary module, and the
+  hygiene sweep
 
 - the courier's remaining successors, cards 152–159, each with its
   piece of the carrier taxonomy assigned by ADR 0005's build map —
