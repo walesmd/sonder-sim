@@ -150,6 +150,25 @@ describe("the continent", function()
       end
    end)
 
+   it("classifies every declared kind, not just the emitted ones", function()
+      -- Declaration-level coverage (card 172): the run-based
+      -- unclassified check above only proves the kinds seed 7
+      -- happened to emit were classified. This holds the whole
+      -- vocabulary to it — space's audit_spec discipline, copied at
+      -- last to the world that gained a rarely-firing kind
+      -- (continent.letter-lost needs an encounter to appear at all).
+      local vocabulary = require "worlds.continent_vocabulary"
+      local kinds = {}
+      for kind in pairs(vocabulary.kinds) do
+         kinds[#kinds + 1] = kind
+      end
+      table.sort(kinds)
+      for _, kind in ipairs(kinds) do
+         assert.is_true(Audit.classified(legs, kind),
+            kind .. " has no ledger classification")
+      end
+   end)
+
    it("every Harrow kind has a Harrow sentence", function()
       local vocabulary = require "worlds.continent_vocabulary"
       local templates = require "worlds.continent_templates"
@@ -166,11 +185,7 @@ describe("the continent", function()
    -- observable.
 
    local function store_of(u, name)
-      for i = 1, #u.factions do
-         if u.factions[i].name == name then
-            return u.factions[i].store
-         end
-      end
+      return u:beliefs(name) -- the card-172 accessor; five hand scans retired
    end
 
    it("the witness rule, lived: the steppe never hears the mountains' hunger", function()
@@ -259,7 +274,7 @@ describe("the continent", function()
       u:run(400)
       for i = 1, #u.factions do
          assert.equal(0,
-            #u.factions[i].store:recall("continent.letter-lost"),
+            #u:beliefs(u.factions[i].name):recall("continent.letter-lost"),
             u.factions[i].name .. " somehow heard a rider die alone")
       end
    end)

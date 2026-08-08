@@ -18,7 +18,8 @@
 package.path = "src/?.lua;" .. package.path
 
 -- Worlds are content; this file stays a window on whichever one
--- --world names (card 160). The whitelist lives in parse_args.
+-- --world names (card 160). This registry is the only list; a
+-- fourth world is one entry here (parse_args consults it too).
 local WORLDS = {
    space = { build = "worlds.space", audit = "worlds.space_audit",
       templates = "worlds.space_templates" },
@@ -43,7 +44,7 @@ local fnv = require "sonder.fnv"
 -- stands. Docs, worlds, and specs bump nothing. Precise
 -- identification is the git commit in provenance; this number only
 -- names determinism epochs.
-local ENGINE_VERSION = "0.2.4"
+local ENGINE_VERSION = "0.2.5"
 
 local function parse_args(argv)
    local opts = { seed = 1893, ticks = 10 }
@@ -69,7 +70,7 @@ local function parse_args(argv)
          opts.audit = true
          i = i + 1
       elseif flag == "--world" then
-         if value ~= "space" and value ~= "office" and value ~= "continent" then
+         if not WORLDS[value] then
             io.stderr:write(("--world wants a known world, got %q\n")
                :format(tostring(value)))
             os.exit(1)
@@ -212,7 +213,7 @@ if opts.believes then
    local store
    for i = 1, #u.factions do
       if u.factions[i].name == opts.believes then
-         store = u.factions[i].store
+         store = u:beliefs(opts.believes)
       end
    end
    if not store then
@@ -290,7 +291,7 @@ if opts.why then
          io.stderr:write(("--why %d: no such event\n"):format(id))
          os.exit(1)
       end
-      print(("%s%s"):format(("  "):rep(depth), Chronicle.line(e)))
+      print(("%s%s"):format(("  "):rep(depth), Chronicle.line(e, TEMPLATES)))
       for i = 1, #e.causes do
          trace(e.causes[i], depth + 1)
       end

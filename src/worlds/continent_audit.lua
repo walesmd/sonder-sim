@@ -68,7 +68,8 @@ return {
          t.gathered = t.gathered + p.gathered
          t.eaten = t.eaten + p.eaten
          local road = lib.drift(s, owner, e.tick)
-         for _, col in ipairs({ "grain", "iron", "salt", "cents" }) do
+         for _, entry in ipairs(s.legs.columns) do
+            local col = entry.key
             if b[col] ~= p[col] then
                lib.mismatch(s, e.id, owner, col, p[col], b[col],
                   road and road[col])

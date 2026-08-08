@@ -27,10 +27,12 @@
 
 local Audit = {}
 
--- The helper library handed to every leg. Legs never touch s's
--- internals directly except through these; that's what keeps the
--- fold's discipline (determinism, copies, ordered walks) in one
--- place.
+-- The helper library handed to every leg. The *folds that must
+-- stay uniform* — flagging, mismatch bookkeeping, enrollment, the
+-- road ledger, drift — go through these; world legs do also read
+-- s.books/s.names/s.seats directly for their own columns (an
+-- honest statement of practice, card 172 — the old comment claimed
+-- a purity the three worlds never had).
 local lib = {}
 
 function lib.flag(s, id, fmt, ...)
@@ -73,7 +75,7 @@ end
 -- cites it. deltas is {column = amount}; sums are commutative, so
 -- the pairs() walk touches no ordered outcome.
 function lib.embark(s, e, deltas)
-   s.roads[e.id] = deltas
+   s.road_ledger[e.id] = deltas
    for col, n in pairs(deltas) do
       s.on_road[col] = s.on_road[col] + n
    end
@@ -83,11 +85,11 @@ end
 -- that departure id. Draining is the caller's assertion that the
 -- entry matched — the engine only does the arithmetic.
 function lib.disembark(s, cause_id)
-   local entry = s.roads[cause_id]
+   local entry = s.road_ledger[cause_id]
    if not entry then
       return nil
    end
-   s.roads[cause_id] = nil
+   s.road_ledger[cause_id] = nil
    for col, n in pairs(entry) do
       s.on_road[col] = s.on_road[col] - n
    end
@@ -254,7 +256,7 @@ function Audit.of(annals, legs, road)
       violations = {}, mismatches = {}, unclassified = {},
       road = road, pending = {},
       unexplained = road and {} or nil,
-      roads = {},
+      road_ledger = {}, -- the goods-in-transit book (was "roads" — one letter from s.road, which is the map; card 172)
       on_road = {},
       world = {}, -- the legs' own scratch: founded, totals, whatever
    }

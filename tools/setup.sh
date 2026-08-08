@@ -112,7 +112,7 @@ if [ -f rocks.lock ]; then
    done
 else
    echo "   no rocks.lock — resolving fresh from the rockspec, then locking"
-   ./luarocks build --only-deps sonder-0.2.4-1.rockspec "SQLITE_DIR=$SQLITE_DIR"
+   ./luarocks build --only-deps sonder-0.2.5-1.rockspec "SQLITE_DIR=$SQLITE_DIR"
    tools/lock.sh
 fi
 
