@@ -27,6 +27,7 @@ local Belief = require "sonder.belief"
 local Travel = require "sonder.travel"
 local Carriage = require "sonder.carriage"
 local Courier = require "sonder.courier"
+local Vocabulary = require "sonder.vocabulary"
 
 local Universe = {}
 Universe.__index = Universe
@@ -54,6 +55,10 @@ function Universe.new(seed, opts)
    opts = opts or {}
    assert(type(opts.vocabulary) == "table",
       "universe: a world must supply its vocabulary (opts.vocabulary)")
+   -- One complete check, one voice, at the earliest moment (card
+   -- 171): a half-shaped vocabulary used to fail at whichever of
+   -- four consumers it reached first.
+   Vocabulary.check(opts.vocabulary)
    assert(opts.distance == nil or type(opts.distance) == "function",
       "universe: opts.distance must be a function (from, to, tick) -> days")
    local channel_speed = opts.channel_speed or 1
@@ -68,7 +73,7 @@ function Universe.new(seed, opts)
       channel_speed = channel_speed,
       carriage = Carriage.new(
          opts.mechanisms or { Carriage.field(channel_speed) },
-         opts.distance),
+         opts.distance, opts.vocabulary.loudnesses),
       systems = {}, -- array of {name, fn}; order is part of the physics
       factions = {}, -- array of {name, home, decide, store}
       names = {}, -- every actor name ever claimed, systems and factions
