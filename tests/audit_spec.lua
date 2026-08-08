@@ -11,7 +11,7 @@ local legs = require "worlds.space_audit"
 -- The world's road, as the audit wants it: the same map and divisor
 -- the courier reads.
 local function road(u)
-   return { distance = u.distance, channel_speed = u.channel_speed }
+   return { days = function(from, to, tick) return u:days(from, to, tick) end }
 end
 
 -- Clean, in the card-122 sense: the arithmetic of truth is perfect

@@ -24,6 +24,7 @@
 local Rng = require "sonder.rng"
 local Annals = require "sonder.annals"
 local Belief = require "sonder.belief"
+local Travel = require "sonder.travel"
 local Carriage = require "sonder.carriage"
 local Courier = require "sonder.courier"
 
@@ -37,8 +38,10 @@ Universe.__index = Universe
 --     means everywhere is adjacent. The tick parameter is passed even
 --     though today's tables ignore it — the door a moving map (card
 --     125 and beyond) walks through without touching this file.
---   channel_speed — the divisor that turns distance into delay;
---     default 1. A parameter, not a constant, on lore's orders.
+--   channel_speed — the road speed (card 170's demotion): the
+--     divisor Universe:days uses to price freight journeys, and
+--     the default field row's speed; default 1. News speed is the
+--     carriage rows' business — each row carries its own.
 --   mechanisms — the world's carriage rows (card 150; ADR 0005):
 --     what carries news here, and how fast. Optional; a world that
 --     declares nothing gets the field row at channel speed — the
@@ -100,6 +103,20 @@ end
 -- the log.
 function Universe:emit(spec)
    return self.annals:append(self.tick, spec)
+end
+
+-- How many days the road between two named places takes at this
+-- world's road speed (card 170) — the one call every freight
+-- system, world, and viewer prices journeys through. News does NOT
+-- go through here: the courier asks the carriage, whose rows carry
+-- their own speeds. nil distance keeps the pass-through convention
+-- (everywhere adjacent).
+function Universe:days(from, to, tick)
+   local d = 0
+   if self.distance then
+      d = self.distance(from, to, tick)
+   end
+   return Travel.days(d, self.channel_speed)
 end
 
 -- Actor names are unique across systems and factions together: the

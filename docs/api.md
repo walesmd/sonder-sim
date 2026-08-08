@@ -20,7 +20,7 @@ local u = Universe.new(seed, opts)
 |---|---|---|
 | `vocabulary` | yes | what can happen here: the world's kinds, payloads, and loudness set. The engine demands exactly one entry, `universe.genesis`, because it emits it |
 | `distance` | no | the world's map: `(from, to, tick) → days`, integers, consulted at each event's departure. `nil` means everywhere is adjacent (the pass-through era) |
-| `channel_speed` | no | default 1; the default field row's speed. **Post-card-150 note:** rows carry their own speeds — this parameter only feeds the default row and the legacy `u.channel_speed` field that roads and the audit still read (a known review finding) |
+| `channel_speed` | no | default 1; **the road speed** (demoted at card 170): the divisor `Universe:days` prices freight with, and the default field row's speed. News speed belongs to each carriage row |
 | `mechanisms` | no | the world's carriage rows (see below). Omitted: the field row at channel speed |
 
 Methods and public fields:
@@ -41,6 +41,11 @@ Methods and public fields:
 - `u:step()` / `u:run(ticks)` — advance time. One step: dawn
   losses → systems in order → per faction: due deliveries, courier
   scan, decide, intents emitted.
+- `u:days(from, to, tick)` — how many days the road between two
+  named places takes at this world's road speed (card 170): the
+  one call freight systems, worlds, and viewers price journeys
+  through. News does not go through here — the courier asks the
+  carriage.
 - `u.annals`, `u.tick`, `u.seed`, `u.distance`, `u.carriage` —
   readable state. Viewers read `u.annals`; nothing should write
   anywhere but through `emit`.
@@ -135,7 +140,9 @@ its owner — beside the event's own `tick`. The gap is the point.
   `Chronicle.believed_line(held, templates)` render one sentence
   (truth single-dated, belief double-dated). Unknown kinds fall
   back to the envelope — readers age, writes are forever.
-- `Audit.of(annals, legs, road)` → the double-entry report:
+- `Audit.of(annals, legs, road)` — `road`, when given, is
+  `{ days = (from, to, tick) → integer }` (pass a closure over
+  `Universe:days`; card 170). Returns the double-entry report:
   `violations` (impossible arithmetic — zero forever),
   `mismatches` / `unexplained` (self-reports vs the fold),
   `world` (the world's own totals), `unclassified` (kinds the legs

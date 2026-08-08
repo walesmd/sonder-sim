@@ -101,11 +101,9 @@ function lib.ship(s, e, name, deltas)
    if not s.road then
       return
    end
-   local d = s.road.distance(e.location, s.seats[name], e.tick)
-   local speed = s.road.channel_speed
    local list = s.pending[name]
    list[#list + 1] = {
-      arrives = e.tick + (d + speed - 1) // speed,
+      arrives = e.tick + s.road.days(e.location, s.seats[name], e.tick),
       deltas = deltas,
    }
 end
@@ -232,22 +230,23 @@ end
 
 -- Fold the annals into a report, under a world's legs. Pure: same
 -- log, same legs, same report, on every machine. The optional road
--- — { distance, channel_speed }, the same map the courier reads —
--- lets the fold certify mismatches; annals + legs + road produce
--- the same report for any holder of all three.
+-- — { days = (from, to, tick) → integer }, the same pricing the
+-- freight rides (Universe:days, card 170) — lets the fold certify
+-- mismatches; annals + legs + road produce the same report for any
+-- holder of all three. (An honest limit, on the record since card
+-- 166: this explains drift by *freight* pace, not by carriage
+-- rows — a world whose news and freight travel differently owes
+-- the audit a richer road when its migration card arrives; see
+-- card 163.)
 function Audit.of(annals, legs, road)
    assert(type(legs) == "table" and type(legs.effects) == "table"
       and type(legs.columns) == "table"
       and type(legs.identities) == "function",
       "audit: a world's legs are required (columns, effects, identities)")
    if road ~= nil then
-      assert(type(road) == "table" and type(road.distance) == "function",
-         "audit: road must carry distance(from, to, tick)")
-      road = { distance = road.distance,
-         channel_speed = road.channel_speed or 1 }
-      assert(math.type(road.channel_speed) == "integer"
-         and road.channel_speed >= 1,
-         "audit: road.channel_speed must be a positive integer")
+      assert(type(road) == "table" and type(road.days) == "function",
+         "audit: road must carry days(from, to, tick)")
+      road = { days = road.days }
    end
    local s = {
       legs = legs,
