@@ -74,3 +74,14 @@ Hiring and departures (actors joining and leaving mid-history — the
 first card this world sends back to the system); clients as
 believable minds; meetings with attendee lists (a known stress on
 flat payloads, to be met when hit).
+
+## Current state (living; the sections above are the card-160 founding)
+
+Bellwether runs at **rung 1** of the carrier taxonomy: news still
+reaches everyone at org-chart pace, but the field is now a row this
+world declares (`Carriage.field(1)`) rather than physics the engine
+assumes. Its rung 2 — what earshot means in a building: the room,
+the thread, the cc line — is card 164, deliberately a design
+conversation before it is code. Golden seal `10fc9a5781a44136`
+(seed 7 × 200, unmoved since founding). The rumor-cascade KPI
+fired unprompted at card 160 and still does.
