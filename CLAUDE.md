@@ -64,6 +64,21 @@ are jointly owned and published.
   tests, first-divergence binary search, and integrity checks).
 - Reproducible toolchain: Lua 5.4 pinned, dependencies locked.
 
+## The living reference (read before re-deriving anything)
+
+`docs/README.md` maps all documentation. Five pages are **living**
+— they describe the system as it stands, and staleness in them is
+a bug: `docs/architecture.md` (modules, the tick, the life of an
+event — start here before touching the engine), `docs/api.md` (the
+public surface and every contract a world or viewer relies on),
+`docs/universe-file.md` (the database a run writes),
+`docs/verification.md` (the seals and how to check one), and
+`docs/glossary.md` (canonical vocabulary). Posts and notebooks are
+**pinned era artifacts** — never retro-corrected; trust them about
+then, not about now. Any card that changes what a living page
+describes updates that page in the same PR (it's a docs-sweep
+item). Built at card 166, post 0017.
+
 ## Working agreement
 
 - Every increment ships twice: the work AND a post in `docs/posts/`.
