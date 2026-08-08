@@ -33,9 +33,7 @@ function Roads.new(u, opts)
 end
 
 local function travel_days(self, from, to, tick)
-   local d = self.u.distance(from, to, tick)
-   local speed = self.u.channel_speed
-   return (d + speed - 1) // speed
+   return self.u:days(from, to, tick)
 end
 
 -- Put a departure on the calendar. Call from the world's catch_up

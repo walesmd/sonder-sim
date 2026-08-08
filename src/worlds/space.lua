@@ -62,8 +62,7 @@ end
 -- outruns the concept of distance (card 122's consistency rule);
 -- what gets to move at its own speed someday is cards 150 and 153.
 local function travel(u, from, to, tick)
-   local d = distance(from, to, tick)
-   return (d + u.channel_speed - 1) // u.channel_speed
+   return u:days(from, to, tick)
 end
 
 -- The cast. Tuned against the 1000-day acceptance run (see the

@@ -1,6 +1,6 @@
 rockspec_format = "3.0"
 package = "sonder"
-version = "0.2.2-1"
+version = "0.2.3-1"
 
 source = {
    url = "git+https://github.com/walesmd/sonder-sim.git"

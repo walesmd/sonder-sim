@@ -451,8 +451,7 @@ local function add_physics(u)
    local cursor = 0
 
    local function travel_days(from, to, tick)
-      local d = distance(from, to, tick)
-      return (d + u.channel_speed - 1) // u.channel_speed
+      return u:days(from, to, tick)
    end
 
    local function catch_up()
