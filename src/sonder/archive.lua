@@ -154,6 +154,12 @@ function Archive.create(path, annals, provenance, opts)
       sqlite_version = sqlite3.version(),
       world = provenance.world,
    }
+   for i = 1, #REQUIRED do
+      -- the demanded list and the written list are two tables; card
+      -- 167's first run proved they can disagree silently. Never again.
+      assert(rows[REQUIRED[i]] ~= nil,
+         "archive: REQUIRED key never written: " .. REQUIRED[i])
+   end
    local keys = {}
    for k in pairs(rows) do
       keys[#keys + 1] = k

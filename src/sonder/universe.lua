@@ -110,6 +110,19 @@ function Universe:emit(spec)
    return self.annals:append(self.tick, spec)
 end
 
+-- A faction's belief store, by name, for viewers (card 172): the
+-- --believes flag and the specs were all scanning the factions
+-- array by hand — five copies of the same loop, each reaching into
+-- the faction row's internals. Viewers may look; law 3 is about
+-- decision code, and this is the reading room's door.
+function Universe:beliefs(name)
+   for i = 1, #self.factions do
+      if self.factions[i].name == name then
+         return self.factions[i].store
+      end
+   end
+end
+
 -- How many days the road between two named places takes at this
 -- world's road speed (card 170) — the one call every freight
 -- system, world, and viewer prices journeys through. News does NOT

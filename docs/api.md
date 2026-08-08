@@ -46,6 +46,9 @@ Methods and public fields:
   one call freight systems, worlds, and viewers price journeys
   through. News does not go through here — the courier asks the
   carriage.
+- `u:beliefs(name)` — a faction's belief store, for viewers (card
+  172). Law 3 governs decision code; this is the reading room's
+  door.
 - `u.annals`, `u.tick`, `u.seed`, `u.distance`, `u.carriage` —
   readable state. Viewers read `u.annals`; nothing should write
   anywhere but through `emit`.
