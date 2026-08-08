@@ -40,6 +40,7 @@ can explain an algorithm better than a paragraph, the post carries one
 | [0016](0016-the-roads-are-not-safe/complete.md) | The Roads Are Not Safe | `post/0016` |
 | [0017](0017-success-debt/complete.md) | Success Debt | `post/0017` |
 | [0018](0018-the-file-that-knows-its-name/complete.md) | The File That Knows Its Name | `post/0018` |
+| [0019](0019-a-file-for-the-question/complete.md) | A File for the Question | `post/0019` |
 
 Tags pushed before card 147 point at the old single-file layout
 (`docs/posts/NNNN-slug.md`); posts are era artifacts, and the tags
