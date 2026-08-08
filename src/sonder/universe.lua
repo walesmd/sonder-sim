@@ -11,22 +11,21 @@
 -- directly. Factions are the governed side of law 3: their decision
 -- code is handed a belief store, a stream, and the tick — never the
 -- universe — and *returns* intents for the universe to emit. The
--- courier lives here too (card 122): news crosses distance on the
--- mechanisms the world declares (card 150, sonder/carriage.lua) —
--- the field row by default, a radiated medium with infinite range
--- at channel speed, which is the old ceil(distance ÷ channel_speed)
--- arithmetic as one honest row of data. A world past rung 1 of
--- ADR 0005's ladder declares real rows instead, and the witness
--- rule applies: an event no row carries to a faction is never
--- delivered to it. The pass-through era (v0.1, everyone briefly
--- omniscient) remains the degenerate case: nil distance means
--- everywhere is adjacent and news is instant.
+-- courier (card 122; its own module since card 168 —
+-- sonder/courier.lua) delivers news on the mechanisms the world
+-- declares (card 150, sonder/carriage.lua) — the field row by
+-- default, a radiated medium with infinite range at channel speed.
+-- A world past rung 1 of ADR 0005's ladder declares real rows
+-- instead, and the witness rule applies: an event no row carries
+-- to a faction is never delivered to it. The pass-through era
+-- (v0.1, everyone briefly omniscient) remains the degenerate case:
+-- nil distance means everywhere is adjacent and news is instant.
 
 local Rng = require "sonder.rng"
 local Annals = require "sonder.annals"
 local Belief = require "sonder.belief"
-local Travel = require "sonder.travel"
 local Carriage = require "sonder.carriage"
+local Courier = require "sonder.courier"
 
 local Universe = {}
 Universe.__index = Universe
@@ -68,15 +67,15 @@ function Universe.new(seed, opts)
          opts.mechanisms or { Carriage.field(channel_speed) },
          opts.distance),
       systems = {}, -- array of {name, fn}; order is part of the physics
-      factions = {}, -- array of {name, home, decide, store, cursor, pending}
+      factions = {}, -- array of {name, home, decide, store}
       names = {}, -- every actor name ever claimed, systems and factions
-      losses = Travel.new(), -- letters the roads have already taken,
-      -- awaiting the day the loss actually lands (card 151)
    }, Universe)
-   -- The courier draws its own dice now (card 151) and owns the
-   -- stream name outright: no world actor may claim "courier",
-   -- because sharing a stream couples draws — law 1's oldest rule.
+   -- The courier (extracted card 168: sonder/courier.lua) draws its
+   -- own dice and owns the stream name outright: no world actor may
+   -- claim "courier", because sharing a stream couples draws —
+   -- law 1's oldest rule.
    u.names["courier"] = true
+   u.courier = Courier.new(u.annals, u.carriage, u.rng:stream("courier"))
    -- In the beginning there was an event, because there is nothing
    -- else for there to be (law 2). Every cause chain in this universe
    -- terminates here, at id 1. Magnitude 0 reads odd on the largest
@@ -135,35 +134,28 @@ function Universe:add_faction(name, home, decide)
    claim(self, name, "faction")
    assert(type(home) == "string" and #home > 0,
       "universe: " .. name .. ": home must be a non-empty string")
+   local store = Belief.new(name)
    self.factions[#self.factions + 1] = {
       name = name,
       home = home,
       decide = decide,
-      store = Belief.new(name),
-      cursor = 0, -- the courier's bookmark into the annals
-      pending = Travel.new(), -- this faction's in-flight news
+      store = store,
    }
+   self.courier:enroll(name, home, store)
 end
 
+-- One tick, in the order that is the physics: dawn (the courier's
+-- losses land as events — emission stays this file's door), then
+-- systems, then each faction in registration order — the courier
+-- delivers to it, it decides on what it believes, and its intents
+-- are emitted through full validation. How news travels, wears,
+-- and dies lives in sonder/courier.lua (card 168); what remains
+-- here is only the heartbeat.
 function Universe:step()
    self.tick = self.tick + 1
-   -- Dawn: losses whose day has come become events (card 151). The
-   -- fate was sealed at departure; the annals stamps the day the
-   -- rider actually dies — quiet, on the road, reason-free (the
-   -- universe does not fake knowledge it lacks; card 165 will
-   -- generate causes as facts). Located wherever the row said, a
-   -- place worlds map far from every home: witnessed by no one.
-   local lost = self.losses:due(self.tick)
+   local lost = self.courier:dawn(self.tick)
    for i = 1, #lost do
-      local l = lost[i]
-      self:emit{
-         kind = l.kind,
-         location = l.where,
-         magnitude = 1,
-         loudness = "quiet",
-         payload = { from = l.from, to = l.to },
-         causes = { l.cause },
-      }
+      self:emit(lost[i])
    end
    for i = 1, #self.systems do
       local system = self.systems[i]
@@ -171,61 +163,7 @@ function Universe:step()
    end
    for i = 1, #self.factions do
       local faction = self.factions[i]
-      -- The courier (card 122; calendar extracted card 153). An
-      -- event departs its location when emitted and reaches this
-      -- faction's home after delay() ticks. What is due today goes
-      -- first — in-flight events are older than anything the
-      -- bookmark hasn't seen, so ids stay ordered within the tick —
-      -- then the bookmark advances over everything new: what has
-      -- already arrived is handed over now, the rest goes on the
-      -- calendar (sonder/travel.lua, which carries the determinism
-      -- argument). Each believed copy is stamped with the tick this
-      -- faction learned it, so the store keeps a private
-      -- chronology: the order news reached it, not the order things
-      -- happened. That gap is the card.
-      local due = faction.pending:due(self.tick)
-      for j = 1, #due do
-         faction.store:receive(due[j], self.tick)
-      end
-      -- Which mechanism carries each event, and when it lands, is
-      -- the carriage's answer (card 150): the rows this world
-      -- declared, earliest arrival winning. nil is the witness rule
-      -- (ADR 0005) — nothing carried it, so for this faction it
-      -- never happened; the cursor moves on and no row ever forms.
-      -- Rows with an encounter profile (card 151) roll the dice at
-      -- departure, one chance per day of exposure, on the courier's
-      -- own stream: the fate is sealed when the rider sets out,
-      -- exactly as the delay always was, but the loss *lands* on
-      -- the day it happens (never before the next dawn — a fate
-      -- sealed mid-scan still needs a dawn to be discovered by).
-      while faction.cursor < self.annals:len() do
-         faction.cursor = faction.cursor + 1
-         local e = self.annals:get(faction.cursor)
-         local arrives, row =
-            self.carriage:arrival(e, faction.name, faction.home)
-         if arrives ~= nil and row.encounters ~= nil then
-            local enc = row.encounters
-            local dice = self.rng:stream("courier")
-            for day = 1, arrives - e.tick do
-               if dice:int(1, enc.per_day) == 1 then
-                  self.losses:schedule(
-                     math.max(e.tick + day, self.tick + 1),
-                     { kind = enc.lost, where = enc.where,
-                        from = e.location, to = faction.home,
-                        cause = e.id })
-                  arrives = nil
-                  break
-               end
-            end
-         end
-         if arrives == nil then
-            -- unwitnessed, uncarried, or lost: never delivered
-         elseif arrives <= self.tick then
-            faction.store:receive(e, self.tick)
-         else
-            faction.pending:schedule(arrives, e)
-         end
-      end
+      self.courier:deliver(i, self.tick)
       local intents = faction.decide(faction.store,
          self.rng:stream(faction.name), self.tick)
       assert(type(intents) == "table",

@@ -31,6 +31,7 @@ graph TB
             AN["annals.lua<br/>the event log; validation"]
         end
         subgraph knowledge["knowledge"]
+            CO["courier.lua<br/>news becomes belief: delivery, dice, losses"]
             C["carriage.lua<br/>mechanism rows: who news reaches, when"]
             B["belief.lua<br/>one faction's private memory"]
             T["travel.lua<br/>the shared calendar"]
@@ -55,9 +56,10 @@ graph TB
     WA --> AU
     U --> R
     U --> AN
-    U --> C
-    U --> B
-    U --> T
+    U --> CO
+    CO --> C
+    CO --> B
+    CO --> T
     W --> RD
     RD --> T
     AN --> BF
