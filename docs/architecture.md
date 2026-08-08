@@ -26,9 +26,10 @@ graph TB
     end
     subgraph engine["src/sonder — the engine (world-blind)"]
         subgraph core["the heartbeat"]
-            U["universe.lua<br/>ticks · systems · factions · the courier"]
+            U["universe.lua<br/>ticks · systems · factions"]
             R["rng.lua<br/>named streams"]
             AN["annals.lua<br/>the event log; validation"]
+            VC["vocabulary.lua<br/>the contract, checked once;<br/>the framework road grammar"]
         end
         subgraph knowledge["knowledge"]
             CO["courier.lua<br/>news becomes belief: delivery, dice, losses"]
@@ -51,7 +52,8 @@ graph TB
     M["src/main.lua<br/>CLI; builds a world, watches it"]
 
     W -->|"Universe.new(seed, opts)"| U
-    WV --> AN
+    WV --> VC
+    VC --> AN
     WT --> CH
     WA --> AU
     U --> R

@@ -17,6 +17,8 @@
 -- vocabulary must declare it: universe.genesis, because every
 -- universe begins.
 
+local Vocabulary = require "sonder.vocabulary"
+
 return {
    -- Bumped when the envelope or an existing kind's payload changes
    -- shape; merely adding a kind doesn't bump it. The archive writes
@@ -48,7 +50,7 @@ return {
    -- and one bind away from a SQLite column (the archive holds them
    -- to it, card 115). Money is integer cents; grain is integer
    -- sacks; law 1 tolerates no floats near an outcome.
-   kinds = {
+   kinds = Vocabulary.with_road_kinds{
       ["universe.genesis"] = {
          doc = "a universe begins; the first row of every annals and "
             .. "the event all cause chains terminate in",
@@ -85,36 +87,6 @@ return {
          payload = { { "buyer", "string" }, { "seller", "string" },
             { "units", "integer" }, { "price", "integer" },
             { "total", "integer" } },
-      },
-      ["cargo.shipped"] = {
-         doc = "matter departs one holder for another: commodity "
-            .. "and units leave the sender's stores and take to the "
-            .. "road (card 153). The arrival is physics' verdict, "
-            .. "never this event's promise — a lot can happen in "
-            .. "seven days",
-         payload = { { "commodity", "string" }, { "units", "integer" },
-            { "sender", "string" }, { "recipient", "string" } },
-      },
-      ["cargo.delivered"] = {
-         doc = "matter arrives: the recipient's stores grow by what "
-            .. "actually made it. Cites its cargo.shipped — the "
-            .. "pairing the road ledger balances on",
-         payload = { { "commodity", "string" }, { "units", "integer" },
-            { "sender", "string" }, { "recipient", "string" } },
-      },
-      ["payment.shipped"] = {
-         doc = "money departs payer for payee and takes to the road "
-            .. "(card 153). How long it rides is the mechanism's "
-            .. "business — a hull takes days, a wire takes seconds; "
-            .. "the story reads the same either way",
-         payload = { { "amount", "integer" },
-            { "payer", "string" }, { "payee", "string" } },
-      },
-      ["payment.delivered"] = {
-         doc = "money arrives in the payee's treasury. Cites its "
-            .. "payment.shipped",
-         payload = { { "amount", "integer" },
-            { "payer", "string" }, { "payee", "string" } },
       },
       ["market.price"] = {
          doc = "the exchange reposts grain: naive price adjustment "

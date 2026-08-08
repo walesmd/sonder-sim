@@ -18,7 +18,7 @@ local u = Universe.new(seed, opts)
 
 | option | required | meaning |
 |---|---|---|
-| `vocabulary` | yes | what can happen here: the world's kinds, payloads, and loudness set. The engine demands exactly one entry, `universe.genesis`, because it emits it |
+| `vocabulary` | yes | what can happen here: the world's kinds, payloads, and loudness set, validated once at construction (`Vocabulary.check`, card 171 — one voice for every shape rule). The engine demands exactly one entry, `universe.genesis`, because it emits it. `Vocabulary.with_road_kinds(kinds)` merges the framework cargo/payment grammar in (the world wins on collision); radiated carriage rows are validated against the *declared* loudness set |
 | `distance` | no | the world's map: `(from, to, tick) → days`, integers, consulted at each event's departure. `nil` means everywhere is adjacent (the pass-through era) |
 | `channel_speed` | no | default 1; **the road speed** (demoted at card 170): the divisor `Universe:days` prices freight with, and the default field row's speed. News speed belongs to each carriage row |
 | `mechanisms` | no | the world's carriage rows (see below). Omitted: the field row at channel speed |
