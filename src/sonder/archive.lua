@@ -77,8 +77,14 @@ BEGIN SELECT RAISE(ABORT, 'checkpoints are append-only'); END;
 
 -- Provenance the caller must supply, because only the host knows:
 -- the archive sits with the viewers, where shells and git are legal,
--- but it still refuses to invent facts it can't verify.
-local REQUIRED = { "engine_version", "git_commit", "seed", "config" }
+-- but it still refuses to invent facts it can't verify. `world`
+-- landed at card 167, paying ADR 0004's oldest unpaid requirement:
+-- three worlds' archives must never be confusable, and before this
+-- row two of them were. (The world's *version* is its vocabulary's
+-- schema_version, already written below — one world, one
+-- vocabulary, one version.)
+local REQUIRED = { "engine_version", "git_commit", "seed", "config",
+   "world" }
 
 local function fail(db, context)
    local msg = db:errmsg()
@@ -146,6 +152,7 @@ function Archive.create(path, annals, provenance, opts)
       schema_version = ("%d"):format(annals.vocabulary.schema_version),
       seed = ("%d"):format(provenance.seed),
       sqlite_version = sqlite3.version(),
+      world = provenance.world,
    }
    local keys = {}
    for k in pairs(rows) do

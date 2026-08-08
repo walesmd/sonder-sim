@@ -154,7 +154,11 @@ reference shelf ([architecture](docs/architecture.md), the
 [verification](docs/verification.md)) beside the pinned posts —
 post 0017,
 [*Success Debt*](docs/posts/0017-success-debt/complete.md)
-(tag `post/0017`). Ahead: Mike's picks from the findings, the
+(tag `post/0017`). The first finding is already paid: every
+universe file now records which world wrote it — nine provenance
+rows, engine 0.2.1 — post 0018,
+[*The File That Knows Its Name*](docs/posts/0018-the-file-that-knows-its-name/complete.md)
+(tag `post/0018`). Ahead: Mike's remaining picks from the findings, the
 courier's remaining successors (cards 152–159), the encounter
 engine that will give losses their reasons (card 165), and the
 lore shelf's road to thirty species. Watching now means watching

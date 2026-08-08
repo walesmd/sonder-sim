@@ -202,13 +202,12 @@ adds it here, in the same PR.
   over the annals, one transaction per tick, never a live reference.
   (post 0004)
 - **provenance** — the table of origins every universe file carries
-  from birth — eight rows today: engine version, git commit, seed,
-  config, vocabulary schema version, intervention log, plus the Lua
-  and SQLite versions that wrote it. A log found on a beach can
-  testify about where it came from. (Owed and on the record: a
-  `world` row, per ADR 0004 — today two worlds' files with one seed
-  are confusable.) Full reference:
-  [`universe-file.md`](universe-file.md). (posts 0004; card 166)
+  from birth — nine rows: engine version, git commit, seed, config,
+  which world wrote it (card 167), that world's vocabulary version,
+  the intervention log, plus the Lua and SQLite versions doing the
+  writing. A log found on a beach can testify about where it came
+  from. Full reference: [`universe-file.md`](universe-file.md).
+  (posts 0004, 0018)
 - **byteform** (`byteform.lua`) — the one byte representation every
   event has: envelope fields in fixed order, payload fields in
   declaration order, total escaping. The archive stores these bytes;

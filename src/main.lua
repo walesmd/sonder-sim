@@ -43,7 +43,7 @@ local fnv = require "sonder.fnv"
 -- stands. Docs, worlds, and specs bump nothing. Precise
 -- identification is the git commit in provenance; this number only
 -- names determinism epochs.
-local ENGINE_VERSION = "0.2.0"
+local ENGINE_VERSION = "0.2.1"
 
 local function parse_args(argv)
    local opts = { seed = 1893, ticks = 10 }
@@ -162,6 +162,7 @@ if opts.db ~= "none" then
       git_commit = git_commit(),
       seed = u.seed,
       config = "{}", -- honestly: there is no config yet (card 118)
+      world = opts.world or "space", -- which world wrote this file
    })
    if not ok then
       io.stderr:write(tostring(created) .. "\n")
