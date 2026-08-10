@@ -22,6 +22,21 @@
 local Travel = {}
 Travel.__index = Travel
 
+-- The one statement of road arithmetic (card 170): how many days
+-- a journey of `distance` takes at `speed`, rounded up in integer
+-- math, because a day decides outcomes and law 1 tolerates no
+-- floats near one. Written five times across the engine and two
+-- worlds before it lived here; grep found every copy by this
+-- formula, which is exactly why a formula this load-bearing gets
+-- one home.
+function Travel.days(distance, speed)
+   assert(math.type(distance) == "integer" and distance >= 0,
+      "travel: distance must be a non-negative integer")
+   assert(math.type(speed) == "integer" and speed >= 1,
+      "travel: speed must be a positive integer")
+   return (distance + speed - 1) // speed
+end
+
 function Travel.new()
    return setmetatable({
       calendar = {}, -- arrival tick → items, in scheduling order

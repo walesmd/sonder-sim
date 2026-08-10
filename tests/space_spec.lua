@@ -38,7 +38,7 @@ describe("conservation", function()
       local u = space(1893)
       u:run(300)
       local report = Audit.of(u.annals, legs,
-         { distance = u.distance, channel_speed = u.channel_speed })
+         { days = function(from, to, tick) return u:days(from, to, tick) end })
       assert.equal(0, #report.mismatches)
       assert.equal(0, #report.unexplained)
    end)

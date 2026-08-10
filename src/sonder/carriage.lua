@@ -37,6 +37,8 @@
 -- earliest arrival across reaching rows wins, ties broken by row
 -- order; integer arithmetic throughout, no pairs() near an outcome.
 
+local Travel = require "sonder.travel"
+
 local Carriage = {}
 Carriage.__index = Carriage
 
@@ -151,7 +153,7 @@ function Carriage:arrival(e, name, home)
          reaches = field ~= nil and e.payload[field] == name
       end
       if reaches then
-         local arrives = e.tick + (d + row.speed - 1) // row.speed
+         local arrives = e.tick + Travel.days(d, row.speed)
          if best == nil or arrives < best then
             best = arrives
             carrier = row

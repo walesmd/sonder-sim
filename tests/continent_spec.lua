@@ -99,7 +99,7 @@ describe("the continent", function()
       local u = continent(7)
       u:run(400)
       local report = Audit.of(u.annals, legs,
-         { distance = u.distance, channel_speed = u.channel_speed })
+         { days = function(from, to, tick) return u:days(from, to, tick) end })
       assert.equal(0, #report.violations,
          table.concat(report.violations, "\n"))
       assert.equal(0, #report.mismatches)

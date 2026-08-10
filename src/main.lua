@@ -43,7 +43,7 @@ local fnv = require "sonder.fnv"
 -- stands. Docs, worlds, and specs bump nothing. Precise
 -- identification is the git commit in provenance; this number only
 -- names determinism epochs.
-local ENGINE_VERSION = "0.2.2"
+local ENGINE_VERSION = "0.2.3"
 
 local function parse_args(argv)
    local opts = { seed = 1893, ticks = 10 }
@@ -254,7 +254,7 @@ end
 if opts.audit then
    local legs = require(WORLD.audit)
    local report = Audit.of(u.annals, legs,
-      { distance = u.distance, channel_speed = u.channel_speed })
+      { days = function(from, to, tick) return u:days(from, to, tick) end })
    print(legs.summary(report))
    for i = 1, #report.violations do
       print("audit violation: " .. report.violations[i])
