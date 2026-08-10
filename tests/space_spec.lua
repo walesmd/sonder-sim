@@ -243,11 +243,7 @@ describe("the believes view", function()
       local u = space(1893)
       u:run(200)
       local store
-      for i = 1, #u.factions do
-         if u.factions[i].name == "vessari" then
-            store = u.factions[i].store
-         end
-      end
+      store = u:beliefs("vessari")
       local rows = store:chronology()
       assert.is_true(#rows > 0)
       local declarations = 0

@@ -165,10 +165,18 @@ return {
    -- One line for the host to print: the world knows what its own
    -- books are called (main.lua --audit).
    summary = function(report)
+      -- the twin of space_templates' comma(), sign branch included
+      -- (card 172: this copy formatted negatives wrong — "-1,00,0"
+      -- territory — and a summary that can't print a deficit
+      -- honestly is a summary waiting to lie)
       local function comma(n)
-         local grouped = tostring(n):reverse():gsub("(%d%d%d)", "%1,")
+         local s, sign = tostring(n), ""
+         if s:sub(1, 1) == "-" then
+            sign, s = "-", s:sub(2)
+         end
+         local grouped = s:reverse():gsub("(%d%d%d)", "%1,")
             :reverse():gsub("^,", "")
-         return grouped
+         return sign .. grouped
       end
       local f = report.world.founded or { grain = 0, cents = 0 }
       local t = report.world.totals or { harvested = 0, eaten = 0, burned = 0 }

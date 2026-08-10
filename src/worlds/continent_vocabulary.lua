@@ -7,10 +7,13 @@
 -- There is no exchange on Harrow. Trade is bilateral: an offer
 -- rides to a neighbor, an acceptance rides back, and only then do
 -- the goods and the payment take to the roads — four events, four
--- journeys, each priced by the map. The framework cargo/payment and
--- the war kinds are copy-declared from the shared grammar (the
--- composition helper's case grows with every world; it can plead at
--- the docs sweep).
+-- journeys, each priced by the map. The framework cargo/payment
+-- kinds ride in via Vocabulary.with_road_kinds (card 171 — this
+-- file's founding comment pleaded for exactly that helper); the
+-- war kinds stay declared here, because war is content two worlds
+-- share and one world refuses, never framework.
+
+local Vocabulary = require "sonder.vocabulary"
 
 return {
    -- v1: Harrow founded (card 160). Four book columns: grain, iron,
@@ -21,7 +24,7 @@ return {
 
    loudnesses = { "loud", "local", "quiet" },
 
-   kinds = {
+   kinds = Vocabulary.with_road_kinds{
       ["universe.genesis"] = {
          doc = "a universe begins; the engine's one demand of every "
             .. "vocabulary",
@@ -118,31 +121,5 @@ return {
       },
 
       -- The framework grammar, copy-declared (see header).
-      ["cargo.shipped"] = {
-         doc = "matter departs one holder for another (framework "
-            .. "grammar; on Harrow the commodity is grain, iron, or "
-            .. "salt)",
-         payload = { { "commodity", "string" }, { "units", "integer" },
-            { "sender", "string" }, { "recipient", "string" } },
-      },
-      ["cargo.delivered"] = {
-         doc = "matter arrives; cites its cargo.shipped (framework "
-            .. "grammar)",
-         payload = { { "commodity", "string" }, { "units", "integer" },
-            { "sender", "string" }, { "recipient", "string" } },
-      },
-      ["payment.shipped"] = {
-         doc = "money departs payer for payee (framework grammar; on "
-            .. "Harrow, always the buyer's half of a bilateral deal "
-            .. "or a raider's plunder riding home)",
-         payload = { { "amount", "integer" },
-            { "payer", "string" }, { "payee", "string" } },
-      },
-      ["payment.delivered"] = {
-         doc = "money arrives; cites its payment.shipped (framework "
-            .. "grammar)",
-         payload = { { "amount", "integer" },
-            { "payer", "string" }, { "payee", "string" } },
-      },
    },
 }

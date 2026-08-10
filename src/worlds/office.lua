@@ -304,10 +304,13 @@ local function founder_decide(person)
 end
 
 local function ops_decide(person)
-   -- amity keeps the lights on: the rent leaves through her tally's
-   -- spent column, on mara's behalf, every week. (v1 flavor; the
-   -- books amity keeps versus the books mara believes is a
-   -- chartered story for a later cut.)
+   -- amity opens the day and, in v1, does little else — the rent
+   -- actually leaves through mara's own weekly tally (extra_spend,
+   -- above), not amity's. This comment used to claim otherwise
+   -- (card 172): in a repo where comments are published prose,
+   -- attributing mara's books to amity was a small lie with a long
+   -- shelf life. The books amity keeps versus the books mara
+   -- believes stays a chartered story for a later cut.
    return function(beliefs, _, tick)
       local intents = open_the_day(person, beliefs, 0)
       return intents

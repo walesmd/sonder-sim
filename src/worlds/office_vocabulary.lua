@@ -4,16 +4,17 @@
 -- engine demands universe.genesis and nothing else; everything else
 -- is this universe's own grammar.
 --
--- Two families are copy-declared from the framework grammar —
--- cargo.* and payment.* — because internal movement rides the
--- engine's road kinds in every world, and vocabularies are
--- self-contained tables. (A composition helper that lets worlds
--- import the framework kinds instead of restating them is a noted
--- refinement; it earns its keep at the third world, per the rule
--- of three.) The doors are the office's own: work is made and
+-- The cargo.* and payment.* families ride in from the framework
+-- grammar via Vocabulary.with_road_kinds (card 171 — this file
+-- predicted that helper would "earn its keep at the third world,
+-- per the rule of three," and it did; the prediction is preserved
+-- in the git history and in post 0021). The doors are the
+-- office's own: work is made and
 -- delivered, money enters as revenue and leaves as spending — an
 -- OPEN system, the first one, with its identities declared to
 -- match.
+
+local Vocabulary = require "sonder.vocabulary"
 
 return {
    -- v1: Bellwether & Co. founded (card 160). The office's books
@@ -22,7 +23,7 @@ return {
 
    loudnesses = { "loud", "local", "quiet" },
 
-   kinds = {
+   kinds = Vocabulary.with_road_kinds{
       ["universe.genesis"] = {
          doc = "a universe begins; the engine's one demand of every "
             .. "vocabulary",
@@ -82,29 +83,5 @@ return {
       },
       -- The framework grammar, restated (see header): internal
       -- movement of work and salaries rides the roads.
-      ["cargo.shipped"] = {
-         doc = "matter departs one holder for another (framework "
-            .. "grammar; here the commodity is work)",
-         payload = { { "commodity", "string" }, { "units", "integer" },
-            { "sender", "string" }, { "recipient", "string" } },
-      },
-      ["cargo.delivered"] = {
-         doc = "matter arrives; cites its cargo.shipped (framework "
-            .. "grammar)",
-         payload = { { "commodity", "string" }, { "units", "integer" },
-            { "sender", "string" }, { "recipient", "string" } },
-      },
-      ["payment.shipped"] = {
-         doc = "money departs payer for payee (framework grammar; "
-            .. "here: salaries, riding the org chart)",
-         payload = { { "amount", "integer" },
-            { "payer", "string" }, { "payee", "string" } },
-      },
-      ["payment.delivered"] = {
-         doc = "money arrives; cites its payment.shipped (framework "
-            .. "grammar)",
-         payload = { { "amount", "integer" },
-            { "payer", "string" }, { "payee", "string" } },
-      },
    },
 }

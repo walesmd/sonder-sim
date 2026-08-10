@@ -42,9 +42,14 @@ local Travel = require "sonder.travel"
 local Carriage = {}
 Carriage.__index = Carriage
 
+-- The classic triple, kept as the default so a carriage built bare
+-- (specs, mostly) still validates sensibly. A universe passes its
+-- world's declared set (card 171): the one module that *consumes*
+-- loudness for an outcome should be validating rows against the
+-- loudnesses that world actually speaks.
 local LOUDNESS = { "loud", "local", "quiet" }
 
-local function validate_row(i, row)
+local function validate_row(i, row, loudnesses)
    local where = ("carriage: row %d"):format(i)
    assert(type(row) == "table", where .. " must be a table")
    assert(type(row.name) == "string" and #row.name > 0,
@@ -57,11 +62,11 @@ local function validate_row(i, row)
       if range ~= "everywhere" then
          assert(type(range) == "table",
             where .. ': range must be "everywhere" or a table over loudness')
-         for j = 1, #LOUDNESS do
-            local r = range[LOUDNESS[j]]
+         for j = 1, #loudnesses do
+            local r = range[loudnesses[j]]
             assert(math.type(r) == "integer" and r >= 0,
                ("%s: range.%s must be a non-negative integer")
-               :format(where, LOUDNESS[j]))
+               :format(where, loudnesses[j]))
          end
       end
    elseif row.shape == "addressed" then
@@ -104,13 +109,17 @@ end
 -- rows: the world's declared mechanisms, in declaration order.
 -- distance: the world's map, (from, to, tick) → days, or nil for
 -- the pass-through convention (everywhere adjacent, distance 0).
-function Carriage.new(rows, distance)
+-- loudnesses: the world's declared loudness set (nil: the classic
+-- triple) — radiated ranges must answer for every loudness the
+-- world can speak, or arrival() would someday index nothing.
+function Carriage.new(rows, distance, loudnesses)
    assert(type(rows) == "table" and #rows >= 1,
       "carriage: a universe needs at least one mechanism row")
    assert(distance == nil or type(distance) == "function",
       "carriage: distance must be a function (from, to, tick) -> days")
+   loudnesses = loudnesses or LOUDNESS
    for i = 1, #rows do
-      validate_row(i, rows[i])
+      validate_row(i, rows[i], loudnesses)
    end
    return setmetatable({ rows = rows, distance = distance }, Carriage)
 end

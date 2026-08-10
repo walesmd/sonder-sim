@@ -122,15 +122,28 @@ describe("the office", function()
       -- and dane's private chronology agrees, to the tick: learned
       -- exactly the road late
       local store
-      for i = 1, #u.factions do
-         if u.factions[i].name == "dane" then
-            store = u.factions[i].store
-         end
-      end
+      store = u:beliefs("dane")
       for _, held in ipairs(store:chronology()) do
          if held.kind == "office.deal_lost" and held.tick == lost_tick then
             assert.equal(lost_tick + lag, held.learned)
          end
+      end
+   end)
+
+   it("classifies every declared kind, not just the emitted ones", function()
+      -- Declaration-level coverage (card 172), space's audit_spec
+      -- discipline applied to the second world too: a kind added to
+      -- the vocabulary with no audit leg fails here, not in
+      -- whichever future run happens to emit it.
+      local vocabulary = require "worlds.office_vocabulary"
+      local kinds = {}
+      for kind in pairs(vocabulary.kinds) do
+         kinds[#kinds + 1] = kind
+      end
+      table.sort(kinds)
+      for _, kind in ipairs(kinds) do
+         assert.is_true(Audit.classified(legs, kind),
+            kind .. " has no ledger classification")
       end
    end)
 
@@ -150,11 +163,7 @@ describe("the office", function()
       local u = office(7)
       u:run(60)
       local store
-      for i = 1, #u.factions do
-         if u.factions[i].name == "dane" then
-            store = u.factions[i].store
-         end
-      end
+      store = u:beliefs("dane")
       local rows = store:chronology()
       assert.is_true(#rows > 0)
       for i = 1, #rows do
