@@ -141,6 +141,50 @@ describe("Belief", function()
       assert.has_error(function() b:chronology("yesterday") end)
    end)
 
+   it("refuses a diary written backward", function()
+      -- since() stops scanning at the first older stamp; this is the
+      -- invariant that makes the stop exact
+      local b = Belief.new("vess")
+      b:receive(drift(2, 1, 3), 5)
+      assert.has_error(function() b:receive(drift(4, 2, -1), 4) end)
+      b:receive(drift(4, 2, -1), 5) -- same day is fine
+   end)
+
+   it("since() returns exactly what was learned after a tick", function()
+      local b = Belief.new("vess")
+      for day = 1, 50 do
+         b:receive(drift(day + 1, day, 1), day)
+      end
+      local late = b:since("market.drift", 40)
+      assert.equal(10, #late) -- no window to overflow
+      assert.equal(41, late[1].learned)
+      assert.same({}, b:since("market.drift", 50))
+      assert.same({}, b:since("war.muster", 0))
+      late[1].payload.drift = 99 -- copies on the way out
+      assert.equal(1, b:since("market.drift", 40)[1].payload.drift)
+      assert.has_error(function() b:since("market.drift", "yesterday") end)
+   end)
+
+   it("newest_where() finds the newest match however far back", function()
+      local b = Belief.new("vess")
+      b:receive(drift(2, 1, 7), 1)
+      for day = 2, 40 do
+         b:receive(drift(day + 1, day, 1), day)
+      end
+      local found = b:newest_where("market.drift",
+         function(e) return e.payload.drift == 7 end)
+      assert.equal(2, found.id)
+      assert.is_nil(b:newest_where("market.drift",
+         function(e) return e.payload.drift == 8 end))
+      assert.is_nil(b:newest_where("war.muster", function() return true end))
+      -- the test sees copies: scribbling on one changes nothing
+      b:newest_where("market.drift", function(e)
+         e.payload.drift = 0
+         return false
+      end)
+      assert.equal(7, b:recall("market.drift")[1].payload.drift)
+   end)
+
    it("rejects things that are not events", function()
       local b = Belief.new("vess")
       assert.has_error(function() b:receive(nil) end)

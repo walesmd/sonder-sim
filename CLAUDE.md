@@ -173,8 +173,6 @@ notable figures, crystallized from aggregates on demand.
 
 - Lua 5.4, deliberately not 5.5 (the integer subtype is load-bearing for
   determinism; the staying-put decision is `docs/adr/0001`).
-- lsqlite3 for the annals; busted for tests when tests arrive; LuaRocks
-  for dependencies.
 - License: MIT (code), CC BY 4.0 (posts and docs).
 - Voice for posts and docs: warm, precise, a little wry. Story before
   theory. Concrete numbers over adjectives. Admit mistakes plainly. No
@@ -182,135 +180,10 @@ notable figures, crystallized from aggregates on demand.
 
 ## Status
 
-**v0.1 — session 1's walking skeleton — is cut.** Done:
-deterministic tick loop + named RNG streams (card 113, post 0001
-*Ticks & Determinism*); event bus + event vocabulary v1 + terminal
-chronicle, visibility stamped on every event (card 114, post 0002
-*The Event Log*); the lore shelf — world-building chartered as an
-eval suite, a floor not a ceiling (card 129, post 0003 *The Lore
-Shelf*); SQLite annals + provenance table — every run archives to a
-universe file that is append-only by trigger and self-describing
-(card 115, post 0004 *The History Book*); rolling state hash +
-golden-master replay — the seal, checkpointed into every universe
-file, with the gremlin spec proving one stolen draw forks history
-(card 116, post 0005 *The Tamper Seal*); pass-through belief store —
-law 3 as capabilities, decide(beliefs, stream, tick) returning
-intents, the courier as the card-122 seam, the war office as first
-believer (card 117, post 0006 *Truth & Belief*); the toy world —
-the Vessari and the Khedrun in src/worlds/ (content, not engine),
-stateless minds projected from beliefs, money circulating through
-trade one way and plunder the other, and twenty unplanned wars per
-thousand days (card 118, post 0007 *A War Nobody Planned*);
-two-track posts — every post now ships as `complete.md` + `simple.md`
-with Mermaid visuals as a standing question, earned by the
-reading-level experiment in `docs/experiments/reading-levels/`
-(card 147, ADR 0003, post 0008 *Simple & Complete*); eval notes on
-every shelf entry — the three story-first civilizations backfilled,
-the world library's collective note, the practice chartered as
-flexibility principle 7 (card 148, post 0009 *What Failure Looks
-Like*); and the v0.1 cut itself — engine version 0.1.0, post 0000
-(*First Tick*) re-cut from aspiration to fact with the real day-86
-war as its front-door excerpt (card 119, tag `post/0000`); the double-entry audit — audit.lua as a
-projection, money with no doors, matter with two recorded ones,
-violations kept structurally apart from the belief-drift mismatches
-card 122 will legitimize, and a counterfeiter spec proving the annals
-checks grammar while the audit checks arithmetic (card 120, post 0010
-*Double Entry*); and news at ship speed — the toy world gained a map
-(distance as content behind `distance(from, to, tick)`, the unused
-tick the moving-map door), the courier delivers every event
-ceil(distance ÷ channel speed) ticks late and stamps each believed
-copy with the tick it was `learned`, visibility became loudness
-(vocabulary v3 — who may know is behavior, never event state),
-armies take the road (`war.march` departs, `war.raid` arrives, no
-recall — a war ended before its last battle on the first try), the
-exchange hears orders at arrival day, the audit certifies drift with
-the road (reported + in-flight = audited to the cent; explained
-mismatches are the product, unexplained are lies, violations stay
-zero), and `--believes NAME [--as-of T]` renders any faction's
-private chronology double-dated — three fingerprints, one seal
-(card 122, post 0011 *News at Ship Speed*); nothing teleports —
-the travel scheduler extracted (sonder/travel.lua, one calendar per
-owner, adopted by the courier with a bit-identical seal proof),
-goods and payment riding the roads as paired departure/arrival
-kinds (cargo.*, payment.*, war.returned; the trade is just the
-agreement now), the audit keeping a road ledger with conservation
-reading founded = held + on-road, and the drift card 122
-legitimized dying honestly — every book-moving event happens at its
-owner's gates, so self-knowledge is exact and mismatches are zero,
-earned (card 153, post 0012 *Nothing Teleports*); and the engine
-became a framework in fact — the toy world renamed to space (its
-real name: the destination), the world interface written down (ADR
-0004: a world supplies its vocabulary, cast, systems, map,
-sentences, audit legs and identities, and its own golden seal; the
-engine demands only universe.genesis), four leaks extracted with
-the space seal as regression anchor (vocabulary, audit legs,
-chronicle templates, and the roads system — rule of three, cashed),
-and two eval universes built against their charters: Bellwether &
-Co. (ten person-tier minds, the org chart as the map, an open
-economy, the rumor cascade firing unprompted) and Harrow (five
-civilizations, adjacency-graph interior, four-column books, no
-exchange — bilateral trade as four journeys with single-fire
-settlement: act the morning you learn). Three worlds, three golden
-seals, 162 specs, one engine that got smaller with every world it
-gained (card 160, post 0013 *Whatever That Universe May Be*); and
-the carrier taxonomy, designed on paper for all three worlds at
-once — movement as a system (five columns: speed, coverage, failure
-profile with a declared threat surface, cost, owner), net-zero
-versus copyable payloads, addressed and radiated as the only
-delivery shapes with rumor demoted to behavior (one plus
-shipments), the witness rule (an event's news exists only in the
-minds that caught it; the annals still hears every tree), carriage
-as trade with custody and manifests, per-world migration off the
-field row, and a build map assigning cards 150–159 their pieces —
-zero code, on purpose (card 161, ADR 0005, post 0014 *The Witness
-Rule*); and the carriage — mechanism rows in the engine
-(sonder/carriage.lua: radiated and addressed shapes, strict
-validation, earliest arrival wins, nil is the witness rule), the
-field row declared as data in space and the office (rung 1), and
-Harrow piloting rung 2 with earshot and letters — where the golden
-seal famously did not move, because no Harrow mind ever read the
-field's over-delivery: history stood still while belief stores
-shrank to what was witnessed or carried (card 150, post 0015 *The
-Seal That Didn't Move*); and the roads are not safe — Harrow's
-letters carry an encounter profile (one chance per fifty
-rider-days on the courier's own reserved stream, exposure not
-fate), losses land on their true day at the-roads, reason-free
-(the universe does not fake knowledge it lacks — causes await the
-encounter engine, card 165) and witnessed by no one, the
-half-settled trade (paid, never shipped) lives as chartered
-settlement risk, the warned-of audit relaxation did not bite
-(loss changes behavior, never book accuracy), and the golden
-continent seal re-cut deliberately for the first time — engine
-0.2.0, the version convention's first minor bump (card 151, post
-0016 *The Roads Are Not Safe*); and the beat — a comprehensive
-two-hat review (thirty findings, ranked in notebook 166, none
-applied: identify first, Mike decides), plus the living reference
-shelf built beside the pinned posts (docs/architecture.md,
-docs/universe-file.md, docs/api.md, docs/verification.md,
-docs/README.md — staleness there is a bug, and the docs sweep now
-names them) (card 166, post 0017 *Success Debt*); and the world row —
-provenance grew to nine rows, ADR 0004's oldest unpaid requirement
-paid, a world's version ruled to be its vocabulary's version,
-engine 0.2.1 (card 167, post 0018 *The File That Knows Its Name*).
-Next up:
-
-- the card-166 findings menu (cards 168–172): the courier
-  extraction (before 152 cuts through the heartbeat), the
-  believed-books cluster (the big one), road-day arithmetic and
-  channel_speed's retirement, the vocabulary module, and the
-  hygiene sweep
-
-- the courier's remaining successors, cards 152–159, each with its
-  piece of the carrier taxonomy assigned by ADR 0005's build map —
-  interpretation, exchanges in the plural, counterfeiting as
-  content, reception-side loudness plus the stamp re-judgment
-  punted there, in-flight actors, and money grown up; the
-  encounter engine research card (165) that gives losses their
-  reasons; the space world's own rung-2 migration awaits a card
-  that must answer for the Fleet (163) and teach the audit's
-  in-flight explainer the carriage
-- the road to thirty species, one lore card at a time (cards 133–146,
-  each entry arriving with its eval note)
+The story so far lives in `README.md` § Status and the post index
+(`docs/posts/README.md`); the engine version is in the rockspec.
+Current and next work lives on the Fizzy board (see Project
+management).
 
 ## Project management
 

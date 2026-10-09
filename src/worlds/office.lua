@@ -21,6 +21,8 @@ local Universe = require "sonder.universe"
 local Travel = require "sonder.travel"
 local Roads = require "sonder.roads"
 local Carriage = require "sonder.carriage"
+local Books = require "sonder.books"
+local VOCABULARY = require "worlds.office_vocabulary"
 
 -- The cast. Salaries are weekly; cents are starting savings;
 -- temperament constants are per-role, the Vessari/Khedrun pattern
@@ -102,77 +104,59 @@ end
 -- own desk, so self-knowledge stays exact (card 153's dividend).
 -- ---------------------------------------------------------------
 
--- Belief windows are sized to the crowd, not the couple: ten
--- people's events arrive at every desk, and paydays emit nine
--- payments in one burst. A window of 8 — generous for two
--- civilizations — silently evicted sef's salary from mara's fold
--- every single week (found the hard way: 113 phantom mismatches in
--- 120 days, every one exactly 150¢ — the first payment out the
--- door). Three mornings' worth of the whole cast is margin.
-local WINDOW = 3 * #CAST
+-- The fold once read count windows, and here they were sized to
+-- the crowd, not the couple: ten people's events arrive at every
+-- desk, and paydays emit nine payments in one burst. A window of 8
+-- — generous for two civilizations — silently evicted sef's salary
+-- from mara's fold every single week (113 phantom mismatches in 120
+-- days, every one exactly 150¢). That lesson is why the fold now
+-- reads back exactly to the anchor instead (card 169, fork 0).
 
-local function my_latest_tally(beliefs, name)
-   local tallies = beliefs:recent("office.tally", WINDOW)
-   for i = #tallies, 1, -1 do
-      if tallies[i].location == name then
-         return tallies[i]
-      end
-   end
-   return nil
-end
+-- The fold is the engine's since card 169 (sonder/books.lua); what
+-- stays here is the office's own grammar — two columns, a tally
+-- that speaks from a desk, and the two kinds only this world has.
 
-local function my_hiring(beliefs, name)
-   local hired = beliefs:recent("office.hired", #CAST + 2)
-   for i = #hired, 1, -1 do
-      if hired[i].payload.name == name then
-         return hired[i]
-      end
-   end
-   return nil
-end
+-- The books' shape, stated once: both folds consume it (the belief
+-- fold here, the truth-side ledger in add_physics). The audit's
+-- legs declare their own copy — different shape, different consumer
+-- (card 169's conscious duplication; see the notebook).
+local COLUMNS = { "work", "cents" }
+local COMMODITIES = { work = "work" }
+local MONEY = "cents"
+
+local BELIEVED = Books.check({
+   columns = COLUMNS,
+   commodities = COMMODITIES,
+   money = MONEY,
+   anchors = {
+      { kind = "office.tally", by = "home" },
+      -- a hiring records your salary terms, not your output — no
+      -- work field to read, so work opens at zero (and if hiring
+      -- ever grows one, Books.check refuses until this default goes)
+      { kind = "office.hired", by = "name",
+         defaults = { work = 0 } },
+   },
+   legs = {
+      { kind = "office.delivered", apply = function(b, e, owner)
+         if e.payload.seller == owner.name then
+            b.work = b.work - e.payload.units
+         end
+      end },
+      -- revenue lands on the founder's books alone: the company's
+      -- one inbound door (money leaves through every tally's spent
+      -- column), and mara is standing in it
+      { kind = "office.revenue", apply = function(b, e, owner)
+         if owner.name == "mara" then
+            b.cents = b.cents + e.payload.amount
+         end
+      end },
+   },
+}, VOCABULARY)
 
 local function believed_books(beliefs, name)
-   local work, cents, since, absorbed
-   local tally = my_latest_tally(beliefs, name)
-   if tally then
-      work, cents, since = tally.payload.work, tally.payload.cents, tally.id
-      absorbed = tally.tick
-   else
-      local hired = my_hiring(beliefs, name)
-      work, cents, since = 0, hired.payload.cents, hired.id
-      absorbed = hired.tick
-   end
-   for _, c in ipairs(beliefs:recent("cargo.shipped", WINDOW)) do
-      if c.learned > absorbed and c.payload.sender == name then
-         work = work - c.payload.units
-      end
-   end
-   for _, c in ipairs(beliefs:recent("cargo.delivered", WINDOW)) do
-      if c.learned > absorbed and c.payload.recipient == name then
-         work = work + c.payload.units
-      end
-   end
-   for _, m in ipairs(beliefs:recent("payment.shipped", WINDOW)) do
-      if m.learned > absorbed and m.payload.payer == name then
-         cents = cents - m.payload.amount
-      end
-   end
-   for _, m in ipairs(beliefs:recent("payment.delivered", WINDOW)) do
-      if m.learned > absorbed and m.payload.payee == name then
-         cents = cents + m.payload.amount
-      end
-   end
-   for _, d in ipairs(beliefs:recent("office.delivered", WINDOW)) do
-      if d.learned > absorbed and d.payload.seller == name then
-         work = work - d.payload.units
-      end
-   end
-   for _, r in ipairs(beliefs:recent("office.revenue", WINDOW)) do
-      if r.learned > absorbed and name == "mara" then
-         cents = cents + r.payload.amount
-      end
-   end
-   return work, cents, since
+   local b, since = Books.believed(beliefs, BELIEVED,
+      { name = name, home = name }) -- a person is a place
+   return b.work, b.cents, since
 end
 
 -- Bad news dims a mind for a while: any deal lost in recent believed
@@ -330,44 +314,48 @@ local DECIDERS = {
 -- ---------------------------------------------------------------
 
 local function add_physics(u)
-   local ledger = {} -- name → { work, cents }, folded truth
    local roads = Roads.new(u, {
       resolve = function(name) return name end, -- a person is a place
       payment_loudness = "quiet", -- a payslip lands without fanfare
    })
    local pitches = {} -- yesterday's, gathered in scan order
-   local cursor = 0
 
-   local function catch_up()
-      while cursor < u.annals:len() do
-         cursor = cursor + 1
-         local e = u.annals:get(cursor)
-         local p = e.payload
-         if e.kind == "office.hired" then
-            ledger[p.name] = { work = 0, cents = p.cents }
-         elseif e.kind == "office.tally" then
-            local b = ledger[e.location]
+   -- Folded truth: the cursor and the framework road legs are the
+   -- engine's since card 169 (sonder/books.lua); the office
+   -- declares what its own kinds do to the books.
+   local truth = Books.ledger(u, {
+      columns = COLUMNS,
+      commodities = COMMODITIES,
+      money = MONEY,
+      roads = roads,
+      effects = {
+         ["office.hired"] = function(led, e)
+            -- a hiring says cents; work opens at zero (enroll's rule)
+            led:enroll(e.payload.name, { cents = e.payload.cents })
+         end,
+         ["office.tally"] = function(led, e)
+            local p = e.payload
+            local b = led.books[e.location]
             b.work = b.work + p.made
             b.cents = b.cents - p.spent
-         elseif e.kind == "cargo.shipped" then
-            ledger[p.sender].work = ledger[p.sender].work - p.units
-            roads:schedule(e)
-         elseif e.kind == "cargo.delivered" then
-            ledger[p.recipient].work = ledger[p.recipient].work + p.units
-         elseif e.kind == "payment.shipped" then
-            ledger[p.payer].cents = ledger[p.payer].cents - p.amount
-            roads:schedule(e)
-         elseif e.kind == "payment.delivered" then
-            ledger[p.payee].cents = ledger[p.payee].cents + p.amount
-         elseif e.kind == "office.delivered" then
-            ledger[p.seller].work = ledger[p.seller].work - p.units
-         elseif e.kind == "office.revenue" then
-            ledger["mara"].cents = ledger["mara"].cents + p.amount
-         elseif e.kind == "office.pitch" then
+         end,
+         ["office.delivered"] = function(led, e)
+            local p = e.payload
+            led.books[p.seller].work = led.books[p.seller].work - p.units
+         end,
+         ["office.revenue"] = function(led, e)
+            led.books["mara"].cents = led.books["mara"].cents
+               + e.payload.amount
+         end,
+         ["office.pitch"] = function(_, e)
             pitches[#pitches + 1] = { id = e.id, tick = e.tick,
-               seller = p.seller }
-         end
-      end
+               seller = e.payload.seller }
+         end,
+      },
+   })
+   local ledger = truth.books -- name → { work, cents }, folded truth
+   local function catch_up()
+      truth:catch_up()
    end
 
    -- The roads (extracted to sonder/roads.lua at card 160, when
@@ -453,7 +441,7 @@ return function(seed)
       -- an office's earshot (the room, the thread, the cc line) is
       -- a design conversation, not a default.
       mechanisms = { Carriage.field(1) },
-      vocabulary = require "worlds.office_vocabulary",
+      vocabulary = VOCABULARY,
    })
    for i = 1, #CAST do
       local p = CAST[i]
