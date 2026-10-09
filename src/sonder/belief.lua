@@ -78,6 +78,13 @@ function Belief:receive(e, learned)
       "belief: received something that is not an event")
    assert(math.type(learned) == "integer" and learned >= e.tick,
       "belief: learned must be an integer tick no earlier than the event")
+   -- News arrives in the order it is learned: a diary is written
+   -- forward. The courier keeps this by construction (it delivers
+   -- once per tick, stamping the tick); stating it here makes it
+   -- structural, and since() below leans on it to stop scanning.
+   local last = self.journal[#self.journal]
+   assert(last == nil or learned >= last.learned,
+      "belief: learned stamps must not go backward in arrival order")
    local held = copy(e)
    held.learned = learned
    local kind = self.by_kind[e.kind]
@@ -148,6 +155,49 @@ function Belief:recent(kind, n)
       out[#out + 1] = copy(held[i])
    end
    return out
+end
+
+-- Everything believed about a kind learned strictly after a tick,
+-- arrival order. Exact where recent() is a guess: a count window
+-- silently drops whatever overflows it, and card 169's review found
+-- that heuristic had already bitten two worlds. Learned stamps never
+-- go backward (receive() refuses), so the scan walks back from the
+-- newest and stops at the first older stamp — it reads only what it
+-- returns.
+function Belief:since(kind, after)
+   assert(math.type(after) == "integer",
+      "belief: since() takes an integer tick")
+   local held = self.by_kind[kind]
+   local out = {}
+   if not held then
+      return out
+   end
+   local first = #held + 1
+   while first > 1 and held[first - 1].learned > after do
+      first = first - 1
+   end
+   for i = first, #held do
+      out[#out + 1] = copy(held[i])
+   end
+   return out
+end
+
+-- The newest belief about a kind that satisfies a test, or nil. The
+-- test sees copies, like every caller of this store; the scan stops
+-- at the first match, so "my last report" costs as far back as the
+-- report is, never a window's guess at it.
+function Belief:newest_where(kind, test)
+   local held = self.by_kind[kind]
+   if not held then
+      return nil
+   end
+   for i = #held, 1, -1 do
+      local e = copy(held[i])
+      if test(e) then
+         return e
+      end
+   end
+   return nil
 end
 
 function Belief:len()

@@ -23,6 +23,8 @@ local Universe = require "sonder.universe"
 local Travel = require "sonder.travel"
 local Roads = require "sonder.roads"
 local Carriage = require "sonder.carriage"
+local Books = require "sonder.books"
+local VOCABULARY = require "worlds.space_vocabulary"
 
 local EXCHANGE = "the-exchange"
 local OPENING_PRICE = 100 -- cents per sack, posted at tick 0
@@ -103,43 +105,59 @@ local KHEDRUN = {
 -- in this section can reach truth; that's the point of it.
 -- ---------------------------------------------------------------
 
+-- The fold itself is the engine's since card 169 (sonder/books.lua:
+-- anchor on my last self-report, absorb every road leg learned
+-- since). What stays here is what only this world knows: its
+-- columns, its anchors, and what a war does to a granary.
+--
 -- Both civs' reports still arrive in every store — the other civ's
 -- just arrive eight days stale now — so "my" latest tally is a short
--- backward scan, not a latest(). The margins on these recent()
--- windows are generous: arrivals stay at most one tally per civ, one
--- trade, one spoils per day, staggered by distance, never bunched.
-local function my_latest_tally(beliefs, civ)
-   local tallies = beliefs:recent("civ.tally", 6)
-   for i = #tallies, 1, -1 do
-      if tallies[i].location == civ.home then
-         return tallies[i]
-      end
-   end
-   return nil
-end
+-- backward scan, not a latest(): the fold reads back to exactly my
+-- own report, however much of the neighbor's news is stacked on it.
+-- The books' shape, stated once: both folds consume it (the belief
+-- fold here, the truth-side ledger in add_physics). The audit's
+-- legs declare their own copy — different shape, different consumer
+-- (card 169's conscious duplication; see the notebook).
+local COLUMNS = { "grain", "cents" }
+local COMMODITIES = { grain = "grain" }
+local MONEY = "cents"
 
-local function my_founding(beliefs, civ)
-   local founded = beliefs:recent("civ.founded", 4)
-   for i = #founded, 1, -1 do
-      if founded[i].payload.name == civ.name then
-         return founded[i]
-      end
-   end
-   return nil
-end
+local BELIEVED = Books.check({
+   columns = COLUMNS,
+   commodities = COMMODITIES,
+   money = MONEY,
+   anchors = {
+      -- The founding says grain; the daily tally says stock — same
+      -- sacks, two spellings (the card-169 fork). The field map is
+      -- option A: one declared line, no vocabulary rename, the seal
+      -- stands. If uniformity is ever wanted, the rename rides card
+      -- 163's scheduled re-cut.
+      { kind = "civ.tally", by = "home",
+         fields = { grain = "stock" } },
+      { kind = "civ.founded", by = "name" },
+   },
+   legs = {
+      { kind = "war.spoils", apply = function(b, e, owner)
+         local p = e.payload
+         if p.target == owner.name then
+            b.grain = b.grain - p.seized - p.burned
+            b.cents = b.cents - p.plunder
+         end
+      end },
+      { kind = "war.returned", apply = function(b, e, owner)
+         local p = e.payload
+         if p.raider == owner.name then
+            b.grain = b.grain + p.seized
+            b.cents = b.cents + p.plunder
+         end
+      end },
+   },
+}, VOCABULARY)
 
 -- What the civ believes it holds: the last self-report, plus every
 -- believed road leg the books haven't absorbed yet. Returns grain,
 -- cents, and the id of the report it grew from (the day's
 -- bookkeeping cause).
---
--- "Absorbed yet" is judged by the courier's `learned` stamp, never
--- by event id: news that crossed distance carries an old id, and an
--- id watermark would drop it forever the moment it finally arrived
--- (card 122's adversarial review caught exactly that). The tally
--- written on day T absorbed everything learned by day T, by
--- induction: each believed leg integrates into exactly the first
--- tally decided after it lands.
 --
 -- Quiet consequence of card 153, worth staring at: every event that
 -- moves *your* books now happens at *your* home — your dispatches
@@ -152,49 +170,9 @@ end
 -- honest and self-knowledge becomes exact, while ignorance moves
 -- to where it belongs — what you believe about everyone else.
 local function believed_books(beliefs, civ)
-   local grain, cents, since, absorbed
-   local tally = my_latest_tally(beliefs, civ)
-   if tally then
-      grain, cents, since = tally.payload.stock, tally.payload.cents, tally.id
-      absorbed = tally.tick
-   else
-      local founded = my_founding(beliefs, civ)
-      grain, cents, since = founded.payload.grain, founded.payload.cents, founded.id
-      absorbed = founded.tick
-   end
-   for _, c in ipairs(beliefs:recent("cargo.shipped", 6)) do
-      if c.learned > absorbed and c.payload.sender == civ.name then
-         grain = grain - c.payload.units
-      end
-   end
-   for _, c in ipairs(beliefs:recent("cargo.delivered", 6)) do
-      if c.learned > absorbed and c.payload.recipient == civ.name then
-         grain = grain + c.payload.units
-      end
-   end
-   for _, m in ipairs(beliefs:recent("payment.shipped", 6)) do
-      if m.learned > absorbed and m.payload.payer == civ.name then
-         cents = cents - m.payload.amount
-      end
-   end
-   for _, m in ipairs(beliefs:recent("payment.delivered", 6)) do
-      if m.learned > absorbed and m.payload.payee == civ.name then
-         cents = cents + m.payload.amount
-      end
-   end
-   for _, s in ipairs(beliefs:recent("war.spoils", 6)) do
-      if s.learned > absorbed and s.payload.target == civ.name then
-         grain = grain - s.payload.seized - s.payload.burned
-         cents = cents - s.payload.plunder
-      end
-   end
-   for _, w in ipairs(beliefs:recent("war.returned", 6)) do
-      if w.learned > absorbed and w.payload.raider == civ.name then
-         grain = grain + w.payload.seized
-         cents = cents + w.payload.plunder
-      end
-   end
-   return grain, cents, since
+   local b, since = Books.believed(beliefs, BELIEVED,
+      { name = civ.name, home = civ.home })
+   return b.grain, b.cents, since
 end
 
 -- The day begins the same way for everyone: harvest, eat, report.
@@ -409,8 +387,9 @@ local function add_physics(u)
    -- and catch_up() runs after every emit, so nothing in a tick can
    -- act on books that don't include its own consequences (that's
    -- how a raid can never seize grain a same-day trade already
-   -- moved).
-   local ledger = {} -- civ name → { grain, cents }
+   -- moved). The cursor and the framework road legs are the
+   -- engine's since card 169 (sonder/books.lua); what follows the
+   -- roads below is the world's own grammar, declared as effects.
    local homes = {} -- location → civ name, learned from foundings
    local seats = {} -- civ name → home location, the reverse map
    local price, price_id -- the posted price and the event that posted it
@@ -423,59 +402,64 @@ local function add_physics(u)
    local roads = Roads.new(u, { -- cargo and payment on the roads
       resolve = function(name) return seats[name] end,
    })
-   local cursor = 0
 
-   local function catch_up()
-      while cursor < u.annals:len() do
-         cursor = cursor + 1
-         local e = u.annals:get(cursor)
-         local p = e.payload
-         if e.kind == "civ.founded" then
-            ledger[p.name] = { grain = p.grain, cents = p.cents }
+   local truth = Books.ledger(u, {
+      columns = COLUMNS,
+      commodities = COMMODITIES,
+      money = MONEY,
+      roads = roads,
+      effects = {
+         ["civ.founded"] = function(led, e)
+            local p = e.payload
+            led:enroll(p.name, { grain = p.grain, cents = p.cents })
             homes[e.location] = p.name
             seats[p.name] = e.location
-         elseif e.kind == "civ.tally" then
-            local books = ledger[homes[e.location]]
-            books.grain = books.grain + p.harvested - p.eaten
-         elseif e.kind == "cargo.shipped" then
-            -- matter leaves the sender at departure and rides
-            ledger[p.sender].grain = ledger[p.sender].grain - p.units
-            roads:schedule(e)
-         elseif e.kind == "cargo.delivered" then
-            ledger[p.recipient].grain = ledger[p.recipient].grain + p.units
-         elseif e.kind == "payment.shipped" then
-            ledger[p.payer].cents = ledger[p.payer].cents - p.amount
-            roads:schedule(e)
-         elseif e.kind == "payment.delivered" then
-            ledger[p.payee].cents = ledger[p.payee].cents + p.amount
-         elseif e.kind == "war.spoils" then
+         end,
+         ["civ.tally"] = function(led, e)
+            local p = e.payload
+            local b = led.books[homes[e.location]]
+            b.grain = b.grain + p.harvested - p.eaten
+         end,
+         ["war.spoils"] = function(led, e)
             -- the target's losses happen where the raid did; the
             -- seized goods ride home with the party (war.returned
             -- credits the raider, days from now)
-            local target = ledger[p.target]
+            local p = e.payload
+            local target = led.books[p.target]
             target.grain = target.grain - p.seized - p.burned
             target.cents = target.cents - p.plunder
-         elseif e.kind == "war.returned" then
-            local raider = ledger[p.raider]
+         end,
+         ["war.returned"] = function(led, e)
+            local p = e.payload
+            local raider = led.books[p.raider]
             raider.grain = raider.grain + p.seized
             raider.cents = raider.cents + p.plunder
-         elseif e.kind == "market.price" then
-            price, price_id = p.price, e.id
-         elseif e.kind == "market.order" then
+         end,
+         ["market.price"] = function(_, e)
+            price, price_id = e.payload.price, e.id
+         end,
+         ["market.order"] = function(_, e)
             -- an order slip is on the road before the exchange can
             -- see it: it arrives, then matches the next morning —
             -- so it goes on the calendar for the morning after
+            local p = e.payload
             orders:schedule(
                e.tick + travel(u, e.location, EXCHANGE, e.tick) + 1,
                { id = e.id, civ = homes[e.location], side = p.side,
                   units = p.units, limit = p.limit })
-         elseif e.kind == "war.march" then
+         end,
+         ["war.march"] = function(_, e)
+            local p = e.payload
             marches:schedule(
                e.tick + travel(u, e.location, seats[p.target], e.tick),
                { id = e.id, raider = p.raider, target = p.target,
                   force = p.force })
-         end
-      end
+         end,
+      },
+   })
+   local ledger = truth.books -- civ name → { grain, cents }
+   local function catch_up()
+      truth:catch_up()
    end
 
    -- The roads (card 153; extracted to sonder/roads.lua at card 160,
@@ -682,7 +666,7 @@ return function(seed)
       -- migration card: the destination moves carefully, and the
       -- Fleet deserves better than a hasty landing.
       mechanisms = { Carriage.field(1) },
-      vocabulary = require "worlds.space_vocabulary",
+      vocabulary = VOCABULARY,
    })
    found(u, VESSARI)
    found(u, KHEDRUN)

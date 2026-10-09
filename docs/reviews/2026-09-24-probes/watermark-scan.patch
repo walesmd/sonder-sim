@@ -1,0 +1,100 @@
+--- a/src/sonder/belief.lua
++++ b/src/sonder/belief.lua
+@@ -150,6 +150,40 @@
+    return out
+ end
+ 
++-- EXPERIMENT (review lane): every belief about a kind learned strictly
++-- after a tick, arrival order. learned is non-decreasing in arrival
++-- order (the courier stamps each delivery with the current tick), so
++-- a backward scan can stop at the first older stamp: exact, no window.
++function Belief:since(kind, after)
++   local held = self.by_kind[kind]
++   local out = {}
++   if not held then
++      return out
++   end
++   local first = #held + 1
++   while first > 1 and held[first - 1].learned > after do
++      first = first - 1
++   end
++   for i = first, #held do
++      out[#out + 1] = copy(held[i])
++   end
++   return out
++end
++
++-- EXPERIMENT: newest belief of a kind satisfying a predicate, no window.
++function Belief:newest_where(kind, pred)
++   local held = self.by_kind[kind]
++   if not held then
++      return nil
++   end
++   for i = #held, 1, -1 do
++      if pred(held[i]) then
++         return copy(held[i])
++      end
++   end
++   return nil
++end
++
+ function Belief:len()
+    return self.received
+ end
+--- a/src/sonder/books.lua
++++ b/src/sonder/books.lua
+@@ -102,12 +102,10 @@
+    local basis, anchor
+    for i = 1, #decl.anchors do
+       local a = decl.anchors[i]
+-      local held = beliefs:recent(a.kind, a.window or decl.window)
+-      for j = #held, 1, -1 do
+-         if matches(a, held[j], owner) then
+-            basis, anchor = held[j], a
+-            break
+-         end
++      local found = beliefs:newest_where(a.kind,
++         function(e) return matches(a, e, owner) end)
++      if found then
++         basis, anchor = found, a
+       end
+       if basis then
+          break
+@@ -129,24 +127,24 @@
+ 
+    -- The framework road grammar: matter and money between places,
+    -- the same four legs the audit books on the truth side.
+-   for _, e in ipairs(beliefs:recent("cargo.shipped", decl.window)) do
++   for _, e in ipairs(beliefs:since("cargo.shipped", absorbed)) do
+       if e.learned > absorbed and e.payload.sender == owner.name then
+          local col = column_of(decl, e.payload.commodity)
+          b[col] = b[col] - e.payload.units
+       end
+    end
+-   for _, e in ipairs(beliefs:recent("cargo.delivered", decl.window)) do
++   for _, e in ipairs(beliefs:since("cargo.delivered", absorbed)) do
+       if e.learned > absorbed and e.payload.recipient == owner.name then
+          local col = column_of(decl, e.payload.commodity)
+          b[col] = b[col] + e.payload.units
+       end
+    end
+-   for _, e in ipairs(beliefs:recent("payment.shipped", decl.window)) do
++   for _, e in ipairs(beliefs:since("payment.shipped", absorbed)) do
+       if e.learned > absorbed and e.payload.payer == owner.name then
+          b[decl.money] = b[decl.money] - e.payload.amount
+       end
+    end
+-   for _, e in ipairs(beliefs:recent("payment.delivered", decl.window)) do
++   for _, e in ipairs(beliefs:since("payment.delivered", absorbed)) do
+       if e.learned > absorbed and e.payload.payee == owner.name then
+          b[decl.money] = b[decl.money] + e.payload.amount
+       end
+@@ -158,7 +156,7 @@
+    local legs = decl.legs or {}
+    for i = 1, #legs do
+       local leg = legs[i]
+-      for _, e in ipairs(beliefs:recent(leg.kind, leg.window or decl.window)) do
++      for _, e in ipairs(beliefs:since(leg.kind, absorbed)) do
+          if e.learned > absorbed then
+             leg.apply(b, e, owner)
+          end

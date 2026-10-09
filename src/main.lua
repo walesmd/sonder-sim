@@ -44,7 +44,7 @@ local fnv = require "sonder.fnv"
 -- stands. Docs, worlds, and specs bump nothing. Precise
 -- identification is the git commit in provenance; this number only
 -- names determinism epochs.
-local ENGINE_VERSION = "0.2.5"
+local ENGINE_VERSION = "0.2.6"
 
 local function parse_args(argv)
    local opts = { seed = 1893, ticks = 10 }

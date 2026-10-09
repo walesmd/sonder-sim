@@ -17,6 +17,8 @@
 local Universe = require "sonder.universe"
 local Travel = require "sonder.travel"
 local Roads = require "sonder.roads"
+local Books = require "sonder.books"
+local VOCABULARY = require "worlds.continent_vocabulary"
 
 -- The regions and the roads between them, in days. The southern
 -- pass (ash-gate) is the shortcut between valley and mountains —
@@ -170,71 +172,50 @@ end
 -- as every world since card 122.
 -- ---------------------------------------------------------------
 
-local WINDOW = 4 * #CAST -- sized to the crowd (the office's lesson)
+local WINDOW = 4 * #CAST -- letter windows, sized to the crowd (the office's lesson)
 
-local function my_latest_tally(beliefs, civ)
-   local tallies = beliefs:recent("continent.tally", WINDOW)
-   for i = #tallies, 1, -1 do
-      if tallies[i].location == civ.home then
-         return tallies[i]
-      end
-   end
-   return nil
-end
+-- The fold is the engine's since card 169 (sonder/books.lua). The
+-- continent is the world the extraction cost least: four uniform
+-- columns, no field map, no defaults — the shape the other two
+-- worlds' quirks are declared against.
 
-local function my_founding(beliefs, civ)
-   local founded = beliefs:recent("continent.founded", #CAST + 2)
-   for i = #founded, 1, -1 do
-      if founded[i].payload.name == civ.name then
-         return founded[i]
-      end
-   end
-   return nil
-end
-
+-- The books' shape, stated once: both folds consume it (the belief
+-- fold here, the truth-side ledger in add_physics). The audit's
+-- legs declare their own copy — different shape, different consumer
+-- (card 169's conscious duplication; see the notebook).
 local COLUMNS = { "grain", "iron", "salt", "cents" }
+local COMMODITIES = { grain = "grain", iron = "iron", salt = "salt" }
+local MONEY = "cents"
+
+local BELIEVED = Books.check({
+   columns = COLUMNS,
+   commodities = COMMODITIES,
+   money = MONEY,
+   anchors = {
+      { kind = "continent.tally", by = "home" },
+      { kind = "continent.founded", by = "name" },
+   },
+   legs = {
+      { kind = "war.spoils", apply = function(b, e, owner)
+         local p = e.payload
+         if p.target == owner.name then
+            b.grain = b.grain - p.seized - p.burned
+            b.cents = b.cents - p.plunder
+         end
+      end },
+      { kind = "war.returned", apply = function(b, e, owner)
+         local p = e.payload
+         if p.raider == owner.name then
+            b.grain = b.grain + p.seized
+            b.cents = b.cents + p.plunder
+         end
+      end },
+   },
+}, VOCABULARY)
 
 local function believed_books(beliefs, civ)
-   local b, since, absorbed = {}, nil, nil
-   local tally = my_latest_tally(beliefs, civ)
-   local basis = tally or my_founding(beliefs, civ)
-   for i = 1, #COLUMNS do
-      b[COLUMNS[i]] = basis.payload[COLUMNS[i]]
-   end
-   since, absorbed = basis.id, basis.tick
-   for _, c in ipairs(beliefs:recent("cargo.shipped", WINDOW)) do
-      if c.learned > absorbed and c.payload.sender == civ.name then
-         b[c.payload.commodity] = b[c.payload.commodity] - c.payload.units
-      end
-   end
-   for _, c in ipairs(beliefs:recent("cargo.delivered", WINDOW)) do
-      if c.learned > absorbed and c.payload.recipient == civ.name then
-         b[c.payload.commodity] = b[c.payload.commodity] + c.payload.units
-      end
-   end
-   for _, m in ipairs(beliefs:recent("payment.shipped", WINDOW)) do
-      if m.learned > absorbed and m.payload.payer == civ.name then
-         b.cents = b.cents - m.payload.amount
-      end
-   end
-   for _, m in ipairs(beliefs:recent("payment.delivered", WINDOW)) do
-      if m.learned > absorbed and m.payload.payee == civ.name then
-         b.cents = b.cents + m.payload.amount
-      end
-   end
-   for _, s in ipairs(beliefs:recent("war.spoils", WINDOW)) do
-      if s.learned > absorbed and s.payload.target == civ.name then
-         b.grain = b.grain - s.payload.seized - s.payload.burned
-         b.cents = b.cents - s.payload.plunder
-      end
-   end
-   for _, w in ipairs(beliefs:recent("war.returned", WINDOW)) do
-      if w.learned > absorbed and w.payload.raider == civ.name then
-         b.grain = b.grain + w.payload.seized
-         b.cents = b.cents + w.payload.plunder
-      end
-   end
-   return b, since
+   return Books.believed(beliefs, BELIEVED,
+      { name = civ.name, home = civ.home })
 end
 
 -- Settlement is single-fire: a mind acts on a letter the morning it
@@ -441,65 +422,68 @@ end
 -- ---------------------------------------------------------------
 
 local function add_physics(u)
-   local ledger = {}
    local roads = Roads.new(u, {
       resolve = function(name) return SEAT[name] end,
       payment_loudness = "quiet",
    })
    local marches = Travel.new()
    local parties = Travel.new()
-   local cursor = 0
 
    local function travel_days(from, to, tick)
       return u:days(from, to, tick)
    end
 
-   local function catch_up()
-      while cursor < u.annals:len() do
-         cursor = cursor + 1
-         local e = u.annals:get(cursor)
-         local p = e.payload
-         if e.kind == "continent.founded" then
-            ledger[p.name] = { grain = p.grain, iron = p.iron,
-               salt = p.salt, cents = p.cents }
-         elseif e.kind == "continent.tally" then
+   -- Folded truth: the cursor and the framework road legs are the
+   -- engine's since card 169 (sonder/books.lua); Harrow declares
+   -- what its own kinds do to the books.
+   local truth = Books.ledger(u, {
+      columns = COLUMNS,
+      commodities = COMMODITIES,
+      money = MONEY,
+      roads = roads,
+      effects = {
+         ["continent.founded"] = function(led, e)
+            local p = e.payload
+            led:enroll(p.name, { grain = p.grain, iron = p.iron,
+               salt = p.salt, cents = p.cents })
+         end,
+         ["continent.tally"] = function(led, e)
+            local p = e.payload
             -- a tally speaks from a home; resolve the owner
             local b
             for i = 1, #CAST do
                if CAST[i].home == e.location then
-                  b = ledger[CAST[i].name]
+                  b = led.books[CAST[i].name]
                end
             end
             b.grain = b.grain + p.grew - p.eaten
             b.iron = b.iron + p.mined
             b.salt = b.salt + p.gathered
-         elseif e.kind == "cargo.shipped" then
-            ledger[p.sender][p.commodity] =
-               ledger[p.sender][p.commodity] - p.units
-            roads:schedule(e)
-         elseif e.kind == "cargo.delivered" then
-            ledger[p.recipient][p.commodity] =
-               ledger[p.recipient][p.commodity] + p.units
-         elseif e.kind == "payment.shipped" then
-            ledger[p.payer].cents = ledger[p.payer].cents - p.amount
-            roads:schedule(e)
-         elseif e.kind == "payment.delivered" then
-            ledger[p.payee].cents = ledger[p.payee].cents + p.amount
-         elseif e.kind == "war.spoils" then
-            local target = ledger[p.target]
+         end,
+         ["war.spoils"] = function(led, e)
+            local p = e.payload
+            local target = led.books[p.target]
             target.grain = target.grain - p.seized - p.burned
             target.cents = target.cents - p.plunder
-         elseif e.kind == "war.returned" then
-            local raider = ledger[p.raider]
+         end,
+         ["war.returned"] = function(led, e)
+            local p = e.payload
+            local raider = led.books[p.raider]
             raider.grain = raider.grain + p.seized
             raider.cents = raider.cents + p.plunder
-         elseif e.kind == "war.march" then
+         end,
+         ["war.march"] = function(_, e)
+            local p = e.payload
             marches:schedule(
                e.tick + travel_days(e.location, SEAT[p.target], e.tick),
                { id = e.id, raider = p.raider, target = p.target,
                   force = p.force })
-         end
-      end
+         end,
+      },
+   })
+   local ledger = truth.books
+   local function catch_up()
+      truth:catch_up()
    end
 
    u:add_system("roads", roads:system(catch_up))
@@ -605,7 +589,7 @@ return function(seed)
             encounters = { per_day = 50,
                lost = "continent.letter-lost", where = "the-roads" } },
       },
-      vocabulary = require "worlds.continent_vocabulary",
+      vocabulary = VOCABULARY,
    })
    for i = 1, #CAST do
       local c = CAST[i]
